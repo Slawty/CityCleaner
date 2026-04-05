@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2926c463d2f39ae41a19ddf65f9c95e7, type: 3}
+  m_Name: Quest_01
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questID: 01
+  title: Collect Trash
+  description: 
+  rewardMoney: 25
+  tasks:
+  - type: 0
+    targetZoneID: 01
+    taskName: Clean House
+    requiredAmount: 0
+    requiredPercent: 0
+  - type: 1
+    targetZoneID: 02
+    taskName: Collect Trash
+    requiredAmount: 0
+    requiredPercent: 0
