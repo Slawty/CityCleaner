@@ -18,26 +18,28 @@ public class PlayerPickupController : MonoBehaviour
             return;
 
         Transform obj = heldObject.transform;
+        Transform objHold = heldObject.HoldPoint;
 
-        obj.position = Vector3.Lerp(obj.position, HoldPoint.position, moveSpeed * Time.deltaTime);
+        Quaternion targetRot = Quaternion.LookRotation(-Camera.main.transform.forward);
 
-        obj.rotation = Quaternion.Lerp(
-            obj.rotation,
-            Quaternion.LookRotation(-Camera.main.transform.forward),
-            moveSpeed * Time.deltaTime
-        );
+        Vector3 holdOffset = obj.position - objHold.position;
+        Vector3 targetPos = HoldPoint.position + holdOffset;
+
+        obj.position = Vector3.Lerp(obj.position, targetPos, moveSpeed * Time.deltaTime);
+
+        obj.rotation = Quaternion.Lerp(obj.rotation, targetRot, moveSpeed * Time.deltaTime);
     }
 
     void BindInput()
     {
         throwAction.action.performed += OnThrow;
-        releaseAction.action.performed += OnRelease;
+        releaseAction.action.canceled += OnRelease;
     }
 
     void UnbindInput()
     {
         throwAction.action.performed -= OnThrow;
-        releaseAction.action.performed -= OnRelease;
+        releaseAction.action.canceled -= OnRelease;
     }
 
     public void HoldObject(PickupInteractable obj)
@@ -45,6 +47,11 @@ public class PlayerPickupController : MonoBehaviour
         heldObject = obj;
 
         obj.EnablePhysics(false);
+
+        if (obj.TryGetComponent(out NpcNavMovement npc))
+        {
+            npc.EnableMovement(false);
+        }
 
         BindInput();
     }
@@ -54,7 +61,13 @@ public class PlayerPickupController : MonoBehaviour
         if (heldObject == null)
             return;
 
-        heldObject.EnablePhysics(true);
+        if (heldObject.TryGetComponent(out NpcNavMovement npc))
+        {
+            npc.EnableMovement(true);
+        }
+
+        heldObject.EnablePhysics(false);
+        heldObject.EnableCollider(true);
         heldObject = null;
 
         UnbindInput();
@@ -68,9 +81,15 @@ public class PlayerPickupController : MonoBehaviour
         Rigidbody rb = heldObject.GetComponent<Rigidbody>();
 
         heldObject.EnablePhysics(true);
+        heldObject.EnableCollider(true);
 
         rb.linearVelocity = Vector3.zero;
         rb.AddForce(Camera.main.transform.forward * throwForce, ForceMode.Impulse);
+
+        if (heldObject.TryGetComponent(out NpcNavMovement npc))
+        {
+            npc.MarkThrown();
+        }
 
         heldObject = null;
 

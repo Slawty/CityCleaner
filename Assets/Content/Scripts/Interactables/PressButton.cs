@@ -59,7 +59,7 @@ public class PressButton : MonoBehaviour, IInteractable
         OnButtonPressed?.Invoke();
     }
 
-    public void InteractCanceled(GameObject interactor)
+    public void InteractReleased(GameObject interactor)
     {
 
     }

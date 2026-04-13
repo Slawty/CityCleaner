@@ -58,7 +58,7 @@ public class GPUPainter : MonoBehaviour
         if (paintable.isClean)
             return;
 
-        if (paintable.maskTexture == null)
+        if (!paintable.IsInitialized)
         {
             paintable.Initialize(textureResolution);
         }

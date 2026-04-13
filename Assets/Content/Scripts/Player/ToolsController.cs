@@ -7,6 +7,7 @@ public class ToolsController : MonoBehaviour
     [Header("Tools")]
     [SerializeField] private List<Tool> tools;
     public WaterSprayTool WaterSprayer;
+    public LaserGunTool Lasergun;
     public GooGunTool GooGun;
 
     [Header("Input")]

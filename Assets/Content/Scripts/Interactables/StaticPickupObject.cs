@@ -17,7 +17,7 @@ public class StaticPickupObject : MonoBehaviour, IInteractable
         Pickup(interactor);
     }
 
-    public void InteractCanceled(GameObject interactor)
+    public void InteractReleased(GameObject interactor)
     {
 
     }

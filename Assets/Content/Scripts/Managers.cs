@@ -14,6 +14,7 @@ public class Managers : MonoBehaviour
     [SerializeField] ToolsController toolsController;
     [SerializeField] AreaManager areaManager;
     [SerializeField] InventoryManager inventoryManager;
+    [SerializeField] InputManager inputManager;
 
     private void Awake()
     {
@@ -28,4 +29,5 @@ public class Managers : MonoBehaviour
     public static ToolsController Tools => Instance.toolsController;
     public static AreaManager Areas => Instance.areaManager;
     public static InventoryManager Inventory => Instance.inventoryManager;
+    public static InputManager Input => Instance.inputManager;
 }

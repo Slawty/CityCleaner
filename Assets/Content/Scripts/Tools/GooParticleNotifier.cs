@@ -17,12 +17,10 @@ public class GooParticleNotifier : MonoBehaviour
 
     void OnParticleCollision(GameObject other)
     {
-        int numEvents = ps.GetCollisionEvents(other, collisionEvents);
-
-        if (numEvents == 0)
-            return;
-
-        Vector3 hitPosition = collisionEvents[0].intersection;
-        OnGooHit?.Invoke(hitPosition, other);
+        if (other.TryGetComponent(out GrowableObject growableObject))
+        {
+            Debug.Log($"Goo hit {growableObject.name}");
+            growableObject.HitByGoo();
+        }
     }
 }

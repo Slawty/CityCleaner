@@ -19,14 +19,14 @@ public class PlayerInteractor : MonoBehaviour
     {
         interactAction.action.Enable();
         interactAction.action.performed += InteractButtonPressed;
-        interactAction.action.canceled += InteractButtonCanceled;
+        interactAction.action.canceled += InteractButtonReleased;
     }
 
     void OnDisable()
     {
         interactAction.action.Disable();
         interactAction.action.performed -= InteractButtonPressed;
-        interactAction.action.canceled -= InteractButtonCanceled;
+        interactAction.action.canceled -= InteractButtonReleased;
     }
 
     void Update()
@@ -38,6 +38,9 @@ public class PlayerInteractor : MonoBehaviour
     {
         bool hitSomething = Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, interactDistance, ~0, QueryTriggerInteraction.Ignore);
 
+        if (Managers.Input.InteractionBlocked())
+            hitSomething = false;
+
         if (hitSomething)
         {
             IInteractable interactable = hit.collider.GetComponent<IInteractable>();
@@ -47,6 +50,7 @@ public class PlayerInteractor : MonoBehaviour
                 if (interactable != currentInteractable)
                 {
                     currentInteractable = interactable;
+                    // Debug.Log($"Found interactable: {hit.collider.name}");
                     Managers.UI.ShowInteractText(interactable.Prompt);
                 }
 
@@ -57,7 +61,6 @@ public class PlayerInteractor : MonoBehaviour
         // caching when we actually lost an interactable
         if (currentInteractable != null)
         {
-            InteractButtonCanceled(ctx: default);
             currentInteractable = null;
             Managers.UI.HideInteractText();
         }
@@ -72,12 +75,12 @@ public class PlayerInteractor : MonoBehaviour
         currentInteractable.Interact(transform.parent.gameObject);
     }
 
-    void InteractButtonCanceled(InputAction.CallbackContext ctx)
+    void InteractButtonReleased(InputAction.CallbackContext ctx)
     {
         if (currentInteractable == null)
             return;
 
-        currentInteractable.InteractCanceled(transform.parent.gameObject);
+        currentInteractable.InteractReleased(transform.parent.gameObject);
     }
 
 }

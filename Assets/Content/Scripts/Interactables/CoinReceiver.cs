@@ -52,12 +52,12 @@ public class CoinReceiver : MonoBehaviour, IInteractable
             fillImage.fillAmount = (float)coinCounter / (float)RequiredCoins;
 
             if (!Managers.Inventory.HasEnoughCoins(1))
-                InteractCanceled(null);
+                InteractReleased(null);
 
             if (coinCounter >= RequiredCoins)
             {
                 OnCompleted?.Invoke();
-                InteractCanceled(null);
+                InteractReleased(null);
             }
         }
     }
@@ -117,7 +117,7 @@ public class CoinReceiver : MonoBehaviour, IInteractable
         // TriggerCollider.enabled = true;
     }
 
-    public void InteractCanceled(GameObject interactor)
+    public void InteractReleased(GameObject interactor)
     {
         isSpawningCoins = false;
         // TriggerCollider.enabled = false;

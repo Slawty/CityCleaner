@@ -52,7 +52,7 @@ public class PoopConverter : MonoBehaviour, IInteractable
             fillImage.fillAmount = (float)poopCounter / (float)ConversionAmount;
 
             if (!Managers.Inventory.HasEnoughPoop(1))
-                InteractCanceled(null);
+                InteractReleased(null);
 
             if (poopCounter >= ConversionAmount)
             {
@@ -118,7 +118,7 @@ public class PoopConverter : MonoBehaviour, IInteractable
         // TriggerCollider.enabled = true;
     }
 
-    public void InteractCanceled(GameObject interactor)
+    public void InteractReleased(GameObject interactor)
     {
         isSpawningPoop = false;
         // TriggerCollider.enabled = false;

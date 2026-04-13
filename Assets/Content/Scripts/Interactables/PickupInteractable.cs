@@ -5,7 +5,7 @@ public class PickupInteractable : MonoBehaviour, IInteractable
 {
     public UnityAction OnInteract;
     public string Prompt => "Pick up";
-
+    public Transform HoldPoint;
     Rigidbody rb;
     Collider col;
 
@@ -15,7 +15,7 @@ public class PickupInteractable : MonoBehaviour, IInteractable
         col = GetComponentInChildren<Collider>();
     }
 
-    public void Interact(GameObject interactor)
+    public void InteractReleased(GameObject interactor)
     {
         PlayerPickupController playerPickup = interactor.GetComponentInChildren<PlayerPickupController>();
 
@@ -24,6 +24,7 @@ public class PickupInteractable : MonoBehaviour, IInteractable
 
         OnInteract?.Invoke();
         playerPickup.HoldObject(this);
+        Debug.Log($"Interact released on {gameObject.name}");
     }
 
     public void EnableCollider(bool b)
@@ -37,7 +38,7 @@ public class PickupInteractable : MonoBehaviour, IInteractable
         col.enabled = b;
     }
 
-    public void InteractCanceled(GameObject interactor)
+    public void Interact(GameObject interactor)
     {
     }
 }

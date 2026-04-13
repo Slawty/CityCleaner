@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
 
     public void ShowInteractText(string text)
     {
+        // Debug.Log($"ShowInteractText: {text}");
         interactText.text = text;
         interactText.gameObject.SetActive(true);
     }

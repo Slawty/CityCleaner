@@ -48,7 +48,7 @@ public class SplitableObject : MonoBehaviour, IInteractable
             return;
 
         Health -= damagePerSecond * Time.deltaTime;
-        Debug.Log("Health: " + Health);
+        // Debug.Log("Health: " + Health);
 
         hitTimer += Time.deltaTime * hitScaleFrequency;
         float curveTime = hitTimer % 1f;
@@ -78,7 +78,7 @@ public class SplitableObject : MonoBehaviour, IInteractable
         GetComponent<Collider>().enabled = true;
     }
 
-    public void InteractCanceled(GameObject interactor)
+    public void InteractReleased(GameObject interactor)
     {
 
     }

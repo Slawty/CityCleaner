@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.Rendering;
-using Unity.Collections;
+using System.Collections.Generic;
 using UnityEngine.Events;
-using System;
+using Unity.Collections;
 
 [RequireComponent(typeof(Renderer))]
 [RequireComponent(typeof(MeshFilter))]
@@ -12,6 +12,7 @@ public class GPUPaintableObject : MonoBehaviour
     public UnityAction OnProgress;
     public UnityAction OnCleaned;
     public int winCoins = 3;
+    public List<GPUPaintableObject> AdditionalObjectsToClean = new();
     [Header("Tracking Resolution")]
     [SerializeField] int trackingResolution = 128;
 
@@ -31,6 +32,7 @@ public class GPUPaintableObject : MonoBehaviour
     int pixelsToCleanCount;
     int cleanedPixelCount;
     Mesh mesh;
+    public bool IsInitialized { get; private set; }
 
     void Awake()
     {
@@ -43,6 +45,7 @@ public class GPUPaintableObject : MonoBehaviour
 
     public void Initialize(RenderTexture runtimeMask)
     {
+        IsInitialized = true;
         maskTexture = runtimeMask;
 
         CreateCoverageTexture();
@@ -53,6 +56,7 @@ public class GPUPaintableObject : MonoBehaviour
 
     public void Initialize(int resolution)
     {
+        IsInitialized = true;
         RenderTexture mask = new RenderTexture(resolution, resolution, 0, RenderTextureFormat.ARGB32);
 
         mask.Create();
@@ -166,12 +170,21 @@ public class GPUPaintableObject : MonoBehaviour
         if (GetCleanPercent() > 0.98f)
         {
             SetClean();
+            if (AdditionalObjectsToClean.Count > 0)
+            {
+                foreach (var obj in AdditionalObjectsToClean)
+                {
+                    if (!obj.IsInitialized)
+                        obj.Initialize(128);
+                    obj.SetClean();
+                }
+            }
         }
 
         OnProgress?.Invoke();
     }
 
-    void SetClean()
+    public void SetClean()
     {
         cleanedPixelCount = pixelsToCleanCount;
         isClean = true;

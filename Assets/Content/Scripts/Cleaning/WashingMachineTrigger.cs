@@ -37,6 +37,7 @@ public class WashingMachineTrigger : MonoBehaviour
         storedPoopling = checkPoopling;
         storedPoopling.PickupInteractable.EnablePhysics(false);
         storedPoopling.PickupInteractable.EnableCollider(true);
+        storedPoopling.Movement.CancelWaitingForCollision();
         storedPoopling.PickupInteractable.OnInteract += OnPooplingPickUp;
         storedPoopling.transform.parent = machineDrum;
         storedPoopling.transform.DOMove(TargetPosition.position, 0.25f);

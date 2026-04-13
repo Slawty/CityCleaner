@@ -30,7 +30,7 @@ public class WashingMachineDoor : MonoBehaviour, IInteractable
             CloseDoor();
     }
 
-    public void InteractCanceled(GameObject interactor)
+    public void InteractReleased(GameObject interactor)
     {
 
     }
@@ -55,7 +55,7 @@ public class WashingMachineDoor : MonoBehaviour, IInteractable
     void UpdatePrompt()
     {
         prompt = isClosed ? "Open" : "Close";
-        Managers.UI.ShowInteractText(prompt);
+        // Managers.UI.ShowInteractText(prompt);
     }
 
 

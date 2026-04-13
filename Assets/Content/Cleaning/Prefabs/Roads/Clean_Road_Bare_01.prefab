@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5896759772522019031}
   - component: {fileID: 8190094885961268142}
   - component: {fileID: 1740530695764505313}
+  - component: {fileID: 6540200888068651593}
   m_Layer: 0
   m_Name: Clean_Road_Bare_01
   m_TagString: Untagged
@@ -148,3 +149,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 5, y: 0.1640916, z: 5}
   m_Center: {x: -2.5, y: -0.082045786, z: -2.5}
+--- !u!114 &6540200888068651593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8812807051658598468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 0
+  m_AffectedAgents: ffffffff

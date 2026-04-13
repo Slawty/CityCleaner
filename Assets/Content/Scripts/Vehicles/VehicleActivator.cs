@@ -42,7 +42,7 @@ public class VehicleActivator : MonoBehaviour, IInteractable
         currentInteractor = null;
     }
 
-    public void InteractCanceled(GameObject interactor)
+    public void InteractReleased(GameObject interactor)
     {
     }
 }

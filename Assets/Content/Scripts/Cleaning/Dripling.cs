@@ -1,7 +1,8 @@
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Events;
 
-public class Dripling : MonoBehaviour
+public class Dripling : MonoBehaviour, IVacuumable
 {
     public enum ConsumableType { Water, Goo };
     public ConsumableType Type;
@@ -14,15 +15,22 @@ public class Dripling : MonoBehaviour
     [SerializeField] float startScale = 1f;
     [SerializeField] DriplingChunkConverter chunkConverter;
     [SerializeField] GameObject goolingPrefab;
-
+    NpcNavMovement mover;
     bool isRefilling;
     float elapsed;
+
+    void Awake()
+    {
+        mover = GetComponent<NpcNavMovement>();
+    }
 
     void Start()
     {
         transform.localScale = Vector3.one * startScale;
         if (chunkConverter != null)
             chunkConverter.OnAllChunksCollected += OnAllChunksCollected;
+
+        mover.Follow(Managers.Player.transform);
     }
 
     void OnDestroy()
@@ -43,7 +51,13 @@ public class Dripling : MonoBehaviour
         // Give water evenly over the duration
         float ammoPerSecond = totalAmmo / shrinkDuration;
         if (Type == ConsumableType.Water)
-            Managers.Tools.WaterSprayer.FillWaterAmount(ammoPerSecond * delta);
+        {
+            if (Managers.Tools.WaterSprayer.isActiveAndEnabled)
+                Managers.Tools.WaterSprayer.FillWaterAmount(ammoPerSecond * delta);
+
+            if (Managers.Tools.Lasergun.isActiveAndEnabled)
+                Managers.Tools.Lasergun.FillWaterAmount(ammoPerSecond * delta);
+        }
         else if (Type == ConsumableType.Goo)
             Managers.Tools.GooGun.FillAmmoAmount(ammoPerSecond * delta);
 
@@ -58,12 +72,12 @@ public class Dripling : MonoBehaviour
         }
     }
 
-    public void Interact(GameObject interactor)
+    public void VacuumStart()
     {
         isRefilling = true;
     }
 
-    public void InteractCanceled(GameObject interactor)
+    public void VacuumEnd()
     {
         isRefilling = false;
     }
