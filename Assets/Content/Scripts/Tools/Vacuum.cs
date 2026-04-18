@@ -72,6 +72,9 @@ public class Vacuum : MonoBehaviour
 
     void InteractButtonHold(InputAction.CallbackContext ctx)
     {
+        if (Managers.Input.InteractionBlocked())
+            return;
+
         if (ctx.interaction is HoldInteraction)
         {
             Debug.Log($"Interact button hold. Activate Vacuum");
@@ -83,6 +86,9 @@ public class Vacuum : MonoBehaviour
 
     void InteractButtonCanceled(InputAction.CallbackContext ctx)
     {
+        if (!vacuumActive)
+            return;
+
         Debug.Log($"Interact button released. Stopping Vacuum");
         vacuumActive = false;
         particleTriggerCollider.enabled = false;

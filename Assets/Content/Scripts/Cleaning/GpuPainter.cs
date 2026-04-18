@@ -87,7 +87,7 @@ public class GPUPainter : MonoBehaviour
 
         if (Time.time > nextUpdateTime)
         {
-            paintable.UpdateTracking();
+            paintable.UpdateTracking(hitPos);
             nextUpdateTime = Time.time + 0.1f;
             Managers.UI.SetCleanProgressBarPercent(paintable.GetCleanPercent() * 100f);
 
@@ -95,7 +95,13 @@ public class GPUPainter : MonoBehaviour
             {
                 Vector3 dirToPlayer = (transform.position - hitPos).normalized;
                 dirToPlayer.y = 1f;
-                Managers.Spawning.SpawnCoins(paintable.winCoins, hitPos + dirToPlayer * 0.25f, dirToPlayer).Forget();
+                Transform coinSpawnPos = paintable.CoinSpawnPos;
+                if (coinSpawnPos == null)
+                    coinSpawnPos = paintable.transform;
+
+                Managers.Spawning.SpawnCoins(paintable.winCoins, coinSpawnPos.position + coinSpawnPos.forward * 0.25f, dirToPlayer).Forget();
+                // Managers.Spawning.SpawnChunks(paintable.winCoins, coinSpawnPos.position + coinSpawnPos.forward * 0.25f, dirToPlayer).Forget();
+
             }
         }
     }

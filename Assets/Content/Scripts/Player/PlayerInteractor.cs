@@ -50,7 +50,7 @@ public class PlayerInteractor : MonoBehaviour
                 if (interactable != currentInteractable)
                 {
                     currentInteractable = interactable;
-                    // Debug.Log($"Found interactable: {hit.collider.name}");
+                    Debug.Log($"Found interactable: {hit.collider.name}");
                     Managers.UI.ShowInteractText(interactable.Prompt);
                 }
 
@@ -59,7 +59,7 @@ public class PlayerInteractor : MonoBehaviour
         }
 
         // caching when we actually lost an interactable
-        if (currentInteractable != null)
+        if (currentInteractable != null && !Managers.Input.InteractionBlocked())
         {
             currentInteractable = null;
             Managers.UI.HideInteractText();
@@ -77,6 +77,7 @@ public class PlayerInteractor : MonoBehaviour
 
     void InteractButtonReleased(InputAction.CallbackContext ctx)
     {
+        Debug.Log($"Interact button released. Has inetractable: {currentInteractable != null}");
         if (currentInteractable == null)
             return;
 

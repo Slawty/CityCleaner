@@ -11,7 +11,7 @@ public class WaterSprayTool : Tool
     float currentAmmo;
     bool isActive;
 
-    void Start()
+    public override void Initialize()
     {
         RefillWater();
     }

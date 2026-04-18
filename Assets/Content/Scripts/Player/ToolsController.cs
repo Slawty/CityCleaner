@@ -35,6 +35,8 @@ public class ToolsController : MonoBehaviour
         {
             if (tool.isActiveAndEnabled)
                 EquipTool(tools.IndexOf(tool));
+
+            tool.Initialize();
         }
     }
 

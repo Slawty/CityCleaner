@@ -52,11 +52,7 @@ public class Dripling : MonoBehaviour, IVacuumable
         float ammoPerSecond = totalAmmo / shrinkDuration;
         if (Type == ConsumableType.Water)
         {
-            if (Managers.Tools.WaterSprayer.isActiveAndEnabled)
-                Managers.Tools.WaterSprayer.FillWaterAmount(ammoPerSecond * delta);
-
-            if (Managers.Tools.Lasergun.isActiveAndEnabled)
-                Managers.Tools.Lasergun.FillWaterAmount(ammoPerSecond * delta);
+            Managers.Tools.WaterSprayer.FillWaterAmount(ammoPerSecond * delta);
         }
         else if (Type == ConsumableType.Goo)
             Managers.Tools.GooGun.FillAmmoAmount(ammoPerSecond * delta);
@@ -81,6 +77,7 @@ public class Dripling : MonoBehaviour, IVacuumable
     {
         isRefilling = false;
     }
+
 
     void OnAllChunksCollected()
     {

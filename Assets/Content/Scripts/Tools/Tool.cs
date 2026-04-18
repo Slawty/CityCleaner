@@ -28,6 +28,7 @@ public abstract class Tool : MonoBehaviour
         OnShootStop();
     }
 
+    public virtual void Initialize() { }
     // These are what tools override
     protected virtual void OnShootStart() { }
     protected virtual void OnShootStop() { }

@@ -144,7 +144,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DirtAmount: 1
     - _DirtMetallic: 0
-    - _DirtMetallicStrength: 1
+    - _DirtMetallicStrength: 0
     - _DirtNoiseOffset: 1.995
     - _DirtNoiseScale: 1.8
     - _DirtNormalStrength: 1

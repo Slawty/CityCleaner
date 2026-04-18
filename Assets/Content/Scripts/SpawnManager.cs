@@ -26,7 +26,7 @@ public class SpawnManager : MonoBehaviour
     {
         ParticleSystem.EmitParams emit = new ParticleSystem.EmitParams();
         emit.position = spawnPos;
-        emit.velocity = spawnDirection * Random.Range(1.5f, 3f);
+        emit.velocity = spawnDirection * Random.Range(1f, 2f);
         chunkParticles.Emit(emit, 1);
     }
 

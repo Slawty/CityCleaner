@@ -13,7 +13,7 @@ public class GooGunTool : Tool
     float currentAmmo;
     bool isActive;
 
-    void Start()
+    public override void Initialize()
     {
         RefillAmmo();
     }

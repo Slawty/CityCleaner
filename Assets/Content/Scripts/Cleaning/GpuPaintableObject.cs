@@ -3,6 +3,7 @@ using UnityEngine.Rendering;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using Unity.Collections;
+using Cysharp.Threading.Tasks;
 
 [RequireComponent(typeof(Renderer))]
 [RequireComponent(typeof(MeshFilter))]
@@ -12,7 +13,9 @@ public class GPUPaintableObject : MonoBehaviour
     public UnityAction OnProgress;
     public UnityAction OnCleaned;
     public int winCoins = 3;
+    public int winDirt = 3;
     public List<GPUPaintableObject> AdditionalObjectsToClean = new();
+    public Transform CoinSpawnPos;
     [Header("Tracking Resolution")]
     [SerializeField] int trackingResolution = 128;
 
@@ -20,7 +23,6 @@ public class GPUPaintableObject : MonoBehaviour
     [SerializeField] int cleanThreshold = 200;
     [SerializeField] float cleanPercentage = 1;
     public RenderTexture maskTexture;
-
     public RenderTexture coverageTexture;
     public Texture2D coverageReadable;
     NativeArray<byte> coverageData;
@@ -33,6 +35,9 @@ public class GPUPaintableObject : MonoBehaviour
     int cleanedPixelCount;
     Mesh mesh;
     public bool IsInitialized { get; private set; }
+    float nextDirtSpawn = 0f;
+    float dirtSpawnStep;
+    int dirtSpawnedCount = 0;
 
     void Awake()
     {
@@ -62,6 +67,13 @@ public class GPUPaintableObject : MonoBehaviour
         mask.Create();
 
         Graphics.Blit(Texture2D.whiteTexture, mask);
+
+        if (winDirt > 0)
+        {
+            dirtSpawnStep = 1f / winDirt;
+            nextDirtSpawn = dirtSpawnStep;
+            dirtSpawnedCount = 0;
+        }
 
         Initialize(mask);
 
@@ -134,7 +146,7 @@ public class GPUPaintableObject : MonoBehaviour
     // UPDATE TRACKING FROM GPU MASK
     // ----------------------------------------------------
 
-    public void UpdateTracking()
+    public void UpdateTracking(Vector3 hitPos)
     {
         if (isClean)
             return;
@@ -167,7 +179,16 @@ public class GPUPaintableObject : MonoBehaviour
             }
         }
 
-        if (GetCleanPercent() > 0.98f)
+        float cleanPercent = GetCleanPercent();
+
+        while (winDirt > 0 && cleanPercent >= nextDirtSpawn)
+        {
+            SpawnDirtChunk(hitPos);
+            dirtSpawnedCount++;
+            nextDirtSpawn = dirtSpawnStep * (dirtSpawnedCount + 1);
+        }
+
+        if (cleanPercent > 0.98f)
         {
             SetClean();
             if (AdditionalObjectsToClean.Count > 0)
@@ -193,6 +214,13 @@ public class GPUPaintableObject : MonoBehaviour
         GL.Clear(true, true, Color.black);
         RenderTexture.active = null;
         OnCleaned?.Invoke();
+    }
+
+    void SpawnDirtChunk(Vector3 hitPos)
+    {
+        Vector3 dirToPlayer = (Managers.Player.transform.position - CoinSpawnPos.position).normalized;
+        dirToPlayer.y = 1f;
+        Managers.Spawning.SpawnChunks(1, hitPos + dirToPlayer * 0.15f, dirToPlayer).Forget();
     }
 
     // ----------------------------------------------------

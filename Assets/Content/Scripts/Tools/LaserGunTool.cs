@@ -3,20 +3,23 @@ using UnityEngine;
 
 public class LaserGunTool : Tool
 {
-    public float MaxAmmo;
-    public float AmmoPerSecond = 2f;
+    public float MaxAmmo = 100f;
+    public float AmmoDrainPerSecond = 2f;
+    public float RechargePerSecond = 5f;
     public float DamagePerSecond = 10f;
+
     [SerializeField] List<ParticleSystem> sprayEffects;
     [SerializeField] ProgressBar ammoBar;
     [SerializeField] LayerMask hitMask;
+
     float currentAmmo;
     bool isActive;
     Camera cam;
 
-    void Start()
+    public override void Initialize()
     {
         cam = Managers.MainCam;
-        RefillWater();
+        RefillAmmo();
     }
 
     protected override void OnShootStart()
@@ -36,23 +39,44 @@ public class LaserGunTool : Tool
 
         foreach (ParticleSystem effect in sprayEffects)
             effect.Stop();
-
     }
 
     void Update()
     {
-        if (!isActive)
+        if (isActive)
+        {
+            DrainAmmo();
+            HandleLaser();
+
+            if (currentAmmo <= 0f)
+                OnShootStop();
+        }
+        else
+        {
+            RechargeAmmo();
+        }
+
+        UpdateAmmoBar();
+    }
+
+    void DrainAmmo()
+    {
+        currentAmmo -= Time.deltaTime * AmmoDrainPerSecond;
+        currentAmmo = Mathf.Clamp(currentAmmo, 0f, MaxAmmo);
+    }
+
+    void RechargeAmmo()
+    {
+        if (currentAmmo >= MaxAmmo)
             return;
 
-        currentAmmo -= Time.deltaTime * AmmoPerSecond;
+        currentAmmo += Time.deltaTime * RechargePerSecond;
         currentAmmo = Mathf.Clamp(currentAmmo, 0f, MaxAmmo);
+    }
+
+    void UpdateAmmoBar()
+    {
         ammoBar.SetPercent((currentAmmo / MaxAmmo) * 100f);
-
-        HandleLaser();
-
-        if (currentAmmo <= 0f)
-            OnShootStop();
-
     }
 
     void HandleLaser()
@@ -62,29 +86,30 @@ public class LaserGunTool : Tool
         if (!Physics.Raycast(ray, out RaycastHit hit, 10f, hitMask, QueryTriggerInteraction.Ignore))
             return;
 
-        var paintable = hit.collider.GetComponent<SplitableObject>();
+        var target = hit.collider.GetComponent<SplitableObject>();
 
-        if (paintable == null)
+        if (target == null)
             return;
 
-        paintable.UpdateLaserHit(DamagePerSecond);
+        target.UpdateLaserHit(DamagePerSecond);
     }
 
     protected override void OnDisable()
     {
         base.OnDisable();
+        OnShootStop();
     }
 
-    public void RefillWater()
+    public void RefillAmmo()
     {
         currentAmmo = MaxAmmo;
-        ammoBar.SetPercent(100f);
+        UpdateAmmoBar();
     }
 
-    public void FillWaterAmount(float amount)
+    public void FillAmmoAmount(float amount)
     {
         currentAmmo += amount;
         currentAmmo = Mathf.Clamp(currentAmmo, 0f, MaxAmmo);
-        ammoBar.SetPercent((currentAmmo / MaxAmmo) * 100f);
+        UpdateAmmoBar();
     }
 }

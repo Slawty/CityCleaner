@@ -7,13 +7,14 @@ using UnityEngine.Events;
 
 public class CoinReceiver : MonoBehaviour, IInteractable
 {
+    public RessourceType Type;
     public UnityAction OnCompleted;
     public float CoinSpawnsPerSecond = 10f;
-    public int RequiredCoins = 20;
+    public int RequiredAmount = 20;
     public ParticleSystem ps;
     public Transform TargetPoint;
     public Collider TriggerCollider;
-    public GameObject BarrierObject;
+    public List<GameObject> RemoveOnComplete;
     public float suctionStrength = 12f;
     public float hopForce = 4f;
     public float collectDistance = 0.3f;
@@ -21,9 +22,9 @@ public class CoinReceiver : MonoBehaviour, IInteractable
     List<ParticleSystem.Particle> inside = new List<ParticleSystem.Particle>();
     float initialSize;
     public string Prompt => "Pay Coins";
-    bool isSpawningCoins;
+    bool isSpawningParticles;
     float coinSpawnTimer;
-    int coinCounter;
+    int amountCounter;
 
     void Start()
     {
@@ -32,7 +33,7 @@ public class CoinReceiver : MonoBehaviour, IInteractable
 
     void Update()
     {
-        if (!isSpawningCoins)
+        if (!isSpawningParticles)
             return;
 
         coinSpawnTimer -= Time.deltaTime;
@@ -47,17 +48,30 @@ public class CoinReceiver : MonoBehaviour, IInteractable
             emit.velocity = Managers.MainCam.transform.forward * Random.Range(1.5f, 3f);
 
             ps.Emit(emit, 1);
-            Managers.Inventory.DecreaseCoins(1);
-            coinCounter++;
-            fillImage.fillAmount = (float)coinCounter / (float)RequiredCoins;
+            if (Type == RessourceType.Coin)
+                Managers.Inventory.DecreaseCoins(1);
+            else if (Type == RessourceType.Poop)
+                Managers.Inventory.DecreasePoop(1);
 
-            if (!Managers.Inventory.HasEnoughCoins(1))
+            amountCounter++;
+            fillImage.fillAmount = (float)amountCounter / (float)RequiredAmount;
+
+            if (Type == RessourceType.Coin && !Managers.Inventory.HasEnoughCoins(1) || Type == RessourceType.Poop && !Managers.Inventory.HasEnoughPoop(1))
                 InteractReleased(null);
 
-            if (coinCounter >= RequiredCoins)
+            if (amountCounter >= RequiredAmount)
             {
+                if (RemoveOnComplete.Count > 0)
+                {
+                    foreach (GameObject go in RemoveOnComplete)
+                    {
+                        go.SetActive(false);
+                    }
+                }
+
                 OnCompleted?.Invoke();
                 InteractReleased(null);
+
             }
         }
     }
@@ -69,7 +83,7 @@ public class CoinReceiver : MonoBehaviour, IInteractable
             inside
         );
 
-        Debug.Log($"OnParticleTrigger. Count: {count}");
+        // Debug.Log($"OnParticleTrigger. Count: {count}");
         for (int i = 0; i < count; i++)
         {
             ParticleSystem.Particle p = inside[i];
@@ -93,7 +107,7 @@ public class CoinReceiver : MonoBehaviour, IInteractable
             // collect coin
             if (dist < collectDistance)
             {
-                OnCoinReceived();
+                OnParticleReceived();
                 p.remainingLifetime = 0f;
             }
 
@@ -103,23 +117,27 @@ public class CoinReceiver : MonoBehaviour, IInteractable
         ps.SetTriggerParticles(ParticleSystemTriggerEventType.Inside, inside);
     }
 
-    void OnCoinReceived()
+    void OnParticleReceived()
     {
 
     }
 
     public void Interact(GameObject interactor)
     {
-        if (!Managers.Inventory.HasEnoughCoins(1))
+        if (Type == RessourceType.Coin && !Managers.Inventory.HasEnoughCoins(1) || Type == RessourceType.Poop && !Managers.Inventory.HasEnoughPoop(1))
             return;
 
-        isSpawningCoins = true;
+        Debug.Log($"Interact {transform.name}");
+        Managers.Input.BlockInteraction(this);
+        isSpawningParticles = true;
         // TriggerCollider.enabled = true;
     }
 
     public void InteractReleased(GameObject interactor)
     {
-        isSpawningCoins = false;
+        Debug.Log($"Release {transform.name}");
+        Managers.Input.UnblockInteraction(this);
+        isSpawningParticles = false;
         // TriggerCollider.enabled = false;
     }
 }
