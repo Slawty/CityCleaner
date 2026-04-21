@@ -1,56 +1,35 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class GrassPatch : MonoBehaviour
+public class GrassPatch : GooHitGrowable
 {
-    public List<Renderer> renderers;
-    int DirtStrengthID = Shader.PropertyToID("_CleanStrength");
+    [Header("Renderers")]
+    [SerializeField] List<Renderer> renderers;
+
+    [Header("Growth")]
+    [SerializeField] float minStrength = 0f;
+    [SerializeField] float maxStrength = 1f;
+
+    readonly int dirtStrengthID = Shader.PropertyToID("_CleanStrength");
     MaterialPropertyBlock mpb;
-    GPUPaintableObject paintable;
 
     void Awake()
     {
-        paintable = GetComponent<GPUPaintableObject>();
-    }
-
-    void OnEnable()
-    {
-        paintable.OnInitialize += OnInitialize;
-        paintable.OnProgress += OnProgress;
-        paintable.OnCleaned += OnCleaned;
-    }
-
-    void OnDisable()
-    {
-        paintable.OnInitialize -= OnInitialize;
-        paintable.OnProgress -= OnProgress;
-        paintable.OnCleaned -= OnCleaned;
-    }
-
-
-    void OnInitialize()
-    {
         mpb = new MaterialPropertyBlock();
-        SetCleanStrength(1f);
+        InitializeGrowable();
     }
 
-    void OnProgress()
+    protected override void ApplyGrowth(float progress, float hitMultiplier)
     {
-        SetCleanStrength(paintable.GetCleanPercent());
-    }
-
-    void OnCleaned()
-    {
-        SetCleanStrength(0f);
-    }
-
-    void SetCleanStrength(float value)
-    {
-        mpb.SetFloat(DirtStrengthID, value);
+        float baseStrength = Mathf.Lerp(minStrength, maxStrength, progress);
+        float bumpedStrength = Mathf.Clamp01(baseStrength * hitMultiplier);
+        mpb.SetFloat(dirtStrengthID, bumpedStrength);
 
         for (int i = 0; i < renderers.Count; i++)
         {
+            if (renderers[i] == null)
+                continue;
+
             renderers[i].SetPropertyBlock(mpb);
         }
     }

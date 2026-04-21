@@ -6,21 +6,26 @@ public class GooParticleNotifier : MonoBehaviour
 {
     public UnityAction<Vector3, GameObject> OnGooHit;
     ParticleSystem ps;
-    ParticleSystem.Particle[] particles;
     List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
 
     void Awake()
     {
         ps = GetComponent<ParticleSystem>();
-        particles = new ParticleSystem.Particle[ps.main.maxParticles];
     }
 
     void OnParticleCollision(GameObject other)
     {
-        if (other.TryGetComponent(out GrowableObject growableObject))
+        Vector3 hitPoint = other.transform.position;
+        int collisionCount = ps.GetCollisionEvents(other, collisionEvents);
+        if (collisionCount > 0)
+            hitPoint = collisionEvents[0].intersection;
+
+        OnGooHit?.Invoke(hitPoint, other);
+
+        IGooHitReceiver[] receivers = other.GetComponents<IGooHitReceiver>();
+        foreach (IGooHitReceiver receiver in receivers)
         {
-            Debug.Log($"Goo hit {growableObject.name}");
-            growableObject.HitByGoo();
+            receiver.OnGooHit(hitPoint, gameObject);
         }
     }
 }

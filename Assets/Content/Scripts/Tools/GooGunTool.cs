@@ -79,7 +79,7 @@ public class GooGunTool : Tool
     void OnParticleHit(Vector3 hitPos, GameObject hitObject)
     {
         // Debug.Log($"Goo hit {hitObject.name} at: {hitPos}");
-        if (hitObject.TryGetComponent(out GPUPaintableObject paintable))
+        if (hitObject.TryGetComponent(out GPUPaintableObject paintable) && paintable.AllowGooCleaning)
         {
             painter.Paint(paintable, hitPos, CleanStrength);
         }

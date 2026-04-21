@@ -22,6 +22,8 @@ public class GPUPaintableObject : MonoBehaviour
     [Header("Clean threshold")]
     [SerializeField] int cleanThreshold = 200;
     [SerializeField] float cleanPercentage = 1;
+    [Header("Tool Interaction")]
+    [SerializeField] bool allowGooCleaning = false;
     public RenderTexture maskTexture;
     public RenderTexture coverageTexture;
     public Texture2D coverageReadable;
@@ -234,4 +236,6 @@ public class GPUPaintableObject : MonoBehaviour
 
         return (float)cleanedPixelCount / (float)pixelsToCleanCount;
     }
+
+    public bool AllowGooCleaning => allowGooCleaning;
 }

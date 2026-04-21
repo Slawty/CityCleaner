@@ -142,7 +142,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DirtAmount: 0
+    - _DirtAmount: 1
     - _DirtMetallic: 0
     - _DirtMetallicStrength: 1
     - _DirtNoiseOffset: 1.995
