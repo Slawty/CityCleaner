@@ -6,7 +6,9 @@ public class SpawnManager : MonoBehaviour
 {
     [SerializeField] private GameObject coinPrefab;
     [SerializeField] private ParticleSystem coinParticles;
-    [SerializeField] private ParticleSystem chunkParticles;
+    [SerializeField] private ParticleSystem pickupChunkParticles;
+    [SerializeField] private ParticleSystem tempChunkParticles;
+
     [SerializeField] private Vector2 spawnForceMinMax = new Vector2(2f, 5f);
     [SerializeField] private float directionRandomness = 0.3f;
     [SerializeField] private float multipleSpawnDelay = 0.2f;
@@ -22,14 +24,6 @@ public class SpawnManager : MonoBehaviour
         coinParticles.Emit(emit, 1);
     }
 
-    void SpawnChunk(Vector3 spawnPos, Vector3 spawnDirection)
-    {
-        ParticleSystem.EmitParams emit = new ParticleSystem.EmitParams();
-        emit.position = spawnPos;
-        emit.velocity = spawnDirection * Random.Range(1f, 2f);
-        chunkParticles.Emit(emit, 1);
-    }
-
     public async UniTask SpawnCoins(int amount, Vector3 spawnPos, Vector3 spawnDirection)
     {
         for (int i = 0; i < amount; i++)
@@ -40,12 +34,39 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    public async UniTask SpawnChunks(int amount, Vector3 spawnPos, Vector3 spawnDirection, float spawnDelay = -1f)
+    void SpawnPickupChunk(Vector3 spawnPos, Vector3 spawnDirection)
+    {
+        ParticleSystem.EmitParams emit = new ParticleSystem.EmitParams();
+        emit.position = spawnPos;
+        emit.velocity = spawnDirection * Random.Range(1f, 2f);
+        pickupChunkParticles.Emit(emit, 1);
+    }
+
+    public async UniTask SpawnPickupChunks(int amount, Vector3 spawnPos, Vector3 spawnDirection, float spawnDelay = -1f)
     {
         for (int i = 0; i < amount; i++)
         {
             Vector3 rngDir = Quaternion.AngleAxis(Random.Range(-90f, 90f), Random.onUnitSphere) * spawnDirection * Random.Range(1f, 1.5f);
-            SpawnChunk(spawnPos, rngDir);
+            SpawnPickupChunk(spawnPos, rngDir);
+            float delay = spawnDelay == -1f ? multipleSpawnDelay : spawnDelay;
+            await UniTask.Delay(System.TimeSpan.FromSeconds(delay), cancellationToken: destroyCancellationToken);
+        }
+    }
+    
+    void SpawnTempChunk(Vector3 spawnPos, Vector3 spawnDirection)
+    {
+        ParticleSystem.EmitParams emit = new ParticleSystem.EmitParams();
+        emit.position = spawnPos;
+        emit.velocity = spawnDirection * Random.Range(1f, 2f);
+        tempChunkParticles.Emit(emit, 1);
+    }
+
+    public async UniTask SpawnTempChunks(int amount, Vector3 spawnPos, Vector3 spawnDirection, float spawnDelay = -1f)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            Vector3 rngDir = Quaternion.AngleAxis(Random.Range(-90f, 90f), Random.onUnitSphere) * spawnDirection * Random.Range(1f, 1.5f);
+            SpawnTempChunk(spawnPos, rngDir);
             float delay = spawnDelay == -1f ? multipleSpawnDelay : spawnDelay;
             await UniTask.Delay(System.TimeSpan.FromSeconds(delay), cancellationToken: destroyCancellationToken);
         }

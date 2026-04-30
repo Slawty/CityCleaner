@@ -402,7 +402,7 @@ Transform:
   m_GameObject: {fileID: 62046717}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.99969804, z: 0, w: 0.024574243}
-  m_LocalPosition: {x: 93.05421, y: 4.866901, z: 249.57709}
+  m_LocalPosition: {x: 78.97309, y: 2.7766094, z: 232.80128}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11428,7 +11428,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpawnManager
   coinPrefab: {fileID: 1192313663402585242, guid: b572bf6d1d0d49d438206a929b12f318, type: 3}
   coinParticles: {fileID: 1942164584}
-  chunkParticles: {fileID: 1896933774}
+  pickupChunkParticles: {fileID: 1896933774}
+  tempChunkParticles: {fileID: 626271372}
   spawnForceMinMax: {x: 2, y: 5}
   directionRandomness: 0.3
   multipleSpawnDelay: 0.2
@@ -11578,7 +11579,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 626271374}
-  - component: {fileID: 626271373}
   - component: {fileID: 626271372}
   - component: {fileID: 626271371}
   m_Layer: 0
@@ -11922,8 +11922,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 17
-      minScalar: 5
+      scalar: 6
+      minScalar: 3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -16401,25 +16401,6 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
---- !u!114 &626271373
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 626271370}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 598176ef916bd814d8a60ab051a5469c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CoinParticleMover
-  Type: 1
-  ps: {fileID: 626271372}
-  vacuumPoint: {fileID: 1678286887}
-  scaleSize: 0
-  suctionStrength: 10
-  hopForce: 5
-  collectDistance: 0.3
 --- !u!4 &626271374
 Transform:
   m_ObjectHideFlags: 0
@@ -23077,7 +23058,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GooGunTool
   Tip: {fileID: 2111863099}
   shootAction: {fileID: 1120369429361536294, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
-  MaxAmmo: 100
+  MaxAmmo: 1000
   AmmoPerSecond: 5
   CleanStrength: 10
   painter: {fileID: 1038422203}
@@ -33989,7 +33970,7 @@ Transform:
   m_GameObject: {fileID: 1518474217}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.99969804, z: -0, w: 0.024574243}
-  m_LocalPosition: {x: 93.05421, y: 4.254901, z: 249.57709}
+  m_LocalPosition: {x: 78.97309, y: 2.1646094, z: 232.80128}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:

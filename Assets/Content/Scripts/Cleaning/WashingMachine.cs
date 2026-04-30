@@ -11,6 +11,7 @@ public class WashingMachine : MonoBehaviour
     public Transform drum;
     public GameObject cleanlingPrefab;
     public Image fillImage;
+    public Transform cleanlingSpawnPoint;
     Poopling storedPoopling;
     bool isWashing = false;
     float washingTimer = 0f;
@@ -113,7 +114,7 @@ public class WashingMachine : MonoBehaviour
     void EndWashing()
     {
         isWashing = false;
-        GameObject cleanling = Instantiate(cleanlingPrefab, storedPoopling.transform.position, storedPoopling.transform.rotation);
+        GameObject cleanling = Instantiate(cleanlingPrefab, cleanlingSpawnPoint.position, cleanlingSpawnPoint.rotation);
         Destroy(storedPoopling.gameObject);
         storedPoopling = null;
         door.OpenDoor();

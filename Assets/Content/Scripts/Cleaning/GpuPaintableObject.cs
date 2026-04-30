@@ -220,9 +220,10 @@ public class GPUPaintableObject : MonoBehaviour
 
     void SpawnDirtChunk(Vector3 hitPos)
     {
-        Vector3 dirToPlayer = (Managers.Player.transform.position - CoinSpawnPos.position).normalized;
+        Vector3 dirToPlayer = (Managers.Player.transform.position - hitPos).normalized;
         dirToPlayer.y = 1f;
-        Managers.Spawning.SpawnChunks(1, hitPos + dirToPlayer * 0.15f, dirToPlayer).Forget();
+        int rngAmount = Random.Range(1, 4);
+        Managers.Spawning.SpawnTempChunks(rngAmount, hitPos + dirToPlayer * 0.15f, Vector3.up).Forget();
     }
 
     // ----------------------------------------------------

@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine.Events;
 
@@ -35,6 +34,7 @@ public class WashingMachineTrigger : MonoBehaviour
             return;
 
         storedPoopling = checkPoopling;
+        storedPoopling.SetWanderingEnabled(false);
         storedPoopling.PickupInteractable.EnablePhysics(false);
         storedPoopling.PickupInteractable.EnableCollider(true);
         storedPoopling.Movement.CancelWaitingForCollision();
@@ -49,8 +49,10 @@ public class WashingMachineTrigger : MonoBehaviour
     void OnPooplingPickUp()
     {
         Debug.Log($"Poopling picked up");
-        storedPoopling.PickupInteractable.OnInteract -= OnPooplingPickUp;
-        storedPoopling.transform.parent = null;
+        Poopling p = storedPoopling;
+        p.PickupInteractable.OnInteract -= OnPooplingPickUp;
+        p.transform.parent = null;
+        p.SetWanderingEnabled(true);
         triggerCol.enabled = true;
         storedPoopling = null;
         OnPooplingPickedUp?.Invoke();

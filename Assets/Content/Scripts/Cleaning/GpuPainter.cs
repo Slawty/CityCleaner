@@ -95,13 +95,10 @@ public class GPUPainter : MonoBehaviour
             {
                 Vector3 dirToPlayer = (transform.position - hitPos).normalized;
                 dirToPlayer.y = 1f;
-                Transform coinSpawnPos = paintable.CoinSpawnPos;
-                if (coinSpawnPos == null)
-                    coinSpawnPos = paintable.transform;
-
-                Managers.Spawning.SpawnCoins(paintable.winCoins, coinSpawnPos.position + coinSpawnPos.forward * 0.25f, dirToPlayer).Forget();
-                // Managers.Spawning.SpawnChunks(paintable.winCoins, coinSpawnPos.position + coinSpawnPos.forward * 0.25f, dirToPlayer).Forget();
-
+                Vector3 coinSpawnPos = paintable.CoinSpawnPos == null ? hitPos : paintable.CoinSpawnPos.position;
+                coinSpawnPos += dirToPlayer * 0.25f;
+                
+                Managers.Spawning.SpawnCoins(paintable.winCoins, coinSpawnPos, dirToPlayer).Forget();
             }
         }
     }

@@ -10195,6 +10195,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WaterDrop04 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5092105737070455390, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -11723,9 +11727,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winCoins: 3
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.8
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -18222,71 +18230,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8850706272011681816, guid: 79187817575a4d64d8ddd0983af77563, type: 3}
   m_PrefabInstance: {fileID: 1952682331}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &742997126
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1845186741148988, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_Name
-      value: SM_Env_Bush_01 (2)
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 2.2911
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -161.74
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.24
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -56.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.8568395
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.5155832
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -62.073
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 23170934470776566, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: adde601e5883c4f40a05780fbd3025a6, type: 2}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
 --- !u!4 &743127578 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5008517538957864037, guid: 089d6fc3908828f4f85635f18a8686be, type: 3}
@@ -18743,9 +18686,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winCoins: 3
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.7
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -21895,9 +21842,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winCoins: 3
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.7
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -22193,9 +22144,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
   winCoins: 3
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.8
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -23909,74 +23864,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 498912, guid: ea3006685c5815f429d7310b7eb965ca, type: 3}
   m_PrefabInstance: {fileID: 1808283647}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &970672529
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1845186741148988, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_Name
-      value: Suckable
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -163.23
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.00000071867066
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -59.87
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4858612123339038, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 23170934470776566, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: adde601e5883c4f40a05780fbd3025a6, type: 2}
-    - target: {fileID: 33806124502091200, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 4300000, guid: c0f760e2915bd664bbc15c2c444f203c, type: 3}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1845186741148988, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-      insertIndex: 1
-      addedObject: {fileID: 1339981516}
-  m_SourcePrefab: {fileID: 100100000, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
 --- !u!1001 &971388231
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27653,9 +27540,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winCoins: 3
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.6
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -31602,9 +31493,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winCoins: 3
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.8
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -31743,48 +31638,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5008517538957864037, guid: 089d6fc3908828f4f85635f18a8686be, type: 3}
   m_PrefabInstance: {fileID: 2066293795}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1339981511 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1845186741148988, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-  m_PrefabInstance: {fileID: 970672529}
-  m_PrefabAsset: {fileID: 0}
---- !u!33 &1339981514 stripped
-MeshFilter:
-  m_CorrespondingSourceObject: {fileID: 33806124502091200, guid: cf8caeea3d1893e4aaa47bd95d17bb2a, type: 3}
-  m_PrefabInstance: {fileID: 970672529}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1339981516
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1339981511}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85212d1b13358614ca54e74ba56f93ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Deform::Deform.Deformable
-  assignOriginalMeshOnDisable: 1
-  updateMode: 0
-  cullingMode: 1
-  stripMode: 1
-  normalsRecalculation: 0
-  boundsRecalculation: 0
-  colliderRecalculation: 0
-  meshCollider: {fileID: 0}
-  data:
-    OriginalMesh: {fileID: 4300000, guid: c0f760e2915bd664bbc15c2c444f203c, type: 3}
-    Target:
-      meshFilter: {fileID: 1339981514}
-      skinnedMeshRenderer: {fileID: 0}
-    initialized: 1
-  deformerElements:
-  - component: {fileID: 816695896}
-    active: 1
-  customBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0.25, y: 0.25, z: 0.25}
 --- !u!4 &1344442110 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 410550, guid: 189a6283bd4925841bbf41d7c5919bff, type: 3}
@@ -40356,9 +40209,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winCoins: 3
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.7
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -42112,9 +41969,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winCoins: 3
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.8
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -44148,9 +44009,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winCoins: 3
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.7
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -46033,9 +45898,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winCoins: 3
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.8
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -57059,8 +56928,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 504fe5a4bf414ac46adf5b36638d7513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 15
-  throwForce: 10
+  HoldPoint: {fileID: 0}
 --- !u!54 &9154926412844824947
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -57111,8 +56979,6 @@ SceneRoots:
   - {fileID: 2634508653702135741}
   - {fileID: 783332380}
   - {fileID: 1304885706}
-  - {fileID: 970672529}
-  - {fileID: 742997126}
   - {fileID: 1141541908}
   - {fileID: 1732283354}
   - {fileID: 1292659557}

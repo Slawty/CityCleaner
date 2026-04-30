@@ -33,8 +33,7 @@ Transform:
   m_LocalPosition: {x: -4.58, y: -0.06, z: -241.84}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 1
-  m_Children:
-  - {fileID: 2327511218071849177}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!114 &2086926381703385505
@@ -50,11 +49,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
   winCoins: 3
-  AdditionalObjectsToClean:
-  - {fileID: 5411439342123008491}
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.85
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -152,88 +153,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -9000174073708706638, guid: 6ae42cca11e7e0840b15d29c798a050f, type: 3}
---- !u!1001 &8418767736923556375
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1299549686381187493}
-    m_Modifications:
-    - target: {fileID: 2948796850995514916, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_Name
-      value: Clean_Roof_1x1 (13)
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.032499995
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.044999998
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -0.00000068545336
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.000000037748926
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0.000000037748972
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
---- !u!4 &2327511218071849177 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-  m_PrefabInstance: {fileID: 8418767736923556375}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5411439342123008491 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4597106287732968444, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-  m_PrefabInstance: {fileID: 8418767736923556375}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject

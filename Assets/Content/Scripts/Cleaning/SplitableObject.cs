@@ -64,7 +64,7 @@ public class SplitableObject : MonoBehaviour, IInteractable
             playerDir.y = 1f;
             float velocity = Random.Range(1f, 1.5f);
             playerDir *= velocity;
-            Managers.Spawning.SpawnChunks(amount, transform.position, playerDir, spawnDelay: 0f).Forget();
+            Managers.Spawning.SpawnTempChunks(amount, transform.position, playerDir, spawnDelay: 0f).Forget();
 
             if (Random.value <= coinChance)
                 Managers.Spawning.SpawnCoins(1, transform.position, playerDir).Forget();

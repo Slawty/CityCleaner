@@ -33,8 +33,7 @@ Transform:
   m_LocalPosition: {x: 1.84, y: 1.41, z: -242.1}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 1
-  m_Children:
-  - {fileID: 6445166552083066140}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!114 &6100299569355722185
@@ -50,11 +49,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
   winCoins: 3
-  AdditionalObjectsToClean:
-  - {fileID: 3613123451664720942}
+  winDirt: 3
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.85
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -152,88 +153,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -7932811050407485081, guid: 1aa04e70d477240488a5d1a3b3f6d913, type: 3}
---- !u!1001 &1002147043576262610
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 3613691710054883696}
-    m_Modifications:
-    - target: {fileID: 2948796850995514916, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_Name
-      value: Clean_Roof_1x1 (6)
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.049999986
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.029999994
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.045000028
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -0.7071067
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 1.0658141e-14
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.7071069
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0.000000053385076
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
---- !u!114 &3613123451664720942 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4597106287732968444, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-  m_PrefabInstance: {fileID: 1002147043576262610}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
---- !u!4 &6445166552083066140 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6096048405345321678, guid: 4ab6de3ef5bf6ab459b1e0b0b62b78da, type: 3}
-  m_PrefabInstance: {fileID: 1002147043576262610}
-  m_PrefabAsset: {fileID: 0}

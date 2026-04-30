@@ -51,10 +51,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eedfb56872e39e8448b387a308d33fd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrassPatch
-  renderers:
-  - {fileID: 1853561475143949766}
-  minStrength: 0
-  maxStrength: 1
   hitsToFullGrowth: 15
   growthProgress: 0
   bumpAmount: 0.15
@@ -62,6 +58,11 @@ MonoBehaviour:
   bumpPeakAt: 0.35
   bumpUpEase: 27
   bumpDownEase: 6
+  linkedGrowables: []
+  renderers:
+  - {fileID: 1853561475143949766}
+  minStrength: 0
+  maxStrength: 1
 --- !u!114 &3672838394095159387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,7 +295,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 6698b7d51b851dc408dd33d2877d0477, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
