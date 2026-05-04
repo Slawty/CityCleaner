@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Events;
 
 public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
 {
@@ -22,6 +23,17 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
     bool fullyGrown;
     float bumpMultiplier = 1f;
     Tween bumpTween;
+
+    /// <summary>0–1 goo growth for area progress.</summary>
+    public float GrowthProgress01 => growthProgress;
+
+    public bool IsFullyGrown => fullyGrown;
+
+    public UnityAction OnGrowthProgressChanged;
+
+    /// <summary>Fires once when growth reaches 100% (including linked propagation).</summary>
+    public UnityAction OnFullyGrownCompleted;
+
 
     protected void InitializeGrowable()
     {
@@ -68,6 +80,8 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
         int safeHitsToFull = Mathf.Max(1, hitsToFullGrowth);
         growthProgress = Mathf.Clamp01((float)gooHitCount / safeHitsToFull);
 
+        OnGrowthProgressChanged?.Invoke();
+
         TriggerBump();
         ApplyGrowth(growthProgress, bumpMultiplier);
 
@@ -75,6 +89,7 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
         {
             fullyGrown = true;
             OnFullyGrown();
+            OnFullyGrownCompleted?.Invoke();
         }
     }
 

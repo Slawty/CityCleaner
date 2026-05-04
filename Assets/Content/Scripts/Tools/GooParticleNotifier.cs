@@ -27,5 +27,14 @@ public class GooParticleNotifier : MonoBehaviour
         {
             receiver.OnGooHit(hitPoint, gameObject);
         }
+
+        // IGooHitReceiver is only resolved on the collider object; DirtNest may live on a parent (mesh child setup).
+        DirtNest nestOnCollider = other.GetComponent<DirtNest>();
+        if (nestOnCollider == null)
+        {
+            DirtNest nestInParents = other.GetComponentInParent<DirtNest>();
+            if (nestInParents != null)
+                nestInParents.OnGooHit(hitPoint, gameObject);
+        }
     }
 }

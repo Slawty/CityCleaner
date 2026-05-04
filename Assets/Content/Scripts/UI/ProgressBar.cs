@@ -15,9 +15,28 @@ public class ProgressBar : MonoBehaviour
     float targetPercent = 0f;
     float displayedPercent = 0f;
 
+    const float ReachEpsilon = 0.01f;
+
+    void Start()
+    {
+        UpdateUI(displayedPercent);
+    }
+
     void Update()
     {
-        if (smooth && displayedPercent != targetPercent)
+        float deltaToTarget = Mathf.Abs(displayedPercent - targetPercent);
+        if (deltaToTarget <= ReachEpsilon)
+        {
+            if (!Mathf.Approximately(displayedPercent, targetPercent))
+            {
+                displayedPercent = targetPercent;
+                UpdateUI(displayedPercent);
+            }
+
+            return;
+        }
+
+        if (smooth)
         {
             displayedPercent = Mathf.Lerp(
                 displayedPercent,

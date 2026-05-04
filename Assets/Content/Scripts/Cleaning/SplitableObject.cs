@@ -1,11 +1,12 @@
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 
 public class SplitableObject : MonoBehaviour, IInteractable
 {
     public float Health = 100;
+    public UnityEvent OnDestroyed;
     [SerializeField] private float hitScaleStrength = 0.1f;
     [SerializeField] private float hitScaleFrequency = 40f;
     [SerializeField] AnimationCurve scaleCurve;
@@ -37,6 +38,7 @@ public class SplitableObject : MonoBehaviour, IInteractable
         Vector3 randomAxis = Random.onUnitSphere;
         rb.AddTorque(randomAxis * spin, ForceMode.Impulse);
         gameObject.AddComponent<PickupInteractable>();
+        OnDestroyed?.Invoke();
         Destroy(this);
         // GetComponent<Collider>().enabled = false;
         // EnableColliderAsync().Forget();
@@ -68,6 +70,7 @@ public class SplitableObject : MonoBehaviour, IInteractable
 
             if (Random.value <= coinChance)
                 Managers.Spawning.SpawnCoins(1, transform.position, playerDir).Forget();
+            OnDestroyed?.Invoke();
             Destroy(gameObject);
         }
     }

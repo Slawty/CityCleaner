@@ -1,5 +1,3 @@
-using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Managers : MonoBehaviour
@@ -8,7 +6,6 @@ public class Managers : MonoBehaviour
 
     [SerializeField] Camera mainCam;
     [SerializeField] UIManager uIManager;
-    [SerializeField] QuestManager questManager;
     [SerializeField] SpawnManager spawnManager;
     [SerializeField] Player player;
     [SerializeField] ToolsController toolsController;
@@ -23,7 +20,6 @@ public class Managers : MonoBehaviour
 
     public static Camera MainCam => Instance.mainCam;
     public static UIManager UI => Instance.uIManager;
-    public static QuestManager Quests => Instance.questManager;
     public static SpawnManager Spawning => Instance.spawnManager;
     public static Player Player => Instance.player;
     public static ToolsController Tools => Instance.toolsController;

@@ -4,6 +4,7 @@ using UnityEngine.Events;
 public class CuttableGrass : MonoBehaviour
 {
     public UnityAction<CuttableGrass> OnCut;
+    public UnityAction OnProgressChanged;
     [SerializeField] GameObject full;
     [SerializeField] GameObject medium;
     [SerializeField] GameObject shortCut;
@@ -19,6 +20,7 @@ public class CuttableGrass : MonoBehaviour
         progress = Mathf.Clamp01(value);
         // Debug.Log($"Progress: {progress}");
         UpdateVisual();
+        OnProgressChanged?.Invoke();
 
         if (progress >= 0.9f)
         {

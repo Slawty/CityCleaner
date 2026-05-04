@@ -3,18 +3,23 @@ using UnityEngine.InputSystem;
 
 public class DebugManager : MonoBehaviour
 {
-    [InlineScriptableObject]
-    [SerializeField] QuestData testQuest_01;
+    public bool InstantCleaning;
     [SerializeField] InputActionReference interactAction;
 
     void Start()
     {
-        interactAction.action.performed += OnDebugButton01Pressed;
+        if (interactAction != null)
+            interactAction.action.performed += OnDebugButton01Pressed;
+    }
+
+    void OnDestroy()
+    {
+        if (interactAction != null)
+            interactAction.action.performed -= OnDebugButton01Pressed;
     }
 
     void OnDebugButton01Pressed(InputAction.CallbackContext context)
     {
-        Managers.Quests.StartQuest(testQuest_01);
+        Debug.Log("Debug button pressed (hook tools here if needed).");
     }
-
 }

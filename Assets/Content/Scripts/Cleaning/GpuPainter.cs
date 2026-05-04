@@ -36,10 +36,16 @@ public class GPUPainter : MonoBehaviour
 
         var paintable = hit.collider.GetComponent<GPUPaintableObject>();
 
-        if (paintable == null)
+        if (paintable != null)
+        {
+            Paint(paintable, hit.point, cleanSpeed * Time.deltaTime);
             return;
+        }
 
-        Paint(paintable, hit.point, cleanSpeed * Time.deltaTime);
+        DirtNest dirtNest = hit.collider.GetComponentInParent<DirtNest>();
+
+        if (dirtNest != null)
+            dirtNest.ApplyWaterDamage(cleanSpeed * Time.deltaTime);
         // Debug.Log($"Paint: {hit.collider.name}");
     }
 
@@ -89,7 +95,6 @@ public class GPUPainter : MonoBehaviour
         {
             paintable.UpdateTracking(hitPos);
             nextUpdateTime = Time.time + 0.1f;
-            Managers.UI.SetCleanProgressBarPercent(paintable.GetCleanPercent() * 100f);
 
             if (paintable.isClean)
             {

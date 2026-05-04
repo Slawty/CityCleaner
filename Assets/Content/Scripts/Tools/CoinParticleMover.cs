@@ -22,7 +22,7 @@ public class CoinParticleMover : MonoBehaviour
     {
         int count = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Inside, inside);
 
-        Debug.Log($"OnParticleTrigger. Count: {count}");
+        // Debug.Log($"OnParticleTrigger. Count: {count}");
         for (int i = 0; i < count; i++)
         {
             ParticleSystem.Particle p = inside[i];

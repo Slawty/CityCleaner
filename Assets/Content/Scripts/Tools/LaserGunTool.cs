@@ -88,10 +88,23 @@ public class LaserGunTool : Tool
 
         var target = hit.collider.GetComponent<SplitableObject>();
 
-        if (target == null)
+        if (target != null)
+        {
+            target.UpdateLaserHit(DamagePerSecond);
             return;
+        }
 
-        target.UpdateLaserHit(DamagePerSecond);
+        var flashTarget = hit.collider.GetComponent<HitFlashObject>();
+
+        if (flashTarget != null)
+        {
+            flashTarget.UpdateLaserHit(DamagePerSecond);
+        }
+
+        DirtNest dirtNest = hit.collider.GetComponentInParent<DirtNest>();
+
+        if (dirtNest != null)
+            dirtNest.ApplyLaserDamage(DamagePerSecond);
     }
 
     protected override void OnDisable()
