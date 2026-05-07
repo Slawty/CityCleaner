@@ -5,7 +5,7 @@ public class WaterSprayTool : Tool
 {
     public float MaxAmmo;
     public float AmmoPerSecond = 2f;
-    [SerializeField] GPUPainter painter;
+    [SerializeField] GPUPainterWorld painter;
     [SerializeField] List<ParticleSystem> sprayEffects;
     [SerializeField] ProgressBar ammoBar;
     float currentAmmo;

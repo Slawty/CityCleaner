@@ -61109,18 +61109,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 4984019092729872339}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dec4c1bfd4056ec44865726b383d140a, type: 3}
+  m_Script: {fileID: 11500000, guid: 1d743fcb66581a0409081acf3f2b2c50, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::GPUPainterWorld
   cam: {fileID: 62046721}
-  textureResolution: 1024
   paintMask:
     serializedVersion: 2
     m_Bits: 1
-  brushTexture: {fileID: 2800000, guid: 9d98daf6ecbce524c8e14f5313225349, type: 3}
+  textureResolution: 1024
+  brushTexture: {fileID: 0}
   brushWorldSize: 0.5
-  cleanSpeed: 30
-  paintMaterial: {fileID: 0}
+  cleanSpeed: 4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -39,6 +39,7 @@ public class GPUPaintableObject : MonoBehaviour
     Renderer cachedRenderer;
     MaterialPropertyBlock propertyBlock;
     static readonly int DirtMaskShaderId = Shader.PropertyToID("_DirtMask");
+    static readonly int LocalCleanMaskShaderId = Shader.PropertyToID("_LocalCleanMask");
     public bool IsInitialized { get; private set; }
     float nextDirtSpawn = 0f;
     float dirtSpawnStep;
@@ -59,6 +60,7 @@ public class GPUPaintableObject : MonoBehaviour
     {
         IsInitialized = true;
         maskTexture = runtimeMask;
+        BindMaskToRenderer(maskTexture);
 
         CreateCoverageTexture();
         InitializeTracking();
@@ -84,11 +86,15 @@ public class GPUPaintableObject : MonoBehaviour
 
         Initialize(mask);
 
-        cachedRenderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.SetTexture(DirtMaskShaderId, mask);
-        cachedRenderer.SetPropertyBlock(propertyBlock);
-
         OnInitialize?.Invoke();
+    }
+
+    void BindMaskToRenderer(RenderTexture runtimeMask)
+    {
+        cachedRenderer.GetPropertyBlock(propertyBlock);
+        propertyBlock.SetTexture(DirtMaskShaderId, runtimeMask);
+        propertyBlock.SetTexture(LocalCleanMaskShaderId, runtimeMask);
+        cachedRenderer.SetPropertyBlock(propertyBlock);
     }
 
     // ----------------------------------------------------
