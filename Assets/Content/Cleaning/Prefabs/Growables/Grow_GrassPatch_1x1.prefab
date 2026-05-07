@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7518720188399448207}
   - component: {fileID: 2777551037330341244}
-  - component: {fileID: 3672838394095159387}
   - component: {fileID: 222163358268968832}
   - component: {fileID: 5038553866092946813}
   - component: {fileID: 1394713169489305368}
@@ -59,35 +58,14 @@ MonoBehaviour:
   bumpUpEase: 27
   bumpDownEase: 6
   linkedGrowables: []
-  renderers:
+  growableRenderers:
   - {fileID: 1853561475143949766}
+  dirtRenderers:
+  - {fileID: 5038553866092946813}
   minStrength: 0
   maxStrength: 1
---- !u!114 &3672838394095159387
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7639681660555044}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
-  winCoins: 1
-  winDirt: 3
-  AdditionalObjectsToClean: []
-  CoinSpawnPos: {fileID: 5816493177959900294}
-  trackingResolution: 128
-  cleanThreshold: 200
-  cleanPercentage: 0.7
-  allowGooCleaning: 1
-  maskTexture: {fileID: 0}
-  coverageTexture: {fileID: 0}
-  coverageReadable: {fileID: 0}
-  maskReadable: {fileID: 0}
-  isClean: 0
+  cleanStrengthWhileGrowing: 0
+  cleanStrengthWhenFullyGrown: 1
 --- !u!33 &222163358268968832
 MeshFilter:
   m_ObjectHideFlags: 0

@@ -1,0 +1,37 @@
+---
+description: Project coding style and simplicity preferences
+alwaysApply: true
+---
+
+# City Cleaner Coding Rules
+
+## Core Style
+- Prefer clean, simple, readable code over complex defensive logic.
+- Optimize for obvious control flow and maintainability.
+- Avoid unnecessary abstraction and over-engineering.
+
+## Null Handling
+- For required references/components, fail fast (do not silently ignore nulls).
+
+## Edge Cases
+- Handle practical gameplay cases only.
+- Avoid adding extreme edge-case guards unless they solve a real issue seen in this project.
+
+## Function Naming and Structure
+- Prefer direct, action-oriented names (`SpawnPoopling`, `SetVulnerable`, `StartSpawning`).
+- Avoid vague "Try..." method naming unless failure is genuinely expected and meaningful.
+
+## Function Parameters Formatting
+- Prefer function parameter lists on a single line when reasonably readable.
+- Do not split parameters into one-per-line unless the signature is genuinely too long or harms readability.
+
+## Loop Variable Naming
+- Use clear, full variable names in loops.
+- Do not over-shorten loop variables (e.g., prefer `infoText` over `t` in `foreach`).
+
+## Gameplay Logic Preferences
+- Use explicit state transitions (e.g., `StartSpawning` / `StopSpawning`) instead of scattered boolean checks.
+- Keep damage and state logic straightforward and centralized.
+
+## Error Visibility
+- Prefer surfacing setup/configuration problems early (clear failures) instead of silent fallbacks.

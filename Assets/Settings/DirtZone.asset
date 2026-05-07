@@ -18,7 +18,7 @@ MonoBehaviour:
     m_Value: 2
   intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.484
   response:
     m_OverrideState: 1
     m_Value: 0.25
@@ -122,8 +122,8 @@ MonoBehaviour:
   - {fileID: 7459505089368610076}
   - {fileID: 7379259404941192807}
   - {fileID: -5216470197434269853}
-  - {fileID: -628385346115992471}
   - {fileID: -3318081501496795484}
+  - {fileID: -628385346115992471}
   - {fileID: 4749785257982900297}
   - {fileID: 1269791716857290854}
   - {fileID: -8238491569569142886}
@@ -144,11 +144,11 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: {x: 0.9336513, y: 0.9246513, z: 1, w: 0}
   midtones:
-    m_OverrideState: 1
-    m_Value: {x: 0.6286291, y: 1, z: 0.7759821, w: 0}
+    m_OverrideState: 0
+    m_Value: {x: 0.9747195, y: 0.92488927, z: 1, w: 0}
   highlights:
     m_OverrideState: 0
-    m_Value: {x: 0.9254525, y: 0.98594797, z: 1, w: 0}
+    m_Value: {x: 0.9881594, y: 0.9798144, z: 1, w: 0}
   shadowsStart:
     m_OverrideState: 0
     m_Value: 0

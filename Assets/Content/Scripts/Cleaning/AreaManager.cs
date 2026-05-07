@@ -11,11 +11,7 @@ public class AreaManager : MonoBehaviour
         if (area == null)
             return;
 
-        if (currentArea != null && currentArea != area)
-            currentArea.SetDrivingCleanUi(false);
-
         currentArea = area;
-        currentArea.SetDrivingCleanUi(true);
         currentArea.RefreshProgressAndPushUi();
     }
 
@@ -24,8 +20,8 @@ public class AreaManager : MonoBehaviour
         if (currentArea != area)
             return;
 
-        currentArea.SetDrivingCleanUi(false);
         currentArea = null;
-        Managers.UI.SetCleanProgressBarPercent(0f);
+        Managers.UI.SetZoneCleanProgressBarPercent(0f);
+        Managers.UI.SetRadioactivesProgressBarPercent(0f);
     }
 }

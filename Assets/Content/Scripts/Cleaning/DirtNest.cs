@@ -3,11 +3,12 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// Local corruption anchor for a neighborhood: invulnerable until <see cref="DirtArea"/> progress crosses the threshold
-/// (or immediately if <see cref="VulnerableAtStart"/>), then takes damage from water, goo, and laser tools.
+/// Local corruption anchor for a neighborhood.
+/// Vulnerability is set explicitly via <see cref="SetVulnerable"/>.
 /// </summary>
 public class DirtNest : MonoBehaviour, IGooHitReceiver
 {
+    [SerializeField] GameObject shieldObject;
     public bool VulnerableAtStart;
     [Header("Area")]
     [SerializeField] DirtArea dirtArea;
@@ -27,8 +28,6 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
     [SerializeField] float pooplingSpawnMinInterval = 10f;
     [SerializeField] float pooplingSpawnMaxInterval = 25f;
     [SerializeField] int maxAlivePooplings = 5;
-    [Tooltip("If false, no pooplings spawn until the nest is vulnerable.")]
-    [SerializeField] bool spawnPooplingsWhileInvulnerable = true;
 
     [Header("Events")]
     public UnityEvent OnBecameVulnerable;
@@ -38,12 +37,11 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
     float health;
     float nextPooplingSpawnTime;
     int alivePooplings;
-    bool wasVulnerable;
     bool freed;
+    bool isSpawning;
     readonly List<Poopling> pooplingsSpawned = new();
 
     public bool IsVulnerable { get; private set; }
-    public float AreaCleanFraction { get; private set; }
     public bool IsFreed => freed;
     public float MaxHealth => maxHealth;
     public float CurrentHealth => health;
@@ -55,51 +53,30 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
         if (dirtArea == null && autoFindDirtAreaInParents)
             dirtArea = GetComponentInParent<DirtArea>();
 
-        ScheduleNextPooplingSpawn();
-        RefreshAreaAndVulnerability();
+        if (VulnerableAtStart)
+            SetVulnerable();
+
         SyncHealthBar();
+    }
+
+    void Start()
+    {
+        dirtArea.OnAreaProgressChanged.AddListener(OnAreaProgressChanged);
+        StartSpawning();
+    }
+
+    void OnAreaProgressChanged(float progress)
+    {
+        if (dirtArea.NormalizedProgress >= vulnerabilityCleanFraction)
+        {
+            SetVulnerable();
+            dirtArea.OnAreaProgressChanged.RemoveListener(OnAreaProgressChanged);
+        }
     }
 
     void Update()
     {
-        if (freed)
-            return;
-
-        RefreshAreaAndVulnerability();
-
-        if (IsVulnerable && !wasVulnerable)
-            SetVulnerable();
-
-        wasVulnerable = IsVulnerable;
-
-        TrySpawnPooplingRoutine();
-    }
-
-    void RefreshAreaAndVulnerability()
-    {
-        AreaCleanFraction = dirtArea != null ? dirtArea.NormalizedProgress : 1f;
-        IsVulnerable =
-            VulnerableAtStart ||
-            AreaCleanFraction >= vulnerabilityCleanFraction;
-    }
-
-    void SetVulnerable()
-    {
-        OnBecameVulnerable?.Invoke();
-    }
-
-    void TrySpawnPooplingRoutine()
-    {
-        if (freed)
-            return;
-
-        if (!spawnPooplingsWhileInvulnerable && !IsVulnerable)
-            return;
-
-        if (pooplingPrefab == null)
-            return;
-
-        if (alivePooplings >= maxAlivePooplings)
+        if (!isSpawning)
             return;
 
         if (Time.time < nextPooplingSpawnTime)
@@ -109,10 +86,36 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
         ScheduleNextPooplingSpawn();
     }
 
+    public void SetVulnerable()
+    {
+        if (IsVulnerable)
+            return;
+
+        IsVulnerable = true;
+        shieldObject.SetActive(false);
+        OnBecameVulnerable?.Invoke();
+        Managers.UI.ShowInfoText("Poop Nest Vulnerable");
+        StopSpawning();
+    }
+
     void ScheduleNextPooplingSpawn()
     {
         float gap = Random.Range(pooplingSpawnMinInterval, pooplingSpawnMaxInterval);
         nextPooplingSpawnTime = Time.time + gap;
+    }
+
+    public void StartSpawning()
+    {
+        if (isSpawning)
+            return;
+
+        isSpawning = true;
+        ScheduleNextPooplingSpawn();
+    }
+
+    public void StopSpawning()
+    {
+        isSpawning = false;
     }
 
     void SpawnPoopling()
@@ -122,18 +125,19 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
 
         GameObject instance = Instantiate(pooplingPrefab, spawnPos, Quaternion.identity);
         var poopling = instance.GetComponent<Poopling>();
-        if (poopling != null)
-        {
-            alivePooplings++;
-            pooplingsSpawned.Add(poopling);
-            poopling.SetWanderCenter(transform.position);
-            poopling.OnConsumed += OnPooplingConsumed;
-        }
+        alivePooplings++;
+        pooplingsSpawned.Add(poopling);
+        poopling.SetWanderCenter(transform.position);
+        poopling.OnConsumed += OnPooplingDestroyed;
+
+        if (alivePooplings >= maxAlivePooplings)
+            StopSpawning();
     }
 
-    void OnPooplingConsumed()
+    void OnPooplingDestroyed()
     {
         alivePooplings = Mathf.Max(0, alivePooplings - 1);
+        StartSpawning();
     }
 
     void OnDestroy()
@@ -141,7 +145,7 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
         foreach (Poopling p in pooplingsSpawned)
         {
             if (p != null)
-                p.OnConsumed -= OnPooplingConsumed;
+                p.OnConsumed -= OnPooplingDestroyed;
         }
 
         pooplingsSpawned.Clear();
@@ -150,26 +154,17 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
     /// <summary>Continuous laser damage (expects damage per second; applies delta internally).</summary>
     public void ApplyLaserDamage(float damagePerSecond)
     {
-        if (!IsVulnerable || freed)
-            return;
-
         ApplyDamage(damagePerSecond * Time.deltaTime);
     }
 
     /// <summary>Water sprayer: pass the same strength GPUPainter uses per frame (cleanSpeed * Time.deltaTime).</summary>
     public void ApplyWaterDamage(float painterStrengthThisFrame)
     {
-        if (!IsVulnerable || freed)
-            return;
-
         ApplyDamage(painterStrengthThisFrame * waterDamageMultiplier);
     }
 
     public void OnGooHit(Vector3 hitPoint, GameObject source)
     {
-        if (!IsVulnerable || freed)
-            return;
-
         ApplyDamage(gooDamagePerHit);
     }
 
@@ -194,17 +189,18 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
 
         freed = true;
         IsVulnerable = false;
+        StopSpawning();
         OnAreaFreed?.Invoke();
 
         foreach (Collider c in GetComponentsInChildren<Collider>())
             c.enabled = false;
+
+        Destroy(gameObject);
+        Managers.UI.ShowInfoText("Area Cleaned");
     }
 
     void SyncHealthBar()
     {
-        if (healthBar == null)
-            return;
-
         float normalized = Mathf.Clamp01(health / Mathf.Max(maxHealth, 1e-5f));
         healthBar.SetNormalizedFill(normalized);
     }

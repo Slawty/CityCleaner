@@ -4,13 +4,19 @@ using System.Collections.Generic;
 public class GrassPatch : GooHitGrowable
 {
     [Header("Renderers")]
-    [SerializeField] List<Renderer> renderers;
+    [SerializeField] List<Renderer> growableRenderers;
+    [SerializeField] List<Renderer> dirtRenderers;
 
     [Header("Growth")]
     [SerializeField] float minStrength = 0f;
     [SerializeField] float maxStrength = 1f;
 
-    readonly int dirtStrengthID = Shader.PropertyToID("_CleanStrength");
+    [Header("Dirt shader")]
+    [SerializeField] float cleanStrengthWhileGrowing = 0f;
+    [SerializeField] float cleanStrengthWhenFullyGrown = 1f;
+
+    readonly int growStrengthID = Shader.PropertyToID("_GrowStrength");
+    readonly int dirtStrengthID = Shader.PropertyToID("_DirtAmount");
     MaterialPropertyBlock mpb;
 
     void Awake()
@@ -23,14 +29,33 @@ public class GrassPatch : GooHitGrowable
     {
         float baseStrength = Mathf.Lerp(minStrength, maxStrength, progress);
         float bumpedStrength = Mathf.Clamp01(baseStrength * hitMultiplier);
-        mpb.SetFloat(dirtStrengthID, bumpedStrength);
+        mpb.SetFloat(growStrengthID, bumpedStrength);
 
-        for (int i = 0; i < renderers.Count; i++)
+        for (int i = 0; i < growableRenderers.Count; i++)
         {
-            if (renderers[i] == null)
+            if (growableRenderers[i] == null)
                 continue;
 
-            renderers[i].SetPropertyBlock(mpb);
+            growableRenderers[i].SetPropertyBlock(mpb);
+        }
+
+
+        mpb.SetFloat(dirtStrengthID, 1 - progress);
+        foreach (var renderer in dirtRenderers)
+        {
+            renderer.SetPropertyBlock(mpb);
+            // renderer.material.SetFloat(dirtStrengthID, 0f);
+        }
+    }
+
+    protected override void OnFullyGrown()
+    {
+        Debug.Log("OnFullyGrown");
+        foreach (var renderer in dirtRenderers)
+        {
+            mpb.SetFloat(dirtStrengthID, 0);
+            renderer.SetPropertyBlock(mpb);
+            // renderer.material.SetFloat(dirtStrengthID, 0f);
         }
     }
 }

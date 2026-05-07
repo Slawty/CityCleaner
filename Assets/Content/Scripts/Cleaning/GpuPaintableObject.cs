@@ -36,6 +36,9 @@ public class GPUPaintableObject : MonoBehaviour
     int pixelsToCleanCount;
     int cleanedPixelCount;
     Mesh mesh;
+    Renderer cachedRenderer;
+    MaterialPropertyBlock propertyBlock;
+    static readonly int DirtMaskShaderId = Shader.PropertyToID("_DirtMask");
     public bool IsInitialized { get; private set; }
     float nextDirtSpawn = 0f;
     float dirtSpawnStep;
@@ -44,6 +47,8 @@ public class GPUPaintableObject : MonoBehaviour
     void Awake()
     {
         mesh = GetComponent<MeshFilter>().sharedMesh;
+        cachedRenderer = GetComponent<Renderer>();
+        propertyBlock = new MaterialPropertyBlock();
     }
 
     // ----------------------------------------------------
@@ -79,8 +84,9 @@ public class GPUPaintableObject : MonoBehaviour
 
         Initialize(mask);
 
-        var material = GetComponent<Renderer>().material;
-        material.SetTexture("_DirtMask", mask);
+        cachedRenderer.GetPropertyBlock(propertyBlock);
+        propertyBlock.SetTexture(DirtMaskShaderId, mask);
+        cachedRenderer.SetPropertyBlock(propertyBlock);
 
         OnInitialize?.Invoke();
     }

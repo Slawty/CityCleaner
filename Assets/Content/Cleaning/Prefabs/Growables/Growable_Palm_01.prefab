@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5426312e8172ab429dafac757a66791, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrowableObject
-  hitsToFullGrowth: 20
+  hitsToFullGrowth: 15
   growthProgress: 0
   bumpAmount: 0.1
   bumpDuration: 0.1

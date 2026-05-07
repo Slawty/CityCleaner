@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// Root for a neighborhood: counts discrete objectives (GPU cleanables, goo growables, splitables) and drives the HUD while the player is inside an <see cref="AreaTrigger"/>.
@@ -9,8 +11,12 @@ using UnityEngine.Events;
 /// </summary>
 public class DirtArea : MonoBehaviour
 {
+    [SerializeField] Volume radioactivePostProcessVolume;
+    [SerializeField] AreaTrigger areaTrigger;
     [Header("GPU dirt")]
     [SerializeField] bool initializeGpuPaintablesOnAwake = true;
+    [Header("Debug")]
+    [SerializeField, Range(0f, 100f)] float debugCleanPercent = 10f;
 
     [Header("Events")]
     public UnityEvent<float> OnAreaProgressChanged;
@@ -18,21 +24,24 @@ public class DirtArea : MonoBehaviour
     List<GPUPaintableObject> paintables = new();
     List<GooHitGrowable> gooGrowables = new();
     List<SplitableObject> splitables = new();
+    List<SplitableObject> radioactives = new();
+
 
     int totalTargets;
     int completedTargets;
+    int totalRadioactivetargets;
+    int completedRadioactivetargets;
 
-    bool drivingCleanUi;
     bool subscribed;
 
     public float NormalizedProgress { get; private set; }
 
-    public bool DrivingCleanUi => drivingCleanUi;
-
     void Awake()
     {
         DiscoverTargets();
-        CountTargets();
+                totalTargets = paintables.Count + gooGrowables.Count + splitables.Count + radioactives.Count;
+        totalRadioactivetargets = radioactives.Count;
+        Debug.Log($"Area {name} Total targets: {totalTargets} Radioactive targets: {totalRadioactivetargets}");
 
         if (initializeGpuPaintablesOnAwake)
         {
@@ -42,18 +51,32 @@ public class DirtArea : MonoBehaviour
                     p.Initialize(128);
             }
         }
+
     }
 
     void Start()
     {
         Subscribe();
         SyncAlreadyCompletedAtStart();
-        PushProgress(forcePush: true);
+        PushProgress();
+        radioactivePostProcessVolume.gameObject.SetActive(true);
     }
 
     void OnDestroy()
     {
         Unsubscribe();
+    }
+
+    void OnPlayerEnteredArea()
+    {
+        RefreshProgressAndPushUi();
+        Managers.UI.ShowZoneProgress(true);
+    }
+
+    void OnPlayerExitedArea()
+    {
+        Managers.UI.ShowZoneProgress(false);
+    
     }
 
     void DiscoverTargets()
@@ -62,34 +85,17 @@ public class DirtArea : MonoBehaviour
         gooGrowables.Clear();
         splitables.Clear();
 
-        paintables.AddRange(GetComponentsInChildren<GPUPaintableObject>(true));
-        gooGrowables.AddRange(GetComponentsInChildren<GooHitGrowable>(true));
-        splitables.AddRange(GetComponentsInChildren<SplitableObject>(true));
-    }
+        paintables.AddRange(GetComponentsInChildren<GPUPaintableObject>());
+        gooGrowables.AddRange(GetComponentsInChildren<GooHitGrowable>());
 
-    void CountTargets()
-    {
-        totalTargets = 0;
-
-        foreach (GPUPaintableObject p in paintables)
+        var splittables = GetComponentsInChildren<SplitableObject>();
+        foreach (SplitableObject s in splittables)
         {
-            if (p != null)
-                totalTargets++;
+            if (s.IsRadioactive)
+                radioactives.Add(s);
+            else
+                splitables.Add(s);
         }
-
-        foreach (GooHitGrowable g in gooGrowables)
-        {
-            if (g != null)
-                totalTargets++;
-        }
-
-        foreach (SplitableObject s in splitables)
-        {
-            if (s != null)
-                totalTargets++;
-        }
-
-        Debug.Log($"Area {name} Total targets: {totalTargets}");
     }
 
     void Subscribe()
@@ -116,6 +122,15 @@ public class DirtArea : MonoBehaviour
             if (s != null)
                 s.OnDestroyed.AddListener(OnSplitDestroyed);
         }
+
+        foreach (SplitableObject s in radioactives)
+        {
+            if (s != null)
+                s.OnDestroyed.AddListener(OnRadioactiveDestroyed);
+        }
+
+        areaTrigger.OnPlayerEnter += OnPlayerEnteredArea;
+        areaTrigger.OnPlayerExit += OnPlayerExitedArea;
     }
 
     void Unsubscribe()
@@ -142,6 +157,15 @@ public class DirtArea : MonoBehaviour
             if (s != null)
                 s.OnDestroyed.RemoveListener(OnSplitDestroyed);
         }
+
+        foreach (SplitableObject s in radioactives)
+        {
+            if (s != null)
+                s.OnDestroyed.RemoveListener(OnRadioactiveDestroyed);
+        }
+
+        areaTrigger.OnPlayerEnter -= OnPlayerEnteredArea;
+        areaTrigger.OnPlayerExit -= OnPlayerExitedArea;
     }
 
     void SyncAlreadyCompletedAtStart()
@@ -162,38 +186,99 @@ public class DirtArea : MonoBehaviour
     void OnPaintableCleaned()
     {
         completedTargets++;
-        PushProgress(forcePush: false);
+        PushProgress();
     }
 
     void OnGooFullyGrown()
     {
         completedTargets++;
-        PushProgress(forcePush: false);
+        PushProgress();
     }
 
     void OnSplitDestroyed()
     {
         completedTargets++;
-        PushProgress(forcePush: false);
+        PushProgress();
     }
 
-    public void SetDrivingCleanUi(bool value)
+    void OnRadioactiveDestroyed()
     {
-        drivingCleanUi = value;
+        completedTargets++;
+        completedRadioactivetargets++;
+        Debug.Log($"Radioactive destroyed: {completedRadioactivetargets} / {totalRadioactivetargets}");
+        PushProgress();
+
+        if (completedRadioactivetargets == totalRadioactivetargets)
+        {
+            radioactivePostProcessVolume.gameObject.SetActive(false);
+            Managers.UI.ShowInfoText("Air Cleared");
+        }
     }
 
     public void RefreshProgressAndPushUi()
     {
-        PushProgress(forcePush: true);
+        PushProgress();
     }
 
-    void PushProgress(bool forcePush)
+    public void DebugCleanFixedPercent()
+    {
+        List<System.Action> completionActions = new();
+
+        foreach (GPUPaintableObject paintableObject in paintables)
+        {
+            if (paintableObject != null && !paintableObject.isClean)
+            {
+                if (!paintableObject.IsInitialized)
+                    paintableObject.Initialize(128);
+
+                completionActions.Add(paintableObject.SetClean);
+            }
+        }
+
+        foreach (GooHitGrowable gooGrowable in gooGrowables)
+        {
+            if (gooGrowable != null && !gooGrowable.IsFullyGrown)
+                completionActions.Add(gooGrowable.DebugSetFullyGrown);
+        }
+
+        foreach (SplitableObject splitableObject in splitables)
+        {
+            if (splitableObject != null)
+                completionActions.Add(splitableObject.DebugDestroyNow);
+        }
+
+        foreach (SplitableObject radioactiveObject in radioactives)
+        {
+            if (radioactiveObject != null)
+                completionActions.Add(radioactiveObject.DebugDestroyNow);
+        }
+
+        int incompleteTargetsCount = completionActions.Count;
+        if (incompleteTargetsCount == 0)
+            return;
+
+        float cleanFraction = debugCleanPercent / 100f;
+        int targetsToClean = Mathf.CeilToInt(totalTargets * cleanFraction);
+        targetsToClean = Mathf.Clamp(targetsToClean, 0, incompleteTargetsCount);
+
+        for (int index = completionActions.Count - 1; index > 0; index--)
+        {
+            int randomIndex = Random.Range(0, index + 1);
+            (completionActions[index], completionActions[randomIndex]) = (completionActions[randomIndex], completionActions[index]);
+        }
+
+        for (int index = 0; index < targetsToClean; index++)
+            completionActions[index].Invoke();
+    }
+
+    void PushProgress()
     {
         NormalizedProgress = totalTargets > 0 ? (float)completedTargets / totalTargets : 1f;
 
         OnAreaProgressChanged?.Invoke(NormalizedProgress);
 
-        if (drivingCleanUi || forcePush)
-            Managers.UI.SetZoneCleanProgressBarPercent(NormalizedProgress * 100f);
+        Managers.UI.SetZoneCleanProgressBarPercent(NormalizedProgress * 100f);
+        if (totalRadioactivetargets > 0)
+            Managers.UI.SetRadioactivesProgressBarPercent((1 - completedRadioactivetargets / (float)totalRadioactivetargets) * 100f);
     }
 }
