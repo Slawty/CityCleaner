@@ -21,7 +21,7 @@ public class GPUPaintableObject : MonoBehaviour
 
     [Header("Clean threshold")]
     [SerializeField] int cleanThreshold = 200;
-    [SerializeField] float cleanPercentage = 1;
+    [SerializeField] float cleanPercentage = 0.85f;
     [Header("Tool Interaction")]
     [SerializeField] bool allowGooCleaning = false;
     public RenderTexture maskTexture;

@@ -21,6 +21,8 @@ public class ZoneDirtMap : MonoBehaviour
     static readonly int StrengthId = Shader.PropertyToID("_Strength");
     static readonly int ProjectionModeId = Shader.PropertyToID("_ProjectionMode");
 
+    const string DefaultZoneDirtSurfaceShaderName = "Shader Graphs/SG_ObjectDirtSimpleWorld";
+
     [Header("Zone Bounds")]
     [SerializeField] BoxCollider zoneBoundsCollider;
 
@@ -28,9 +30,15 @@ public class ZoneDirtMap : MonoBehaviour
     [SerializeField] int textureResolution = 1024;
     [SerializeField, Range(0f, 1f)] float initialDirt = 1f;
     [SerializeField] Texture2D initialZoneDirtTexture;
+    [Tooltip("Optional per-axis masks. Parent DirtArea axis masks take priority when non-null.")]
+    [SerializeField] Texture2D initialZoneDirtTextureXZ;
+    [SerializeField] Texture2D initialZoneDirtTextureXY;
+    [SerializeField] Texture2D initialZoneDirtTextureYZ;
 
     [Header("Targets")]
     [SerializeField] bool autoCollectTargetRenderers = true;
+    [Tooltip("Materials using this shader receive zone dirt masks. Leave empty to resolve SG_ObjectDirtSimpleWorld by name.")]
+    [SerializeField] Shader zoneDirtSurfaceShader;
     [SerializeField] List<Renderer> targetRenderers = new();
 
     [Header("Brush")]
@@ -51,6 +59,24 @@ public class ZoneDirtMap : MonoBehaviour
     Vector2 zoneMaxXY;
     Vector2 zoneMinYZ;
     Vector2 zoneMaxYZ;
+
+    void OnEnable()
+    {
+        if (Application.isPlaying)
+            return;
+
+        if (zoneBoundsCollider == null)
+            zoneBoundsCollider = GetComponent<BoxCollider>();
+
+        if (zoneBoundsCollider == null)
+            return;
+
+        propertyBlock ??= new MaterialPropertyBlock();
+
+        RebuildZoneTexture();
+        UpdateZoneBounds();
+        ApplyToTargetRenderers();
+    }
 
     void Awake()
     {
@@ -121,11 +147,51 @@ public class ZoneDirtMap : MonoBehaviour
     public void CollectTargetRenderers()
     {
         targetRenderers.Clear();
-        targetRenderers.AddRange(GetComponentsInChildren<Renderer>(true));
+        EnsureZoneDirtSurfaceShader();
+        if (zoneDirtSurfaceShader == null)
+        {
+            Debug.LogWarning(
+                $"ZoneDirtMap on {name}: zone dirt surface shader not found ({DefaultZoneDirtSurfaceShaderName}). Assign Zone Dirt Surface Shader on this component.",
+                this);
+            return;
+        }
+
+        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+        foreach (Renderer renderer in renderers)
+        {
+            if (renderer == null || !RendererUsesShader(renderer, zoneDirtSurfaceShader))
+                continue;
+
+            if (!targetRenderers.Contains(renderer))
+                targetRenderers.Add(renderer);
+        }
+    }
+
+    void EnsureZoneDirtSurfaceShader()
+    {
+        if (zoneDirtSurfaceShader != null)
+            return;
+
+        zoneDirtSurfaceShader = Shader.Find(DefaultZoneDirtSurfaceShaderName);
+    }
+
+    static bool RendererUsesShader(Renderer renderer, Shader shader)
+    {
+        Material[] materials = renderer.sharedMaterials;
+        foreach (Material material in materials)
+        {
+            if (material != null && material.shader == shader)
+                return true;
+        }
+
+        return false;
     }
 
     public void ApplyToTargetRenderers()
     {
+        if (propertyBlock == null)
+            propertyBlock = new MaterialPropertyBlock();
+
         if (autoCollectTargetRenderers)
             CollectTargetRenderers();
 
@@ -178,6 +244,32 @@ public class ZoneDirtMap : MonoBehaviour
         PaintIntoTexture(zoneTextureYZ, 2);
     }
 
+    Texture2D ResolveInitialTextureForProjection(string suffix)
+    {
+        DirtArea area = GetComponentInParent<DirtArea>();
+        Texture2D fromArea = suffix switch
+        {
+            "XZ" => area != null ? area.ZoneInitialMaskXZ : null,
+            "XY" => area != null ? area.ZoneInitialMaskXY : null,
+            "YZ" => area != null ? area.ZoneInitialMaskYZ : null,
+            _ => null
+        };
+
+        Texture2D localAxis = suffix switch
+        {
+            "XZ" => initialZoneDirtTextureXZ,
+            "XY" => initialZoneDirtTextureXY,
+            "YZ" => initialZoneDirtTextureYZ,
+            _ => null
+        };
+
+        if (fromArea != null)
+            return fromArea;
+        if (localAxis != null)
+            return localAxis;
+        return initialZoneDirtTexture;
+    }
+
     RenderTexture CreateZoneTexture(string suffix)
     {
         RenderTexture zoneTexture = new RenderTexture(textureResolution, textureResolution, 0, RenderTextureFormat.R8)
@@ -188,10 +280,12 @@ public class ZoneDirtMap : MonoBehaviour
         };
         zoneTexture.Create();
 
+        Texture2D initialSource = ResolveInitialTextureForProjection(suffix);
+
         RenderTexture activeTarget = RenderTexture.active;
-        if (initialZoneDirtTexture != null)
+        if (initialSource != null)
         {
-            Graphics.Blit(initialZoneDirtTexture, zoneTexture);
+            Graphics.Blit(initialSource, zoneTexture);
         }
         else
         {

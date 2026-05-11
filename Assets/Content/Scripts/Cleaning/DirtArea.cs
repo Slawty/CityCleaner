@@ -15,6 +15,15 @@ public class DirtArea : MonoBehaviour
     [SerializeField] AreaTrigger areaTrigger;
     [Header("GPU dirt")]
     [SerializeField] bool initializeGpuPaintablesOnAwake = true;
+    [Tooltip("Optional baked dirt mask per tri-planar axis for child ZoneDirtMap. When set, overrides that axis on ZoneDirtMap.")]
+    [SerializeField] Texture2D zoneInitialMaskXZ;
+    [SerializeField] Texture2D zoneInitialMaskXY;
+    [SerializeField] Texture2D zoneInitialMaskYZ;
+
+    public Texture2D ZoneInitialMaskXZ => zoneInitialMaskXZ;
+    public Texture2D ZoneInitialMaskXY => zoneInitialMaskXY;
+    public Texture2D ZoneInitialMaskYZ => zoneInitialMaskYZ;
+
     [Header("Debug")]
     [SerializeField, Range(0f, 100f)] float debugCleanPercent = 10f;
 

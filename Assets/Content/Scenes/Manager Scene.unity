@@ -34127,7 +34127,7 @@ MonoBehaviour:
   moveSpeed: 3
   sprintSpeed: 6
   gravity: -9.81
-  jumpHeight: 1.5
+  jumpHeight: 2.5
   moveAction: {fileID: -1680190386980627800, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   jumpAction: {fileID: -2099379676528639254, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   sprintAction: {fileID: 6393252724350737843, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
@@ -61118,8 +61118,8 @@ MonoBehaviour:
     m_Bits: 1
   textureResolution: 1024
   brushTexture: {fileID: 0}
-  brushWorldSize: 0.5
-  cleanSpeed: 4
+  brushWorldSize: 1
+  cleanSpeed: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
