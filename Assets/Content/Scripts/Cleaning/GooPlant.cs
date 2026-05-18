@@ -1,9 +1,11 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GooPlant : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] WashingMachineTrigger pooplingTrigger;
+    [FormerlySerializedAs("pooplingTrigger")]
+    [SerializeField] WashingMachineTrigger dirtlingTrigger;
     [SerializeField] Transform spinTarget;
     [SerializeField] Transform goolingSpawnPoint;
     [SerializeField] GameObject goolingPrefab;
@@ -13,57 +15,56 @@ public class GooPlant : MonoBehaviour
     [SerializeField] float spinSpeed = 540f;
     [SerializeField] float startSpinDistanceThreshold = 0.05f;
 
-    Poopling storedPoopling;
+    Dirtling storedDirtling;
     bool isConverting;
     float conversionTimer;
 
     void Start()
     {
-        pooplingTrigger.OnPooplingStored += OnPooplingStored;
-        pooplingTrigger.OnPooplingPickedUp += OnPooplingPickedUp;
-        pooplingTrigger.EnableCollider(true);
+        dirtlingTrigger.OnDirtlingStored += OnDirtlingStored;
+        dirtlingTrigger.OnDirtlingReleased += OnDirtlingReleased;
+        dirtlingTrigger.EnableCollider(true);
     }
 
     void OnDestroy()
     {
-        if (pooplingTrigger == null)
+        if (dirtlingTrigger == null)
             return;
 
-        pooplingTrigger.OnPooplingStored -= OnPooplingStored;
-        pooplingTrigger.OnPooplingPickedUp -= OnPooplingPickedUp;
+        dirtlingTrigger.OnDirtlingStored -= OnDirtlingStored;
+        dirtlingTrigger.OnDirtlingReleased -= OnDirtlingReleased;
     }
 
     void Update()
     {
-        if (!isConverting || storedPoopling == null)
+        if (!isConverting || storedDirtling == null)
             return;
 
         if (!HasReachedSpinTarget())
             return;
 
-        storedPoopling.transform.Rotate(Vector3.up * (spinSpeed * Time.deltaTime), Space.World);
+        storedDirtling.transform.Rotate(Vector3.up * (spinSpeed * Time.deltaTime), Space.World);
         conversionTimer -= Time.deltaTime;
 
         if (conversionTimer <= 0f)
             FinishConversion();
     }
 
-    void OnPooplingStored(Poopling poopling)
+    void OnDirtlingStored(Dirtling dirtling)
     {
         if (isConverting)
             return;
 
-        storedPoopling = poopling;
-        // Keep the poopling locked in place while conversion runs.
-        storedPoopling.PickupInteractable.EnableCollider(false);
+        storedDirtling = dirtling;
+        storedDirtling.SetBodyColliderEnabled(false);
         conversionTimer = conversionDuration;
         isConverting = true;
     }
 
-    void OnPooplingPickedUp()
+    void OnDirtlingReleased()
     {
         isConverting = false;
-        storedPoopling = null;
+        storedDirtling = null;
     }
 
     bool HasReachedSpinTarget()
@@ -71,22 +72,22 @@ public class GooPlant : MonoBehaviour
         if (spinTarget == null)
             return true;
 
-        return Vector3.SqrMagnitude(storedPoopling.transform.position - spinTarget.position)
+        return Vector3.SqrMagnitude(storedDirtling.transform.position - spinTarget.position)
             <= startSpinDistanceThreshold * startSpinDistanceThreshold;
     }
 
     void FinishConversion()
     {
-        if (storedPoopling == null)
+        if (storedDirtling == null)
         {
             isConverting = false;
             return;
         }
 
         Instantiate(goolingPrefab, goolingSpawnPoint.position, goolingSpawnPoint.rotation);
-        Destroy(storedPoopling.gameObject);
-        storedPoopling = null;
+        Destroy(storedDirtling.gameObject);
+        storedDirtling = null;
         isConverting = false;
-        pooplingTrigger.EnableCollider(true);
+        dirtlingTrigger.EnableCollider(true);
     }
 }

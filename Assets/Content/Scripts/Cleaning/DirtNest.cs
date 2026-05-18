@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Local corruption anchor for a neighborhood.
@@ -22,12 +23,17 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
     [SerializeField] float waterDamageMultiplier = 30f;
     [SerializeField] float gooDamagePerHit = 15f;
 
-    [Header("Pooplings")]
-    [SerializeField] GameObject pooplingPrefab;
-    [SerializeField] float pooplingSpawnRadius = 4f;
-    [SerializeField] float pooplingSpawnMinInterval = 10f;
-    [SerializeField] float pooplingSpawnMaxInterval = 25f;
-    [SerializeField] int maxAlivePooplings = 5;
+    [Header("Dirtlings")]
+    [FormerlySerializedAs("pooplingPrefab")]
+    [SerializeField] GameObject dirtlingPrefab;
+    [FormerlySerializedAs("pooplingSpawnRadius")]
+    [SerializeField] float dirtlingSpawnRadius = 4f;
+    [FormerlySerializedAs("pooplingSpawnMinInterval")]
+    [SerializeField] float dirtlingSpawnMinInterval = 10f;
+    [FormerlySerializedAs("pooplingSpawnMaxInterval")]
+    [SerializeField] float dirtlingSpawnMaxInterval = 25f;
+    [FormerlySerializedAs("maxAlivePooplings")]
+    [SerializeField] int maxAliveDirtlings = 5;
 
     [Header("Events")]
     public UnityEvent OnBecameVulnerable;
@@ -35,11 +41,11 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
     public UnityEvent<float> OnHealthNormalizedChanged;
 
     float health;
-    float nextPooplingSpawnTime;
-    int alivePooplings;
+    float nextDirtlingSpawnTime;
+    int aliveDirtlings;
     bool freed;
     bool isSpawning;
-    readonly List<Poopling> pooplingsSpawned = new();
+    readonly List<Dirtling> dirtlingsSpawned = new();
 
     public bool IsVulnerable { get; private set; }
     public bool IsFreed => freed;
@@ -79,11 +85,11 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
         if (!isSpawning)
             return;
 
-        if (Time.time < nextPooplingSpawnTime)
+        if (Time.time < nextDirtlingSpawnTime)
             return;
 
-        SpawnPoopling();
-        ScheduleNextPooplingSpawn();
+        SpawnDirtling();
+        ScheduleNextDirtlingSpawn();
     }
 
     public void SetVulnerable()
@@ -98,10 +104,10 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
         StopSpawning();
     }
 
-    void ScheduleNextPooplingSpawn()
+    void ScheduleNextDirtlingSpawn()
     {
-        float gap = Random.Range(pooplingSpawnMinInterval, pooplingSpawnMaxInterval);
-        nextPooplingSpawnTime = Time.time + gap;
+        float gap = Random.Range(dirtlingSpawnMinInterval, dirtlingSpawnMaxInterval);
+        nextDirtlingSpawnTime = Time.time + gap;
     }
 
     public void StartSpawning()
@@ -110,7 +116,7 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
             return;
 
         isSpawning = true;
-        ScheduleNextPooplingSpawn();
+        ScheduleNextDirtlingSpawn();
     }
 
     public void StopSpawning()
@@ -118,37 +124,37 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
         isSpawning = false;
     }
 
-    void SpawnPoopling()
+    void SpawnDirtling()
     {
-        Vector2 offset = Random.insideUnitCircle * pooplingSpawnRadius;
+        Vector2 offset = Random.insideUnitCircle * dirtlingSpawnRadius;
         Vector3 spawnPos = transform.position + new Vector3(offset.x, 0f, offset.y);
 
-        GameObject instance = Instantiate(pooplingPrefab, spawnPos, Quaternion.identity);
-        var poopling = instance.GetComponent<Poopling>();
-        alivePooplings++;
-        pooplingsSpawned.Add(poopling);
-        poopling.SetWanderCenter(transform.position);
-        poopling.OnConsumed += OnPooplingDestroyed;
+        GameObject instance = Instantiate(dirtlingPrefab, spawnPos, Quaternion.identity);
+        var dirtling = instance.GetComponent<Dirtling>();
+        aliveDirtlings++;
+        dirtlingsSpawned.Add(dirtling);
+        dirtling.SetWanderCenter(transform.position);
+        dirtling.OnConsumed += OnDirtlingDestroyed;
 
-        if (alivePooplings >= maxAlivePooplings)
+        if (aliveDirtlings >= maxAliveDirtlings)
             StopSpawning();
     }
 
-    void OnPooplingDestroyed()
+    void OnDirtlingDestroyed()
     {
-        alivePooplings = Mathf.Max(0, alivePooplings - 1);
+        aliveDirtlings = Mathf.Max(0, aliveDirtlings - 1);
         StartSpawning();
     }
 
     void OnDestroy()
     {
-        foreach (Poopling p in pooplingsSpawned)
+        foreach (Dirtling dirtling in dirtlingsSpawned)
         {
-            if (p != null)
-                p.OnConsumed -= OnPooplingDestroyed;
+            if (dirtling != null)
+                dirtling.OnConsumed -= OnDirtlingDestroyed;
         }
 
-        pooplingsSpawned.Clear();
+        dirtlingsSpawned.Clear();
     }
 
     /// <summary>Continuous laser damage (expects damage per second; applies delta internally).</summary>

@@ -50,7 +50,7 @@ public class WaterSource : MonoBehaviour, IInteractable
         Vector2 offset = Random.insideUnitCircle * spawnRadius;
         Vector3 spawnPos = transform.position + new Vector3(offset.x, 0f, offset.y);
 
-        var dripling = Instantiate(DroplingPrefab, spawnPos, Quaternion.identity).GetComponent<Poopling>();
+        var dripling = Instantiate(DroplingPrefab, spawnPos, Quaternion.identity).GetComponent<Dirtling>();
         dripling.OnConsumed += OnDriplingConsumed;
     }
 

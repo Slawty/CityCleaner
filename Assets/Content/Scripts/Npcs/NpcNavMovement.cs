@@ -83,8 +83,12 @@ public class NpcNavMovement : MonoBehaviour
         Debug.Log($"Collision with {collision.gameObject.name}");
         waitingForGround = false;
 
-        pickupInteractable.EnablePhysics(false);
-        pickupInteractable.EnableCollider(true);
+        if (pickupInteractable != null)
+        {
+            pickupInteractable.EnablePhysics(false);
+            pickupInteractable.EnableCollider(true);
+        }
+
         EnableMovement(true);
     }
 

@@ -18,7 +18,7 @@ alwaysApply: true
 - Avoid adding extreme edge-case guards unless they solve a real issue seen in this project.
 
 ## Function Naming and Structure
-- Prefer direct, action-oriented names (`SpawnPoopling`, `SetVulnerable`, `StartSpawning`).
+- Prefer direct, action-oriented names (`SpawnDirtling`, `SetVulnerable`, `StartSpawning`).
 - Avoid vague "Try..." method naming unless failure is genuinely expected and meaningful.
 
 ## Function Parameters Formatting

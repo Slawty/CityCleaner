@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class WashingMachine : MonoBehaviour
@@ -6,13 +7,14 @@ public class WashingMachine : MonoBehaviour
     public float spinSpeed = 720f;
     public float washingDuration = 8f;
     public WashingMachineDoor door;
-    public WashingMachineTrigger pooplingTrigger;
+    [FormerlySerializedAs("pooplingTrigger")]
+    public WashingMachineTrigger dirtlingTrigger;
     public PressButton startButton;
     public Transform drum;
     public GameObject cleanlingPrefab;
     public Image fillImage;
     public Transform cleanlingSpawnPoint;
-    Poopling storedPoopling;
+    Dirtling storedDirtling;
     bool isWashing = false;
     float washingTimer = 0f;
     float accumulatedRotation = 0f;
@@ -23,8 +25,8 @@ public class WashingMachine : MonoBehaviour
     {
         door.OnDoorOpened += OnDoorOpened;
         door.OnDoorClosed += OnDoorClosed;
-        pooplingTrigger.OnPooplingStored += OnPooplingStored;
-        pooplingTrigger.OnPooplingPickedUp += OnPooplingPickedUp;
+        dirtlingTrigger.OnDirtlingStored += OnDirtlingStored;
+        dirtlingTrigger.OnDirtlingReleased += OnDirtlingReleased;
         startButton.OnButtonPressed += OnStartButtonPressed;
         startButton.SetState(PressButton.ButtonState.Unavailable);
     }
@@ -33,8 +35,8 @@ public class WashingMachine : MonoBehaviour
     {
         door.OnDoorOpened -= OnDoorOpened;
         door.OnDoorClosed -= OnDoorClosed;
-        pooplingTrigger.OnPooplingStored -= OnPooplingStored;
-        pooplingTrigger.OnPooplingPickedUp -= OnPooplingPickedUp;
+        dirtlingTrigger.OnDirtlingStored -= OnDirtlingStored;
+        dirtlingTrigger.OnDirtlingReleased -= OnDirtlingReleased;
         startButton.OnButtonPressed -= OnStartButtonPressed;
     }
 
@@ -70,27 +72,27 @@ public class WashingMachine : MonoBehaviour
 
     void OnDoorOpened()
     {
-        pooplingTrigger.EnableCollider(true);
+        dirtlingTrigger.EnableCollider(true);
     }
 
     void OnDoorClosed()
     {
-        pooplingTrigger.EnableCollider(false);
+        dirtlingTrigger.EnableCollider(false);
 
-        if (storedPoopling != null)
+        if (storedDirtling != null)
         {
             startButton.SetState(PressButton.ButtonState.Available);
         }
     }
 
-    void OnPooplingStored(Poopling poopling)
+    void OnDirtlingStored(Dirtling dirtling)
     {
-        storedPoopling = poopling;
+        storedDirtling = dirtling;
     }
 
-    void OnPooplingPickedUp()
+    void OnDirtlingReleased()
     {
-        storedPoopling = null;
+        storedDirtling = null;
     }
 
     void OnStartButtonPressed()
@@ -115,8 +117,8 @@ public class WashingMachine : MonoBehaviour
     {
         isWashing = false;
         GameObject cleanling = Instantiate(cleanlingPrefab, cleanlingSpawnPoint.position, cleanlingSpawnPoint.rotation);
-        Destroy(storedPoopling.gameObject);
-        storedPoopling = null;
+        Destroy(storedDirtling.gameObject);
+        storedDirtling = null;
         door.OpenDoor();
         startButton.SetState(PressButton.ButtonState.Unavailable);
     }

@@ -10,13 +10,14 @@ GameObject:
   m_Component:
   - component: {fileID: 7790433046431713669}
   - component: {fileID: 436108582819913870}
-  - component: {fileID: 664434712194785690}
-  - component: {fileID: 6934544251180262295}
+  - component: {fileID: 8821045736291847051}
+  - component: {fileID: 7712953846102938475}
   - component: {fileID: 2598561027961041231}
+  - component: {fileID: 664434712194785690}
   - component: {fileID: 5964112250100179603}
   - component: {fileID: 6724032519245183590}
   m_Layer: 0
-  m_Name: Poopling
+  m_Name: Dirtling
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50,16 +51,57 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ca467b85f6cb8804f924e6691aea42ec, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Poopling
-  wanderEnabled: 1
+  m_EditorClassIdentifier: Assembly-CSharp::Dirtling
+--- !u!114 &8821045736291847051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5563417056416187508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f8b2c1a9e6d4f7082b5c0d9e7a4f316, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DirtlingStateController
+--- !u!114 &7712953846102938475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5563417056416187508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d2e6f4a8c1b4750e3a9f6d2c8b4e710, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DirtlingWander
+  wanderEnabledOnStart: 1
   wanderRadius: 3
   sampleRadius: 1.5
   idleMin: 1
   idleMax: 3
   minMoveDistance: 0.4
   navSampleTries: 20
+  stuckTimeout: 2.5
+  stuckProgressThreshold: 0.05
   reanchorWanderOnMovementResume: 1
-  pauseWanderWhenParented: 1
+--- !u!114 &2598561027961041231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5563417056416187508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59948237f6a550343bb63c461720fa58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcNavMovement
+  animator: {fileID: 9214712571095320456}
+  followPlayerOnStart: 0
+  speedParameter: Speed
+  animationSmooth: 100
 --- !u!136 &664434712194785690
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -83,35 +125,6 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0.5, z: 0}
---- !u!114 &6934544251180262295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5563417056416187508}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 504fe5a4bf414ac46adf5b36638d7513, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PickupInteractable
-  HoldPoint: {fileID: 2806930688370392845}
---- !u!114 &2598561027961041231
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5563417056416187508}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59948237f6a550343bb63c461720fa58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NpcNavMovement
-  animator: {fileID: 9214712571095320456}
-  followPlayerOnStart: 0
-  speedParameter: Speed
-  animationSmooth: 10
 --- !u!54 &5964112250100179603
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -157,8 +170,8 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
+  m_Height: 1.22
+  m_BaseOffset: -0.1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!1 &9112229698428877845

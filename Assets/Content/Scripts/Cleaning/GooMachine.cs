@@ -1,39 +1,43 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
+
 public class GooMachine : MonoBehaviour
 {
     public float spinSpeed = 720f;
     public float washingDuration = 8f;
-    public WashingMachineTrigger pooplingTrigger;
+    [FormerlySerializedAs("pooplingTrigger")]
+    public WashingMachineTrigger dirtlingTrigger;
     public PressButton startButton;
     public Transform drum;
     public GameObject cleanlingPrefab;
     public Image fillImage;
     public Transform cleanlingSpawnPoint;
-    [Tooltip("World-space target the stored poopling moves toward over the wash cycle (e.g. bottom of drum).")]
-    public Transform pooplingSinkTarget;
-    Poopling storedPoopling;
+    [Tooltip("World-space target the stored dirtling moves toward over the wash cycle (e.g. bottom of drum).")]
+    [FormerlySerializedAs("pooplingSinkTarget")]
+    public Transform dirtlingSinkTarget;
+    Dirtling storedDirtling;
     bool isWashing = false;
     float washingTimer = 0f;
     float accumulatedRotation = 0f;
-    Vector3 pooplingSinkStartLocal;
-    Vector3 pooplingSinkEndLocal;
-    bool pooplingSinkActive;
+    Vector3 dirtlingSinkStartLocal;
+    Vector3 dirtlingSinkEndLocal;
+    bool dirtlingSinkActive;
 
     Quaternion startRotation;
 
     void Start()
     {
-        pooplingTrigger.OnPooplingStored += OnPooplingStored;
-        pooplingTrigger.OnPooplingPickedUp += OnPooplingPickedUp;
+        dirtlingTrigger.OnDirtlingStored += OnDirtlingStored;
+        dirtlingTrigger.OnDirtlingReleased += OnDirtlingReleased;
         startButton.OnButtonPressed += OnStartButtonPressed;
         startButton.SetState(PressButton.ButtonState.Unavailable);
     }
 
     void OnDestroy()
     {
-        pooplingTrigger.OnPooplingStored -= OnPooplingStored;
-        pooplingTrigger.OnPooplingPickedUp -= OnPooplingPickedUp;
+        dirtlingTrigger.OnDirtlingStored -= OnDirtlingStored;
+        dirtlingTrigger.OnDirtlingReleased -= OnDirtlingReleased;
         startButton.OnButtonPressed -= OnStartButtonPressed;
     }
 
@@ -51,10 +55,10 @@ public class GooMachine : MonoBehaviour
         accumulatedRotation += deltaRotation;
         washingTimer -= Time.deltaTime;
 
-        if (pooplingSinkActive && storedPoopling != null)
+        if (dirtlingSinkActive && storedDirtling != null)
         {
             float sinkT = 1f - washingTimer / washingDuration;
-            storedPoopling.transform.localPosition = Vector3.Lerp(pooplingSinkStartLocal, pooplingSinkEndLocal, Mathf.Clamp01(sinkT));
+            storedDirtling.transform.localPosition = Vector3.Lerp(dirtlingSinkStartLocal, dirtlingSinkEndLocal, Mathf.Clamp01(sinkT));
         }
 
         fillImage.fillAmount = 1 - washingTimer / washingDuration;
@@ -74,15 +78,15 @@ public class GooMachine : MonoBehaviour
         }
     }
 
-    void OnPooplingStored(Poopling poopling)
+    void OnDirtlingStored(Dirtling dirtling)
     {
-        storedPoopling = poopling;
+        storedDirtling = dirtling;
         startButton.SetState(PressButton.ButtonState.Available);
     }
 
-    void OnPooplingPickedUp()
+    void OnDirtlingReleased()
     {
-        storedPoopling = null;
+        storedDirtling = null;
     }
 
     void OnStartButtonPressed()
@@ -102,14 +106,14 @@ public class GooMachine : MonoBehaviour
         washingTimer = washingDuration;
         isWashing = true;
 
-        pooplingSinkActive = storedPoopling != null
-            && pooplingSinkTarget != null
-            && storedPoopling.transform.parent != null;
-        if (pooplingSinkActive)
+        dirtlingSinkActive = storedDirtling != null
+            && dirtlingSinkTarget != null
+            && storedDirtling.transform.parent != null;
+        if (dirtlingSinkActive)
         {
-            Transform poopParent = storedPoopling.transform.parent;
-            pooplingSinkStartLocal = storedPoopling.transform.localPosition;
-            pooplingSinkEndLocal = poopParent.InverseTransformPoint(pooplingSinkTarget.position);
+            Transform dirtParent = storedDirtling.transform.parent;
+            dirtlingSinkStartLocal = storedDirtling.transform.localPosition;
+            dirtlingSinkEndLocal = dirtParent.InverseTransformPoint(dirtlingSinkTarget.position);
         }
     }
 
@@ -117,8 +121,8 @@ public class GooMachine : MonoBehaviour
     {
         isWashing = false;
         GameObject cleanling = Instantiate(cleanlingPrefab, cleanlingSpawnPoint.position, cleanlingSpawnPoint.rotation);
-        Destroy(storedPoopling.gameObject);
-        storedPoopling = null;
+        Destroy(storedDirtling.gameObject);
+        storedDirtling = null;
         startButton.SetState(PressButton.ButtonState.Unavailable);
     }
 }

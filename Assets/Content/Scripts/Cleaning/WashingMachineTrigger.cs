@@ -4,12 +4,12 @@ using UnityEngine.Events;
 
 public class WashingMachineTrigger : MonoBehaviour
 {
-    public UnityAction<Poopling> OnPooplingStored;
-    public UnityAction OnPooplingPickedUp;
+    public UnityAction<Dirtling> OnDirtlingStored;
+    public UnityAction OnDirtlingReleased;
     public Transform TargetPosition;
     public Transform machineDrum;
     Collider triggerCol;
-    Poopling storedPoopling;
+    Dirtling storedDirtling;
 
     void Awake()
     {
@@ -21,40 +21,35 @@ public class WashingMachineTrigger : MonoBehaviour
         triggerCol.enabled = b;
     }
 
-    private void OnTriggerEnter(Collider other)
+    public bool HasStoredDirtling => storedDirtling != null;
+
+    public void ReleaseStoredDirtling()
     {
-        if (storedPoopling != null)
+        if (storedDirtling == null)
             return;
 
-        Debug.Log($"Thing entered washing machine: {other.name}");
-
-        Poopling checkPoopling = other.GetComponent<Poopling>();
-
-        if (checkPoopling == null)
-            return;
-
-        storedPoopling = checkPoopling;
-        storedPoopling.SetWanderingEnabled(false);
-        storedPoopling.PickupInteractable.EnablePhysics(false);
-        storedPoopling.PickupInteractable.EnableCollider(true);
-        storedPoopling.Movement.CancelWaitingForCollision();
-        storedPoopling.PickupInteractable.OnInteract += OnPooplingPickUp;
-        storedPoopling.transform.parent = machineDrum;
-        storedPoopling.transform.DOMove(TargetPosition.position, 0.25f);
-        storedPoopling.transform.DORotateQuaternion(TargetPosition.rotation, 0.25f);
-        triggerCol.enabled = false;
-        OnPooplingStored?.Invoke(storedPoopling);
+        Dirtling dirtling = storedDirtling;
+        storedDirtling = null;
+        dirtling.ReleaseFromMachineStorage();
+        triggerCol.enabled = true;
+        OnDirtlingReleased?.Invoke();
     }
 
-    void OnPooplingPickUp()
+    void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"Poopling picked up");
-        Poopling p = storedPoopling;
-        p.PickupInteractable.OnInteract -= OnPooplingPickUp;
-        p.transform.parent = null;
-        p.SetWanderingEnabled(true);
-        triggerCol.enabled = true;
-        storedPoopling = null;
-        OnPooplingPickedUp?.Invoke();
+        if (storedDirtling != null)
+            return;
+
+        Dirtling dirtling = other.GetComponent<Dirtling>();
+        if (dirtling == null)
+            return;
+
+        storedDirtling = dirtling;
+        storedDirtling.PrepareForMachineStorage();
+        storedDirtling.transform.parent = machineDrum;
+        storedDirtling.transform.DOMove(TargetPosition.position, 0.25f);
+        storedDirtling.transform.DORotateQuaternion(TargetPosition.rotation, 0.25f);
+        triggerCol.enabled = false;
+        OnDirtlingStored?.Invoke(storedDirtling);
     }
 }
