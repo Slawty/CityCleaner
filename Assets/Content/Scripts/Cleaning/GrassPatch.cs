@@ -5,7 +5,7 @@ public class GrassPatch : GooHitGrowable
 {
     [Header("Renderers")]
     [SerializeField] List<Renderer> growableRenderers;
-    [SerializeField] List<Renderer> dirtRenderers;
+    [SerializeField] List<Renderer> cleanRenderers;
 
     [Header("Growth")]
     [SerializeField] float minStrength = 0f;
@@ -41,7 +41,7 @@ public class GrassPatch : GooHitGrowable
 
 
         mpb.SetFloat(dirtStrengthID, 1 - progress);
-        foreach (var renderer in dirtRenderers)
+        foreach (var renderer in cleanRenderers)
         {
             renderer.SetPropertyBlock(mpb);
             // renderer.material.SetFloat(dirtStrengthID, 0f);
@@ -51,7 +51,7 @@ public class GrassPatch : GooHitGrowable
     protected override void OnFullyGrown()
     {
         Debug.Log("OnFullyGrown");
-        foreach (var renderer in dirtRenderers)
+        foreach (var renderer in cleanRenderers)
         {
             mpb.SetFloat(dirtStrengthID, 0);
             renderer.SetPropertyBlock(mpb);

@@ -28,14 +28,12 @@ public class DirtPainter : MonoBehaviour
 
     void Awake()
     {
-        brushMaterial =
-            new Material(Shader.Find("Hidden/BrushStrength"));
+        brushMaterial = new Material(Shader.Find("Hidden/BrushStrength"));
     }
 
     void Update()
     {
-        if (shootAction.action.WasPressedThisFrame()
-            || shootAction.action.IsPressed())
+        if (shootAction.action.WasPressedThisFrame() || shootAction.action.IsPressed())
         {
             Paint();
         }
@@ -47,63 +45,37 @@ public class DirtPainter : MonoBehaviour
 
     void Paint()
     {
-        Ray ray =
-            playerCamera.ViewportPointToRay(
-                new Vector3(0.5f, 0.5f));
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f));
 
-        if (!Physics.Raycast(ray,
-            out RaycastHit hit,
-            maxDistance))
+        if (!Physics.Raycast(ray, out RaycastHit hit, maxDistance))
             return;
 
-        Renderer renderer =
-            hit.collider.GetComponent<Renderer>();
+        Renderer renderer = hit.collider.GetComponent<Renderer>();
 
         if (renderer == null)
             return;
 
         // Ensure runtime mask exists
-        if (!runtimeMasks.TryGetValue(
-            renderer,
-            out RenderTexture runtimeMask))
+        if (!runtimeMasks.TryGetValue(renderer, out RenderTexture runtimeMask))
         {
-            runtimeMask =
-                CreateRuntimeMask(renderer);
-
+            runtimeMask = CreateRuntimeMask(renderer);
             runtimeMasks.Add(renderer, runtimeMask);
         }
 
         Vector2 uv = hit.textureCoord2;
 
-        RenderTexture active =
-            RenderTexture.active;
-
-        RenderTexture.active =
-            runtimeMask;
+        RenderTexture active = RenderTexture.active;
+        RenderTexture.active = runtimeMask;
 
         GL.PushMatrix();
         GL.LoadOrtho();
 
-        Rect rect =
-            new Rect(
-                uv.x - brushSize * 0.5f,
-                uv.y - brushSize * 0.5f,
-                brushSize,
-                brushSize
-            );
+        Rect rect = new Rect(uv.x - brushSize * 0.5f, uv.y - brushSize * 0.5f, brushSize, brushSize);
 
-        float strength =
-            Mathf.Clamp01(
-                Time.deltaTime * cleanSpeed);
+        float strength = Mathf.Clamp01(Time.deltaTime * cleanSpeed);
+        brushMaterial.SetFloat("_Strength", strength);
 
-        brushMaterial.SetFloat(
-            "_Strength",
-            strength);
-
-        Graphics.DrawTexture(
-            rect,
-            brushTexture,
-            brushMaterial);
+        Graphics.DrawTexture(rect, brushTexture, brushMaterial);
 
         GL.PopMatrix();
 
@@ -122,12 +94,9 @@ public class DirtPainter : MonoBehaviour
 
     RenderTexture CreateRuntimeMask(Renderer renderer)
     {
-        Texture existingMask =
-            renderer.material.GetTexture("_CleanMask");
+        Texture existingMask = renderer.material.GetTexture("_CleanMask");
 
-        RenderTexture rt =
-            new RenderTexture(maskTemplate.descriptor);
-
+        RenderTexture rt = new RenderTexture(maskTemplate.descriptor);
         rt.Create();
 
         if (existingMask != null)
@@ -136,21 +105,16 @@ public class DirtPainter : MonoBehaviour
         }
         else
         {
-            RenderTexture active =
-                RenderTexture.active;
-
+            RenderTexture active = RenderTexture.active;
             RenderTexture.active = rt;
-
             GL.Clear(true, true, Color.white);
-
             RenderTexture.active = active;
         }
 
         renderer.material.SetTexture("_CleanMask", rt);
 
         // IMPORTANT: link mask to PaintableObject
-        PaintableObject paintable =
-    renderer.GetComponent<PaintableObject>();
+        PaintableObject paintable = renderer.GetComponent<PaintableObject>();
 
         if (paintable != null)
         {
@@ -164,24 +128,18 @@ public class DirtPainter : MonoBehaviour
     // NEW FUNCTION: UPDATE CLEAN PROGRESS
     // =====================================================
 
-    void UpdateCleanProgress(
-    Renderer renderer,
-    Vector2 uv)
+    void UpdateCleanProgress(Renderer renderer, Vector2 uv)
     {
-        PaintableObject paintable =
-            renderer.GetComponent<PaintableObject>();
+        PaintableObject paintable = renderer.GetComponent<PaintableObject>();
 
         if (paintable == null)
             return;
 
         // NEW: pass UV and brush size directly
-        paintable.UpdateCleanPixels(
-            uv,
-            brushSize);
+        paintable.UpdateCleanPixels(uv, brushSize);
 
         // Debug output
-        float percent =
-            paintable.GetCleanPercent();
+        float percent = paintable.GetCleanPercent();
 
         // Debug.Log(
         //     $"{renderer.name} Cleaned: {percent:F1}%");

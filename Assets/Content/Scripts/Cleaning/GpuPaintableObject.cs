@@ -193,16 +193,16 @@ public class GPUPaintableObject : MonoBehaviour
             }
         }
 
-        float cleanPercent = GetCleanPercent();
+        float currentPercent = GetCleanPercent();
 
-        while (winDirt > 0 && cleanPercent >= nextDirtSpawn)
+        while (winDirt > 0 && currentPercent >= nextDirtSpawn)
         {
             SpawnDirtChunk(hitPos);
             dirtSpawnedCount++;
             nextDirtSpawn = dirtSpawnStep * (dirtSpawnedCount + 1);
         }
 
-        if (cleanPercent > 0.98f)
+        if (currentPercent > cleanPercentage)
         {
             SetClean();
             if (AdditionalObjectsToClean.Count > 0)
@@ -215,6 +215,8 @@ public class GPUPaintableObject : MonoBehaviour
                 }
             }
         }
+
+        Managers.UI.SetCleanProgressBarPercent(currentPercent * 100f);
 
         OnProgress?.Invoke();
     }
@@ -246,6 +248,9 @@ public class GPUPaintableObject : MonoBehaviour
     {
         if (pixelsToCleanCount == 0)
             return 0;
+
+        if (isClean)
+            return 1f;
 
         return (float)cleanedPixelCount / (float)pixelsToCleanCount;
     }

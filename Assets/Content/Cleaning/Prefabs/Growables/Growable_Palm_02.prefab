@@ -55,13 +55,11 @@ MonoBehaviour:
   bumpUpEase: 27
   bumpDownEase: 6
   linkedGrowables:
-  - {fileID: 7935755501143443008}
+  - {fileID: 3235930491320773876}
   minScale: 0.1
   maxScale: 0.47
   growObject: {fileID: 3347577470557138714}
-  cleanRenderers:
-  - {fileID: 8440749456889974515}
-  - {fileID: 5649175215528382002}
+  cleanRenderers: []
 --- !u!136 &3929695046607723004
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -95,15 +93,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 280594562966d8540be212c30a891184, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.45198
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 280594562966d8540be212c30a891184, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.45198
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 280594562966d8540be212c30a891184, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.45198
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 280594562966d8540be212c30a891184, type: 3}
       propertyPath: m_LocalPosition.x
@@ -145,6 +143,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3459866055596770206, guid: 280594562966d8540be212c30a891184, type: 3}
+      propertyPath: m_Name
+      value: Leaves
+      objectReference: {fileID: 0}
+    - target: {fileID: -3459866055596770206, guid: 280594562966d8540be212c30a891184, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -2416615142244824989, guid: 280594562966d8540be212c30a891184, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -156,15 +162,33 @@ PrefabInstance:
     - target: {fileID: 4581329694889985829, guid: 280594562966d8540be212c30a891184, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 2efcb4aa58dba1a479fc0dd35dd2dc53, type: 2}
+      objectReference: {fileID: 2100000, guid: 8cd0d4012dbacfd43a7e7e05aeb42d9e, type: 2}
+    - target: {fileID: 6590678545394003062, guid: 280594562966d8540be212c30a891184, type: 3}
+      propertyPath: m_Name
+      value: Trunk
+      objectReference: {fileID: 0}
+    - target: {fileID: 6590678545394003062, guid: 280594562966d8540be212c30a891184, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 280594562966d8540be212c30a891184, type: 3}
+--- !u!23 &1615215094084931540 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4581329694889985829, guid: 280594562966d8540be212c30a891184, type: 3}
+  m_PrefabInstance: {fileID: 3025929135820490993}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3347577470557138714 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 280594562966d8540be212c30a891184, type: 3}
+  m_PrefabInstance: {fileID: 3025929135820490993}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &8613195656787329170 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -2416615142244824989, guid: 280594562966d8540be212c30a891184, type: 3}
   m_PrefabInstance: {fileID: 3025929135820490993}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7215841551091679220
@@ -232,12 +256,16 @@ PrefabInstance:
       value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: -1695386897620489773, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1695386897620489773, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
       propertyPath: m_Name
-      value: Planter_Tree_01 (1)
+      value: Planter_Tree_01
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -263,101 +291,10 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: -3946574740672294846, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
-      insertIndex: 1
-      addedObject: {fileID: 7935755501143443008}
-    - targetCorrespondingSourceObject: {fileID: -4134309388324870040, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
-      insertIndex: 1
-      addedObject: {fileID: 8453028711330153397}
-    - targetCorrespondingSourceObject: {fileID: -4134309388324870040, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5466018965873891191}
+      addedObject: {fileID: 3235930491320773876}
   m_SourcePrefab: {fileID: 100100000, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
---- !u!1 &2502921864952141724 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -4134309388324870040, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
-  m_PrefabInstance: {fileID: 7215841551091679220}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &8453028711330153397
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2502921864952141724}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
-  winCoins: 1
-  winDirt: 3
-  AdditionalObjectsToClean: []
-  CoinSpawnPos: {fileID: 0}
-  trackingResolution: 128
-  cleanThreshold: 200
-  cleanPercentage: 0.85
-  allowGooCleaning: 0
-  maskTexture: {fileID: 0}
-  coverageTexture: {fileID: 0}
-  coverageReadable: {fileID: 0}
-  maskReadable: {fileID: 0}
-  isClean: 0
---- !u!64 &5466018965873891191
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2502921864952141724}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6129358574221967040, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
---- !u!1 &3249666566100381622 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -3946574740672294846, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
-  m_PrefabInstance: {fileID: 7215841551091679220}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &7935755501143443008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3249666566100381622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eedfb56872e39e8448b387a308d33fd2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GrassPatch
-  hitsToFullGrowth: 15
-  growthProgress: 0
-  bumpAmount: 0.15
-  bumpDuration: 0.15
-  bumpPeakAt: 0.35
-  bumpUpEase: 27
-  bumpDownEase: 6
-  linkedGrowables: []
-  growableRenderers:
-  - {fileID: 5274058856861126698}
-  dirtRenderers:
-  - {fileID: 5649175215528382002}
-  minStrength: 0
-  maxStrength: 1
-  cleanStrengthWhileGrowing: 0
-  cleanStrengthWhenFullyGrown: 1
 --- !u!23 &5274058856861126698 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -5975457300521455650, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
@@ -373,6 +310,42 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
   m_PrefabInstance: {fileID: 7215841551091679220}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7557805955524559525 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}
+  m_PrefabInstance: {fileID: 7215841551091679220}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3235930491320773876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7557805955524559525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eedfb56872e39e8448b387a308d33fd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrassPatch
+  hitsToFullGrowth: 15
+  growthProgress: 0
+  bumpAmount: 0.15
+  bumpDuration: 0.15
+  bumpPeakAt: 0.35
+  bumpUpEase: 27
+  bumpDownEase: 6
+  linkedGrowables: []
+  growableRenderers:
+  - {fileID: 5274058856861126698}
+  cleanRenderers:
+  - {fileID: 8440749456889974515}
+  - {fileID: 5649175215528382002}
+  - {fileID: 1615215094084931540}
+  - {fileID: 8613195656787329170}
+  minStrength: 0
+  maxStrength: 1
+  cleanStrengthWhileGrowing: 0
+  cleanStrengthWhenFullyGrown: 1
 --- !u!23 &8440749456889974515 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 1225050842578366727, guid: 538e112b204b0504fa3e5e01f17854a7, type: 3}

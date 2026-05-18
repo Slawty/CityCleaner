@@ -57,7 +57,10 @@ public class GPUPainterWorld : MonoBehaviour
     void PaintLocalMask(GPUPaintableObject paintable, Vector3 hitPos, float cleanStrength)
     {
         if (paintable.isClean)
+        {
+            Managers.UI.SetCleanProgressBarPercent(100f);
             return;
+        }
 
         if (!paintable.IsInitialized)
             paintable.Initialize(textureResolution);

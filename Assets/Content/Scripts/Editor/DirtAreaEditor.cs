@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
+[CanEditMultipleObjects]
 [CustomEditor(typeof(DirtArea))]
 public class DirtAreaEditor : Editor
 {
@@ -10,20 +11,40 @@ public class DirtAreaEditor : Editor
 
         GUILayout.Space(8f);
 
-        DirtArea dirtArea = (DirtArea)target;
         if (GUILayout.Button("Debug Clean Fixed Percent"))
         {
-            dirtArea.DebugCleanFixedPercent();
-            EditorUtility.SetDirty(dirtArea);
+            foreach (Object selectedObject in targets)
+            {
+                DirtArea dirtArea = selectedObject as DirtArea;
+                if (dirtArea == null)
+                    continue;
+
+                dirtArea.DebugCleanFixedPercent();
+                EditorUtility.SetDirty(dirtArea);
+            }
         }
 
         GUILayout.Space(8f);
 
         if (GUILayout.Button("Quick Refresh Zone Dirt"))
-            RefreshZoneDirt(dirtArea, rebuildTextures: false);
+        {
+            foreach (Object selectedObject in targets)
+            {
+                DirtArea dirtArea = selectedObject as DirtArea;
+                if (dirtArea != null)
+                    RefreshZoneDirt(dirtArea, rebuildTextures: false);
+            }
+        }
 
         if (GUILayout.Button("Full Rebuild Zone Dirt"))
-            RefreshZoneDirt(dirtArea, rebuildTextures: true);
+        {
+            foreach (Object selectedObject in targets)
+            {
+                DirtArea dirtArea = selectedObject as DirtArea;
+                if (dirtArea != null)
+                    RefreshZoneDirt(dirtArea, rebuildTextures: true);
+            }
+        }
     }
 
     internal static void RefreshZoneDirt(DirtArea dirtArea, bool rebuildTextures)

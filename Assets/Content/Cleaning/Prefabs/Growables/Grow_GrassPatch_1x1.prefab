@@ -60,7 +60,7 @@ MonoBehaviour:
   linkedGrowables: []
   growableRenderers:
   - {fileID: 1853561475143949766}
-  dirtRenderers:
+  cleanRenderers:
   - {fileID: 5038553866092946813}
   minStrength: 0
   maxStrength: 1

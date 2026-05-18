@@ -50,7 +50,7 @@ public class UIManager : MonoBehaviour
 
     public void SetCleanProgressBarPercent(float value)
     {
-        // Debug.Log($"SetCleanProgressBarPercent: {value}");
+        Debug.Log($"SetCleanProgressBarPercent: {value}");
         cleanProgressBar.SetPercent(value);
     }
 
