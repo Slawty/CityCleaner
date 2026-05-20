@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Dirtling))]
 [RequireComponent(typeof(DirtlingWander))]
@@ -12,8 +13,9 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class DirtlingStateController : MonoBehaviour
 {
-    [Header("Water")]
-    [SerializeField] float waterDizzyPerSecond = 0.35f;
+    [Header("Laser")]
+    [FormerlySerializedAs("waterDizzyPerSecond")]
+    [SerializeField] float laserDizzyPerSecond = 0.35f;
 
     public DirtlingState CurrentState { get; private set; }
     public bool WanderingEnabled { get; private set; } = true;
@@ -50,7 +52,24 @@ public class DirtlingStateController : MonoBehaviour
         EnterState(DirtlingState.Wandering);
     }
 
-    public void ApplyWater(float deltaTime)
+    public void ApplyWater(Vector3 pushDirection, float forcePerSecond)
+    {
+        if (CurrentState == DirtlingState.Processed || CurrentState == DirtlingState.Vacuumed)
+            return;
+
+        if (CurrentState != DirtlingState.PhysicsBall)
+            EnterState(DirtlingState.PhysicsBall);
+
+        physicsBall.ApplyPush(pushDirection, forcePerSecond * Time.deltaTime);
+    }
+
+    public void OnGooApplied()
+    {
+        if (CurrentState == DirtlingState.Fleeing)
+            OnFleeEnded();
+    }
+
+    public void ApplyLaser(float deltaTime)
     {
         if (deltaTime <= 0f)
             return;
@@ -61,11 +80,11 @@ public class DirtlingStateController : MonoBehaviour
         if (CurrentState == DirtlingState.PhysicsBall)
             return;
 
-        float dizzyRate = waterDizzyPerSecond * goo.WaterDizzyMultiplier;
+        float dizzyRate = laserDizzyPerSecond * goo.WaterDizzyMultiplier;
 
         if (IsDizzy)
         {
-            ApplyWaterDizzyOnly(deltaTime, dizzyRate);
+            ApplyLaserDizzyOnly(deltaTime, dizzyRate);
             return;
         }
 
@@ -87,30 +106,13 @@ public class DirtlingStateController : MonoBehaviour
             EnterState(DirtlingState.Fleeing);
     }
 
-    void ApplyWaterDizzyOnly(float deltaTime, float dizzyRate)
+    void ApplyLaserDizzyOnly(float deltaTime, float dizzyRate)
     {
         Dizzy = Mathf.Min(1f, Dizzy + dizzyRate * deltaTime);
         dizzyBar.SetDizzy(Dizzy);
 
         if (CurrentState != DirtlingState.Dizzy)
             EnterState(DirtlingState.Dizzy);
-    }
-
-    public void OnGooApplied()
-    {
-        if (CurrentState == DirtlingState.Fleeing)
-            OnFleeEnded();
-    }
-
-    public void ApplyLaser(Vector3 pushDirection, float forcePerSecond)
-    {
-        if (CurrentState == DirtlingState.Processed || CurrentState == DirtlingState.Vacuumed)
-            return;
-
-        if (CurrentState != DirtlingState.PhysicsBall)
-            EnterState(DirtlingState.PhysicsBall);
-
-        physicsBall.ApplyPush(pushDirection, forcePerSecond * Time.deltaTime);
     }
 
     public void OnFleeEnded()

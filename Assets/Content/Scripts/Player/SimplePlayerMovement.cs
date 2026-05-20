@@ -15,7 +15,10 @@ public class SimplePlayerMovement : MonoBehaviour
     private CharacterController controller;
     private Vector3 velocity;
     private bool jumpRequested;
-    private bool wasGrounded;
+
+    public float HorizontalSpeed { get; private set; }
+    public float VerticalVelocity => velocity.y;
+    public bool IsSprinting { get; private set; }
 
     void Awake()
     {
@@ -67,7 +70,9 @@ public class SimplePlayerMovement : MonoBehaviour
         Vector2 input = moveAction.action.ReadValue<Vector2>();
         Vector3 move = transform.right * input.x + transform.forward * input.y;
 
-        float speed = sprintAction.action.IsPressed() ? sprintSpeed : moveSpeed;
+        IsSprinting = sprintAction.action.IsPressed();
+        float speed = IsSprinting ? sprintSpeed : moveSpeed;
+        HorizontalSpeed = move.magnitude * speed;
 
         controller.Move(move * speed * Time.deltaTime);
         controller.Move(velocity * Time.deltaTime);

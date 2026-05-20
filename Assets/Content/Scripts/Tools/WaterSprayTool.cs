@@ -10,6 +10,7 @@ public class WaterSprayTool : Tool
     [SerializeField] ProgressBar ammoBar;
     [SerializeField] LayerMask dirtlingHitMask = ~0;
     [SerializeField] float dirtlingRayDistance = 12f;
+    [SerializeField] float dirtlingPushForcePerSecond = 10f;
 
     float currentAmmo;
     bool isActive;
@@ -70,7 +71,8 @@ public class WaterSprayTool : Tool
         if (dirtling == null)
             return;
 
-        dirtling.StateController.ApplyWater(Time.deltaTime);
+        Vector3 pushDirection = hit.point - cam.transform.position;
+        dirtling.StateController.ApplyWater(pushDirection, dirtlingPushForcePerSecond);
     }
 
     protected override void OnDisable()

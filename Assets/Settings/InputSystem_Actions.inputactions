@@ -61,6 +61,24 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Vacuum",
+                    "type": "Button",
+                    "id": "27bdd685-6c89-4254-a2d1-42bbd1041600",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "VacuumHold",
+                    "type": "Button",
+                    "id": "03f3b715-0e5f-4770-98e6-a6ca91e9a78a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Hold",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "InteractHold",
                     "type": "Button",
                     "id": "a177b30d-d300-4119-808e-e624430b8e00",
@@ -525,6 +543,28 @@
                 },
                 {
                     "name": "",
+                    "id": "402e553c-452d-45c4-baca-528c9ecbcab2",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Vacuum",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a88f9574-3019-4637-8d17-27a1fcf79d02",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Vacuum",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "23cd6538-f8d6-41c7-b085-aa4de95e431e",
                     "path": "<Keyboard>/e",
                     "interactions": "",
@@ -542,6 +582,28 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "InteractHold",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ec1f63a4-819c-4431-bcf6-cf5968f581d2",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "VacuumHold",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "99f816e2-1678-4632-af03-6b295c78b1ba",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "VacuumHold",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

@@ -12,6 +12,8 @@ public class MouseLook : MonoBehaviour
 
     float xRotation;
 
+    public Vector2 LookDelta { get; private set; }
+
     void OnEnable()
     {
         lookAction.action.Enable();
@@ -39,6 +41,7 @@ public class MouseLook : MonoBehaviour
 
         float mouseX = lookInput.x * sensitivity;
         float mouseY = lookInput.y * sensitivity;
+        LookDelta = new Vector2(mouseX, mouseY);
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);

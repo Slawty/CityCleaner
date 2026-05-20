@@ -89,8 +89,7 @@ public class LaserGunTool : Tool
         Dirtling dirtling = hit.collider.GetComponentInParent<Dirtling>();
         if (dirtling != null)
         {
-            Vector3 pushDirection = hit.point - cam.transform.position;
-            dirtling.StateController.ApplyLaser(pushDirection, DamagePerSecond);
+            dirtling.StateController.ApplyLaser(Time.deltaTime);
             return;
         }
 
