@@ -3,18 +3,32 @@ using UnityEngine.AI;
 
 [RequireComponent(typeof(Dirtling))]
 [RequireComponent(typeof(DirtlingWander))]
+[RequireComponent(typeof(DirtlingFlee))]
+[RequireComponent(typeof(DirtlingVacuumCapture))]
+[RequireComponent(typeof(DirtlingDizzyBar))]
+[RequireComponent(typeof(DirtlingPhysicsBall))]
+[RequireComponent(typeof(DirtlingGoo))]
 [RequireComponent(typeof(NpcNavMovement))]
 [RequireComponent(typeof(NavMeshAgent))]
 public class DirtlingStateController : MonoBehaviour
 {
+    [Header("Water")]
+    [SerializeField] float waterDizzyPerSecond = 0.35f;
+
     public DirtlingState CurrentState { get; private set; }
     public bool WanderingEnabled { get; private set; } = true;
+    public float Dizzy { get; private set; }
+    public bool IsDizzy => Dizzy >= 1f;
 
     public Dirtling Dirtling { get; private set; }
     public NpcNavMovement Movement { get; private set; }
     public NavMeshAgent NavAgent { get; private set; }
 
     DirtlingWander wander;
+    DirtlingFlee flee;
+    DirtlingDizzyBar dizzyBar;
+    DirtlingPhysicsBall physicsBall;
+    DirtlingGoo goo;
 
     void Awake()
     {
@@ -22,18 +36,101 @@ public class DirtlingStateController : MonoBehaviour
         Movement = GetComponent<NpcNavMovement>();
         NavAgent = GetComponent<NavMeshAgent>();
         wander = GetComponent<DirtlingWander>();
+        flee = GetComponent<DirtlingFlee>();
+        dizzyBar = GetComponent<DirtlingDizzyBar>();
+        physicsBall = GetComponent<DirtlingPhysicsBall>();
+        goo = GetComponent<DirtlingGoo>();
     }
 
     void Start()
     {
         wander.Initialize();
         WanderingEnabled = wander.InitialWanderingEnabled;
+        dizzyBar.SetDizzy(Dizzy);
         EnterState(DirtlingState.Wandering);
+    }
+
+    public void ApplyWater(float deltaTime)
+    {
+        if (deltaTime <= 0f)
+            return;
+
+        if (CurrentState == DirtlingState.Processed || CurrentState == DirtlingState.Vacuumed)
+            return;
+
+        if (CurrentState == DirtlingState.PhysicsBall)
+            return;
+
+        float dizzyRate = waterDizzyPerSecond * goo.WaterDizzyMultiplier;
+
+        if (IsDizzy)
+        {
+            ApplyWaterDizzyOnly(deltaTime, dizzyRate);
+            return;
+        }
+
+        Dizzy = Mathf.Min(1f, Dizzy + dizzyRate * deltaTime);
+        dizzyBar.SetDizzy(Dizzy);
+
+        if (IsDizzy)
+        {
+            EnterState(DirtlingState.Dizzy);
+            return;
+        }
+
+        if (goo.BlocksFlee)
+            return;
+
+        if (CurrentState == DirtlingState.Fleeing)
+            flee.NotifyWaterHit();
+        else
+            EnterState(DirtlingState.Fleeing);
+    }
+
+    void ApplyWaterDizzyOnly(float deltaTime, float dizzyRate)
+    {
+        Dizzy = Mathf.Min(1f, Dizzy + dizzyRate * deltaTime);
+        dizzyBar.SetDizzy(Dizzy);
+
+        if (CurrentState != DirtlingState.Dizzy)
+            EnterState(DirtlingState.Dizzy);
+    }
+
+    public void OnGooApplied()
+    {
+        if (CurrentState == DirtlingState.Fleeing)
+            OnFleeEnded();
+    }
+
+    public void ApplyLaser(Vector3 pushDirection, float forcePerSecond)
+    {
+        if (CurrentState == DirtlingState.Processed || CurrentState == DirtlingState.Vacuumed)
+            return;
+
+        if (CurrentState != DirtlingState.PhysicsBall)
+            EnterState(DirtlingState.PhysicsBall);
+
+        physicsBall.ApplyPush(pushDirection, forcePerSecond * Time.deltaTime);
+    }
+
+    public void OnFleeEnded()
+    {
+        if (IsDizzy)
+            EnterState(DirtlingState.Dizzy);
+        else
+            EnterState(DirtlingState.Wandering);
+    }
+
+    public void OnPhysicsBallRecovered()
+    {
+        OnFleeEnded();
     }
 
     public void EnterState(DirtlingState state)
     {
         CurrentState = state;
+
+        flee.enabled = state == DirtlingState.Fleeing;
 
         switch (state)
         {
@@ -41,6 +138,27 @@ public class DirtlingStateController : MonoBehaviour
                 wander.enabled = true;
                 if (WanderingEnabled)
                     wander.BeginWandering();
+                break;
+            case DirtlingState.Fleeing:
+                wander.enabled = false;
+                wander.StopWandering();
+                Movement.Stop();
+                break;
+            case DirtlingState.Dizzy:
+                wander.enabled = false;
+                wander.StopWandering();
+                Movement.Stop();
+                break;
+            case DirtlingState.PhysicsBall:
+                wander.enabled = false;
+                wander.StopWandering();
+                physicsBall.BeginBall();
+                break;
+            case DirtlingState.Vacuumed:
+            case DirtlingState.Processed:
+                wander.enabled = false;
+                wander.StopWandering();
+                Movement.Stop();
                 break;
             default:
                 wander.enabled = false;

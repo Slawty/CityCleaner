@@ -86,6 +86,14 @@ public class LaserGunTool : Tool
         if (!Physics.Raycast(ray, out RaycastHit hit, 10f, hitMask, QueryTriggerInteraction.Ignore))
             return;
 
+        Dirtling dirtling = hit.collider.GetComponentInParent<Dirtling>();
+        if (dirtling != null)
+        {
+            Vector3 pushDirection = hit.point - cam.transform.position;
+            dirtling.StateController.ApplyLaser(pushDirection, DamagePerSecond);
+            return;
+        }
+
         var target = hit.collider.GetComponent<SplitableObject>();
 
         if (target != null)

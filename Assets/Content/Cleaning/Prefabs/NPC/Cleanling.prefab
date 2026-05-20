@@ -114,7 +114,6 @@ GameObject:
   - component: {fileID: 1919283467771478247}
   - component: {fileID: 3363111975109093528}
   - component: {fileID: 2304605779416928869}
-  - component: {fileID: 9190818771239453335}
   - component: {fileID: 6912682421103994261}
   - component: {fileID: 1775336854156995368}
   m_Layer: 9
@@ -201,19 +200,6 @@ MonoBehaviour:
   followPlayerOnStart: 1
   speedParameter: Speed
   animationSmooth: 10
---- !u!114 &9190818771239453335
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3390144607806561004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 504fe5a4bf414ac46adf5b36638d7513, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PickupInteractable
-  HoldPoint: {fileID: 2876215151350421865}
 --- !u!54 &6912682421103994261
 Rigidbody:
   m_ObjectHideFlags: 0

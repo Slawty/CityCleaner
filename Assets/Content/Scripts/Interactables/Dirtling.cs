@@ -3,6 +3,11 @@ using UnityEngine.Events;
 
 [RequireComponent(typeof(DirtlingStateController))]
 [RequireComponent(typeof(DirtlingWander))]
+[RequireComponent(typeof(DirtlingFlee))]
+[RequireComponent(typeof(DirtlingVacuumCapture))]
+[RequireComponent(typeof(DirtlingDizzyBar))]
+[RequireComponent(typeof(DirtlingPhysicsBall))]
+[RequireComponent(typeof(DirtlingGoo))]
 [RequireComponent(typeof(Rigidbody))]
 public class Dirtling : MonoBehaviour
 {
@@ -58,7 +63,10 @@ public class Dirtling : MonoBehaviour
         SetPhysicsEnabled(false);
         SetBodyColliderEnabled(true);
         SetWanderingEnabled(true);
-        StateController.EnterState(DirtlingState.Wandering);
+        if (StateController.IsDizzy)
+            StateController.EnterState(DirtlingState.Dizzy);
+        else
+            StateController.EnterState(DirtlingState.Wandering);
     }
 
     void OnDestroy()

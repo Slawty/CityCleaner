@@ -44,4 +44,9 @@ public class HealthBar : MonoBehaviour
 
         progressBar.SetPercent(Mathf.Clamp01(normalized01) * 100f);
     }
+
+    public void SetProgressBar(ProgressBar bar)
+    {
+        progressBar = bar;
+    }
 }

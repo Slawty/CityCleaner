@@ -68,6 +68,8 @@ public class Dripling : MonoBehaviour, IVacuumable
         }
     }
 
+    public bool CanVacuum => true;
+
     public void VacuumStart()
     {
         isRefilling = true;

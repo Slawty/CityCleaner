@@ -1,40 +1,113 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Interactions;
 
 public class Vacuum : MonoBehaviour
 {
     public LayerMask vacuumMask;
     public float interactDistance = 3f;
-    public InputActionReference interactAction;
+    public float shootForce = 12f;
     public Collider particleTriggerCollider;
+    [Tooltip("Dirtlings parent here while vacuumed.")]
+    public Transform dirtlingAttachPoint;
+
     IVacuumable currentVacuumable;
     Camera cam;
-    bool vacuumActive;
+    bool suctionActive;
+    bool carryMode;
 
-    void Start()
+    public bool HasCarryTarget =>
+        currentVacuumable is IVacuumCarryable carryable && carryable.IsAttached;
+
+    void Awake()
     {
         cam = Managers.MainCam;
     }
 
     void Update()
     {
-        if (!vacuumActive)
+        if (!suctionActive || carryMode)
             return;
 
         CheckForVacuumable();
     }
 
+    public void Begin()
+    {
+        suctionActive = true;
+        carryMode = false;
+        particleTriggerCollider.enabled = true;
+        Managers.Input.BlockInteraction(this);
+    }
+
+    public void EnterCarryMode()
+    {
+        if (!HasCarryTarget)
+            return;
+
+        carryMode = true;
+        suctionActive = false;
+        particleTriggerCollider.enabled = false;
+    }
+
+    public void ReleaseCarried()
+    {
+        if (currentVacuumable is IVacuumCarryable carryable && carryable.IsAttached)
+            carryable.ReleaseFromVacuum();
+        else if (currentVacuumable != null)
+            currentVacuumable.VacuumEnd();
+
+        ClearTarget();
+    }
+
+    public void ShootCarried()
+    {
+        if (currentVacuumable is IVacuumCarryable carryable && carryable.IsAttached)
+        {
+            Vector3 direction = cam.transform.forward;
+            carryable.ShootFromVacuum(direction, shootForce);
+            ClearTarget();
+            return;
+        }
+
+        if (currentVacuumable != null)
+            currentVacuumable.VacuumEnd();
+        ClearTarget();
+    }
+
+    public void End()
+    {
+        if (currentVacuumable != null)
+            currentVacuumable.VacuumEnd();
+
+        currentVacuumable = null;
+        suctionActive = false;
+        carryMode = false;
+        particleTriggerCollider.enabled = false;
+        Managers.Input.UnblockInteraction(this);
+    }
+
+    void ClearTarget()
+    {
+        currentVacuumable = null;
+        suctionActive = false;
+        carryMode = false;
+    }
+
     void CheckForVacuumable()
     {
+        if (HasCarryTarget)
+            return;
+
         bool hitSomething = Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, interactDistance, vacuumMask, QueryTriggerInteraction.Ignore);
 
         if (hitSomething)
         {
-            IVacuumable vacuumable = hit.collider.GetComponent<IVacuumable>();
+            IVacuumable vacuumable = hit.collider.GetComponentInParent<IVacuumable>();
 
-            if (vacuumable != null)
+            if (vacuumable != null && vacuumable.CanVacuum)
             {
+                if (vacuumable is DirtlingVacuumCapture capture && dirtlingAttachPoint != null)
+                    capture.BindVacuumAttachPoint(dirtlingAttachPoint);
+
                 if (vacuumable != currentVacuumable)
                 {
                     if (currentVacuumable != null)
@@ -47,55 +120,10 @@ public class Vacuum : MonoBehaviour
             }
         }
 
-        // caching when we actually lost an interactable
-        if (currentVacuumable != null)
+        if (currentVacuumable != null && !HasCarryTarget)
         {
             currentVacuumable.VacuumEnd();
             currentVacuumable = null;
-
         }
     }
-
-    void OnEnable()
-    {
-        interactAction.action.Enable();
-        interactAction.action.performed += InteractButtonHold;
-        interactAction.action.canceled += InteractButtonCanceled;
-    }
-
-    void OnDisable()
-    {
-        interactAction.action.Disable();
-        interactAction.action.performed -= InteractButtonHold;
-        interactAction.action.canceled -= InteractButtonCanceled;
-    }
-
-    void InteractButtonHold(InputAction.CallbackContext ctx)
-    {
-        if (Managers.Input.InteractionBlocked())
-            return;
-
-        if (ctx.interaction is HoldInteraction)
-        {
-            Debug.Log($"Interact button hold. Activate Vacuum");
-            vacuumActive = true;
-            particleTriggerCollider.enabled = true;
-            Managers.Input.BlockInteraction(this);
-        }
-    }
-
-    void InteractButtonCanceled(InputAction.CallbackContext ctx)
-    {
-        if (!vacuumActive)
-            return;
-
-        Debug.Log($"Interact button released. Stopping Vacuum");
-        vacuumActive = false;
-        particleTriggerCollider.enabled = false;
-        if (currentVacuumable != null)
-            currentVacuumable.VacuumEnd();
-        currentVacuumable = null;
-        Managers.Input.UnblockInteraction(this);
-    }
-
 }

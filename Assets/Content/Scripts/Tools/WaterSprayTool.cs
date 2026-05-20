@@ -8,11 +8,16 @@ public class WaterSprayTool : Tool
     [SerializeField] GPUPainterWorld painter;
     [SerializeField] List<ParticleSystem> sprayEffects;
     [SerializeField] ProgressBar ammoBar;
+    [SerializeField] LayerMask dirtlingHitMask = ~0;
+    [SerializeField] float dirtlingRayDistance = 12f;
+
     float currentAmmo;
     bool isActive;
+    Camera cam;
 
     public override void Initialize()
     {
+        cam = Managers.MainCam;
         RefillWater();
     }
 
@@ -48,8 +53,24 @@ public class WaterSprayTool : Tool
         currentAmmo = Mathf.Clamp(currentAmmo, 0f, MaxAmmo);
         ammoBar.SetPercent((currentAmmo / MaxAmmo) * 100f);
 
+        HandleWaterRay();
+
         if (currentAmmo <= 0f)
             OnShootStop();
+    }
+
+    void HandleWaterRay()
+    {
+        Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+
+        if (!Physics.Raycast(ray, out RaycastHit hit, dirtlingRayDistance, dirtlingHitMask, QueryTriggerInteraction.Ignore))
+            return;
+
+        Dirtling dirtling = hit.collider.GetComponentInParent<Dirtling>();
+        if (dirtling == null)
+            return;
+
+        dirtling.StateController.ApplyWater(Time.deltaTime);
     }
 
     protected override void OnDisable()

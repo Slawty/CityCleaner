@@ -16760,7 +16760,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &696942971
 Transform:
   m_ObjectHideFlags: 0
@@ -16774,7 +16774,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
+  - {fileID: 1659276696}
   - {fileID: 1678286887}
+  - {fileID: 1855674348}
   m_Father: {fileID: 2031905419}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!330 &696942972
@@ -17288,8 +17290,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   interactDistance: 3
-  interactAction: {fileID: -309029934379754649, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  shootForce: 12
   particleTriggerCollider: {fileID: 1678286888}
+  dirtlingAttachPoint: {fileID: 1855674348}
 --- !u!1 &710676621
 GameObject:
   m_ObjectHideFlags: 0
@@ -32694,7 +32697,7 @@ ParticleSystem:
     quality: 0
     voxelSize: 0.5
     collisionMessages: 1
-    collidesWithDynamic: 0
+    collidesWithDynamic: 1
     interiorCollisions: 0
   TriggerModule:
     enabled: 0
@@ -34208,11 +34211,15 @@ MonoBehaviour:
   - {fileID: 8777165808046631629}
   - {fileID: 1038422204}
   - {fileID: 977524221}
+  vacuum: {fileID: 696942973}
   WaterSprayer: {fileID: 8777165808046631629}
   Lasergun: {fileID: 977524221}
   GooGun: {fileID: 1038422204}
   nextToolAction: {fileID: 7476244043514120974, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   prevToolAction: {fileID: 2411907206095950430, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  vacuumInteractAction: {fileID: -309029934379754649, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  vacuumReleaseAction: {fileID: 1781555164194001046, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  vacuumShootAction: {fileID: 1120369429361536294, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
 --- !u!1001 &1578721367
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34479,6 +34486,68 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1659174781}
   m_CullTransparentMesh: 1
+--- !u!1001 &1659276695
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 696942971}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0238
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.0397
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.076
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.000000037748947
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+      propertyPath: m_Name
+      value: Vacuum
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+--- !u!4 &1659276696 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ecc0853e8afb0f34f9ff6ad8c826cb90, type: 3}
+  m_PrefabInstance: {fileID: 1659276695}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1664735093
 GameObject:
   m_ObjectHideFlags: 0
@@ -40621,6 +40690,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1840058027}
   m_CullTransparentMesh: 1
+--- !u!1 &1855674347
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1855674348}
+  m_Layer: 0
+  m_Name: Dirtling Attach Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1855674348
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1855674347}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 696942971}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1856564913
 GameObject:
   m_ObjectHideFlags: 0
@@ -61100,6 +61200,10 @@ MonoBehaviour:
   - {fileID: 482141405}
   - {fileID: 1856564916}
   ammoBar: {fileID: 810804258}
+  dirtlingHitMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  dirtlingRayDistance: 12
 --- !u!114 &8777165808046631630
 MonoBehaviour:
   m_ObjectHideFlags: 0

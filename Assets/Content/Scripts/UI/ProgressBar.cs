@@ -60,6 +60,11 @@ public class ProgressBar : MonoBehaviour
         targetPercent = Mathf.Clamp(percent, 0f, 100f);
     }
 
+    public void SetFillImage(Image image)
+    {
+        fillImage = image;
+    }
+
     // --------------------------------------------------
 
     void UpdateUI(float percent)
