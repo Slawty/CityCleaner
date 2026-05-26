@@ -23503,6 +23503,7 @@ MonoBehaviour:
   shootAction: {fileID: 1120369429361536294, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   MaxAmmo: 1000
   AmmoPerSecond: 5
+  DamagePerSecond: 100
   CleanStrength: 10
   painter: {fileID: 1038422203}
   sprayEffects:
@@ -40785,13 +40786,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1855674347}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.08877839, y: 0.99351096, z: 0.06292876, w: 0.033080842}
+  m_LocalPosition: {x: -0.005, y: -0.226, z: 0.431}
+  m_LocalScale: {x: 0.51386, y: 0.51386, z: 0.51386}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 696942971}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -7.522, y: 176.845, z: -10.005}
 --- !u!1 &1856564913
 GameObject:
   m_ObjectHideFlags: 0
@@ -61261,6 +61262,7 @@ MonoBehaviour:
   shootAction: {fileID: 1120369429361536294, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   MaxAmmo: 100
   AmmoPerSecond: 1
+  DamagePerSecond: 100
   painter: {fileID: 8777165808046631630}
   sprayEffects:
   - {fileID: 482141405}

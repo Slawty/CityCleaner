@@ -111,7 +111,7 @@ public class LaserGunTool : Tool
         DirtNest dirtNest = hit.collider.GetComponentInParent<DirtNest>();
 
         if (dirtNest != null)
-            dirtNest.ApplyLaserDamage(DamagePerSecond);
+            dirtNest.ApplyDamageOverTime(DamagePerSecond);
     }
 
     protected override void OnDisable()

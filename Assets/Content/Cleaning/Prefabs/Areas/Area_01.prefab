@@ -2846,8 +2846,6 @@ MonoBehaviour:
   vulnerabilityCleanFraction: 0.9
   maxHealth: 500
   healthBar: {fileID: 7605050399512068764}
-  waterDamageMultiplier: 30
-  gooDamagePerHit: 15
   pooplingPrefab: {fileID: 5563417056416187508, guid: ae55632a1a4045e49a8897c840e9cf6b, type: 3}
   pooplingSpawnRadius: 4
   pooplingSpawnMinInterval: 10

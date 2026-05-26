@@ -5,6 +5,7 @@ public class WaterSprayTool : Tool
 {
     public float MaxAmmo;
     public float AmmoPerSecond = 2f;
+    public float DamagePerSecond = 100f;
     [SerializeField] GPUPainterWorld painter;
     [SerializeField] List<ParticleSystem> sprayEffects;
     [SerializeField] ProgressBar ammoBar;
@@ -19,6 +20,7 @@ public class WaterSprayTool : Tool
     public override void Initialize()
     {
         cam = Managers.MainCam;
+        painter.Bind(this);
         RefillWater();
     }
 

@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 /// Local corruption anchor for a neighborhood.
 /// Vulnerability is set explicitly via <see cref="SetVulnerable"/>.
 /// </summary>
-public class DirtNest : MonoBehaviour, IGooHitReceiver
+public class DirtNest : MonoBehaviour
 {
     [SerializeField] GameObject shieldObject;
     public bool VulnerableAtStart;
@@ -19,9 +19,6 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
     [Header("Combat")]
     [SerializeField] float maxHealth = 200f;
     [SerializeField] HealthBar healthBar;
-    [Tooltip("Multiplies GPUPainter strength (cleanSpeed * deltaTime) when applying water damage.")]
-    [SerializeField] float waterDamageMultiplier = 30f;
-    [SerializeField] float gooDamagePerHit = 15f;
 
     [Header("Dirtlings")]
     [FormerlySerializedAs("pooplingPrefab")]
@@ -100,6 +97,7 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
         IsVulnerable = true;
         shieldObject.SetActive(false);
         OnBecameVulnerable?.Invoke();
+        healthBar.gameObject.SetActive(true);
         Managers.UI.ShowInfoText("Poop Nest Vulnerable");
         StopSpawning();
     }
@@ -157,21 +155,16 @@ public class DirtNest : MonoBehaviour, IGooHitReceiver
         dirtlingsSpawned.Clear();
     }
 
-    /// <summary>Continuous laser damage (expects damage per second; applies delta internally).</summary>
-    public void ApplyLaserDamage(float damagePerSecond)
+    /// <summary>Continuous tool damage (laser, water); expects damage per second.</summary>
+    public void ApplyDamageOverTime(float damagePerSecond)
     {
         ApplyDamage(damagePerSecond * Time.deltaTime);
     }
 
-    /// <summary>Water sprayer: pass the same strength GPUPainter uses per frame (cleanSpeed * Time.deltaTime).</summary>
-    public void ApplyWaterDamage(float painterStrengthThisFrame)
+    /// <summary>Instant damage from goo particle collisions (already scaled by hit count).</summary>
+    public void ApplyGooDamage(float amount)
     {
-        ApplyDamage(painterStrengthThisFrame * waterDamageMultiplier);
-    }
-
-    public void OnGooHit(Vector3 hitPoint, GameObject source)
-    {
-        ApplyDamage(gooDamagePerHit);
+        ApplyDamage(amount);
     }
 
     void ApplyDamage(float amount)

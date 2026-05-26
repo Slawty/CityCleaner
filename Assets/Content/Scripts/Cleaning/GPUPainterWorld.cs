@@ -17,6 +17,7 @@ public class GPUPainterWorld : MonoBehaviour
     Material localPaintMaterial;
     float nextUpdateTime;
     bool isPainting;
+    WaterSprayTool waterTool;
 
     void Awake()
     {
@@ -40,8 +41,13 @@ public class GPUPainterWorld : MonoBehaviour
         }
 
         DirtNest dirtNest = hit.collider.GetComponentInParent<DirtNest>();
-        if (dirtNest != null)
-            dirtNest.ApplyWaterDamage(cleanSpeed * Time.deltaTime);
+        if (dirtNest != null && waterTool != null)
+            dirtNest.ApplyDamageOverTime(waterTool.DamagePerSecond);
+    }
+
+    public void Bind(WaterSprayTool tool)
+    {
+        waterTool = tool;
     }
 
     public void StartPainting()

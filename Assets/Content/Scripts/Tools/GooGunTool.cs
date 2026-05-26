@@ -5,6 +5,7 @@ public class GooGunTool : Tool
 {
     public float MaxAmmo;
     public float AmmoPerSecond = 2f;
+    public float DamagePerSecond = 100f;
     public float CleanStrength = 1f;
     [SerializeField] GPUPainter painter;
     [SerializeField] List<ParticleSystem> sprayEffects;
@@ -15,7 +16,17 @@ public class GooGunTool : Tool
 
     public override void Initialize()
     {
+        particleHitNotifier.Bind(this);
         RefillAmmo();
+    }
+
+    public float GooDamagePerParticle
+    {
+        get
+        {
+            float emissionRate = particleHitNotifier.EmissionRateOverTime;
+            return DamagePerSecond / Mathf.Max(emissionRate, 0.001f);
+        }
     }
 
     protected override void OnShootStart()

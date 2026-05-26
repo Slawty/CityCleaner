@@ -37,16 +37,7 @@ public class GPUPainter : MonoBehaviour
         var paintable = hit.collider.GetComponent<GPUPaintableObject>();
 
         if (paintable != null)
-        {
             Paint(paintable, hit.point, cleanSpeed * Time.deltaTime);
-            return;
-        }
-
-        DirtNest dirtNest = hit.collider.GetComponentInParent<DirtNest>();
-
-        if (dirtNest != null)
-            dirtNest.ApplyWaterDamage(cleanSpeed * Time.deltaTime);
-        // Debug.Log($"Paint: {hit.collider.name}");
     }
 
     public void StartPainting()
