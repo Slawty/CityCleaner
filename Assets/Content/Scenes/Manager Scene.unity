@@ -477,7 +477,7 @@ Transform:
   m_GameObject: {fileID: 62046717}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.99969804, z: 0, w: 0.024574243}
-  m_LocalPosition: {x: 6.15048, y: 3.825365, z: 34.542503}
+  m_LocalPosition: {x: 48.50389, y: 0.9279666, z: 68.36386}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -34203,6 +34203,7 @@ MonoBehaviour:
   sprintSpeed: 6
   gravity: -9.81
   jumpHeight: 2.5
+  ladderClimbSpeed: 3
   moveAction: {fileID: -1680190386980627800, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   jumpAction: {fileID: -2099379676528639254, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   sprintAction: {fileID: 6393252724350737843, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
@@ -34240,7 +34241,7 @@ Transform:
   m_GameObject: {fileID: 1518474217}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.99969804, z: -0, w: 0.024574243}
-  m_LocalPosition: {x: 6.15048, y: 3.213365, z: 34.542503}
+  m_LocalPosition: {x: 48.50389, y: 0.3159666, z: 68.36386}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:

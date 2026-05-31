@@ -109,7 +109,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _Enable_Emission: 0
+    - _Enable_Emission: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.2
     - _GlossyReflections: 1
@@ -136,7 +136,7 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Emission_Color: {r: 0, g: 0, b: 0, a: 1}
+    - _Emission_Color: {r: 0, g: 0.103773594, b: 0.009397238, a: 1}
     - _Hair_Color: {r: 0.30980387, g: 0.25490198, b: 0.17647055, a: 0}
     - _Skin_Color: {r: 1, g: 0.8, b: 0.682353, a: 0}
   m_BuildTextureStacks: []

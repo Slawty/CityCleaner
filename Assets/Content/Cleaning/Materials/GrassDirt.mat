@@ -125,6 +125,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _GrowStrength: 1
     - _GrowthBaseY: 0
     - _MaskScale: 0.2
     - _MaxHeight: 0.75
