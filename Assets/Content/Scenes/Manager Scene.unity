@@ -34,7 +34,7 @@ RenderSettings:
   m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
-  m_ReflectionBounces: 1
+  m_ReflectionBounces: 2
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
@@ -94,7 +94,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 112000002, guid: 740346660aafaea40bdc27e356e02dab, type: 2}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 5482702ed11dfe349bc16acf514d93a6, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -476,8 +476,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 62046717}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.99969804, z: 0, w: 0.024574243}
-  m_LocalPosition: {x: 48.50389, y: 0.9279666, z: 68.36386}
+  m_LocalRotation: {x: 0, y: 0.7242696, z: -0, w: -0.6895169}
+  m_LocalPosition: {x: 49.566586, y: 1.1145921, z: 62.87118}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -34240,8 +34240,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1518474217}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.99969804, z: -0, w: 0.024574243}
-  m_LocalPosition: {x: 48.50389, y: 0.3159666, z: 68.36386}
+  m_LocalRotation: {x: -0, y: 0.7242696, z: -0, w: -0.6895169}
+  m_LocalPosition: {x: 49.566586, y: 0.5025921, z: 62.87118}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -34252,7 +34252,7 @@ Transform:
   - {fileID: 1379156951}
   - {fileID: 1915682489}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 177.184, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 267.184, z: 0}
 --- !u!114 &1518474222
 MonoBehaviour:
   m_ObjectHideFlags: 0
