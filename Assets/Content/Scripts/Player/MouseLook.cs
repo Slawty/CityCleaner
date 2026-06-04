@@ -11,6 +11,8 @@ public class MouseLook : MonoBehaviour
     public float maxDelta = 100f; // clamp extreme spikes
 
     float xRotation;
+    bool pointerMode;
+    int discardLookFrames;
 
     public Vector2 LookDelta { get; private set; }
 
@@ -33,6 +35,20 @@ public class MouseLook : MonoBehaviour
 
     void Update()
     {
+        if (pointerMode)
+        {
+            LookDelta = Vector2.zero;
+            return;
+        }
+
+        if (discardLookFrames > 0)
+        {
+            discardLookFrames--;
+            lookAction.action.ReadValue<Vector2>();
+            LookDelta = Vector2.zero;
+            return;
+        }
+
         Vector2 lookInput = lookAction.action.ReadValue<Vector2>();
 
         // Clamp extreme spikes (debug freezes, editor stalls, etc.)
@@ -54,5 +70,27 @@ public class MouseLook : MonoBehaviour
     {
         xRotation = pitch;
         cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+    }
+
+    public void SetPointerMode(bool pointerVisible)
+    {
+        if (pointerMode == pointerVisible)
+            return;
+
+        pointerMode = pointerVisible;
+        LookDelta = Vector2.zero;
+
+        if (pointerVisible)
+        {
+            lookAction.action.Disable();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            return;
+        }
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        lookAction.action.Enable();
+        discardLookFrames = 2;
     }
 }

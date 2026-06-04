@@ -899,7 +899,6 @@ Transform:
   - {fileID: 8904495522796862773}
   - {fileID: 519340739213418167}
   - {fileID: 8394601520636253880}
-  - {fileID: 5729599020035006630}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2270063432295711915
@@ -916,6 +915,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DirtArea
   radioactivePostProcessVolume: {fileID: 7216038683632440791}
   areaTrigger: {fileID: 5085832650707329697}
+  indicator: {fileID: 0}
+  visualBorder: {fileID: 0}
   initializeGpuPaintablesOnAwake: 0
   zoneInitialMaskXZ: {fileID: 0}
   zoneInitialMaskXY: {fileID: 0}
@@ -1820,95 +1821,6 @@ MonoBehaviour:
   blendDistance: 3
   weight: 1
   sharedProfile: {fileID: 11400000, guid: 79020b19e006bbb4e996425e13c5530f, type: 2}
---- !u!1 &5164918222887856194
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5729599020035006630}
-  - component: {fileID: 1933166698615912958}
-  - component: {fileID: 7616384501160771865}
-  - component: {fileID: 4416535644869731290}
-  m_Layer: 0
-  m_Name: AreaTrigger (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5729599020035006630
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5164918222887856194}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.67, y: 0.72, z: -7.39}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 5534781855179396467}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1933166698615912958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5164918222887856194}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4353aa3f2918cf94697670b39e98595f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AreaTrigger
-  dirtArea: {fileID: 2270063432295711915}
---- !u!65 &7616384501160771865
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5164918222887856194}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 1015
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 22.83, y: 11.73, z: 26.82}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &4416535644869731290
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5164918222887856194}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 1015
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 87.1, y: 11.73, z: 77.4}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5412928861142981497
 GameObject:
   m_ObjectHideFlags: 0
@@ -1926,7 +1838,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6063691738839860865
 Transform:
   m_ObjectHideFlags: 0
@@ -2846,11 +2758,11 @@ MonoBehaviour:
   vulnerabilityCleanFraction: 0.9
   maxHealth: 500
   healthBar: {fileID: 7605050399512068764}
-  pooplingPrefab: {fileID: 5563417056416187508, guid: ae55632a1a4045e49a8897c840e9cf6b, type: 3}
-  pooplingSpawnRadius: 4
-  pooplingSpawnMinInterval: 10
-  pooplingSpawnMaxInterval: 25
-  maxAlivePooplings: 5
+  dirtlingPrefab: {fileID: 5563417056416187508, guid: ae55632a1a4045e49a8897c840e9cf6b, type: 3}
+  dirtlingSpawnRadius: 4
+  dirtlingSpawnMinInterval: 10
+  dirtlingSpawnMaxInterval: 25
+  maxAliveDirtlings: 5
   OnBecameVulnerable:
     m_PersistentCalls:
       m_Calls: []

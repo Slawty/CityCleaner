@@ -21,8 +21,13 @@ public class Player : MonoBehaviour
 
     public void SetPlayerActive(bool active)
     {
-        movement.enabled = active;
+        SetMovementEnabled(active);
         mouseLook.enabled = active;
         playerCamera.Priority = active ? 10 : 0;
+    }
+
+    public void SetMovementEnabled(bool enabled)
+    {
+        movement.enabled = enabled;
     }
 }

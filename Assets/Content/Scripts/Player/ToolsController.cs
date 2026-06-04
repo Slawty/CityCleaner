@@ -140,7 +140,7 @@ public class ToolsController : MonoBehaviour
 
     void OnVacuumShoot(InputAction.CallbackContext ctx)
     {
-        if (!vacuumMode)
+        if (!vacuumMode || Managers.Input.InteractionBlocked())
             return;
 
         vacuum.ShootCarried();
@@ -203,5 +203,11 @@ public class ToolsController : MonoBehaviour
         if (currentToolIndex < 0)
             return null;
         return tools[currentToolIndex];
+    }
+
+    public void StopActiveShooting()
+    {
+        if (currentToolIndex >= 0)
+            tools[currentToolIndex].StopShooting();
     }
 }

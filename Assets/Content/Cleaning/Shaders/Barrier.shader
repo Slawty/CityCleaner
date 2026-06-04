@@ -14,6 +14,8 @@ Shader "Cleaning/Barrier"
         _PatternScale ("Pattern Density (tiles per world unit)", Float) = 2
         _PatternStrength ("Pattern Strength", Range(0, 1)) = 0.45
         _TriplanarSharpness ("Projection Sharpness", Range(1, 8)) = 4
+        [HDR] _GridColor ("Grid Color", Color) = (0, 2.5, 0.35, 1)
+        _GridEmission ("Grid Emission", Range(0, 10)) = 1
     }
 
     SubShader
@@ -62,6 +64,8 @@ Shader "Cleaning/Barrier"
 
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
+                half4 _GridColor;
+                half _GridEmission;
                 half _FadePower;
                 half _InvertVerticalUV;
                 float _PatternScale;
@@ -102,9 +106,12 @@ Shader "Cleaning/Barrier"
             {
                 half3 n = normalize(input.normalWS);
                 half4 pattern = SamplePatternTriplanar(input.positionWS, n);
+                half gridMask = saturate(max(pattern.r, max(pattern.g, pattern.b)));
+                half gridBlend = gridMask * _PatternStrength;
 
+                half3 gridEmissive = _GridColor.rgb * _GridEmission * gridBlend;
                 half4 c = _Color;
-                c.rgb *= lerp(half3(1, 1, 1), pattern.rgb, _PatternStrength);
+                c.rgb = lerp(c.rgb, half3(0, 0, 0), gridBlend * 0.85h) + gridEmissive;
                 c.a *= input.fade;
                 return c;
             }

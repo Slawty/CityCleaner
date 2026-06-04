@@ -16,19 +16,32 @@ public abstract class Tool : MonoBehaviour
     {
         shootAction.action.performed -= HandleShootDown;
         shootAction.action.canceled -= HandleShootUp;
+        OnShootStop();
     }
 
     private void HandleShootDown(InputAction.CallbackContext ctx)
     {
+        if (Managers.Input.InteractionBlocked())
+            return;
+
         OnShootStart();
     }
 
     private void HandleShootUp(InputAction.CallbackContext ctx)
     {
+        if (Managers.Input.InteractionBlocked())
+            return;
+
         OnShootStop();
     }
 
     public virtual void Initialize() { }
+
+    public void StopShooting()
+    {
+        OnShootStop();
+    }
+
     // These are what tools override
     protected virtual void OnShootStart() { }
     protected virtual void OnShootStop() { }

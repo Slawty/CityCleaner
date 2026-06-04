@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text interactText;
     [SerializeField] private TMP_Text coinValueText;
     [SerializeField] private TMP_Text poopValueText;
+    [SerializeField] GameObject hudRoot;
 
 
 
@@ -48,9 +49,14 @@ public class UIManager : MonoBehaviour
         interactText.gameObject.SetActive(false);
     }
 
+    public void SetHudVisible(bool visible)
+    {
+        hudRoot.SetActive(visible);
+    }
+
     public void SetCleanProgressBarPercent(float value)
     {
-        Debug.Log($"SetCleanProgressBarPercent: {value}");
+        // Debug.Log($"SetCleanProgressBarPercent: {value}");
         cleanProgressBar.SetPercent(value);
     }
 

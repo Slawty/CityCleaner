@@ -12,6 +12,8 @@ public class Managers : MonoBehaviour
     [SerializeField] AreaManager areaManager;
     [SerializeField] InventoryManager inventoryManager;
     [SerializeField] InputManager inputManager;
+    [SerializeField] SpeechPanelController speechPanelController;
+    [SerializeField] JobManager jobManager;
 
     private void Awake()
     {
@@ -26,4 +28,6 @@ public class Managers : MonoBehaviour
     public static AreaManager Areas => Instance.areaManager;
     public static InventoryManager Inventory => Instance.inventoryManager;
     public static InputManager Input => Instance.inputManager;
+    public static SpeechPanelController Speech => Instance.speechPanelController;
+    public static JobManager Jobs => Instance.jobManager;
 }

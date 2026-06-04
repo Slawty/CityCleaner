@@ -13,6 +13,8 @@ public class DirtArea : MonoBehaviour
 {
     [SerializeField] Volume radioactivePostProcessVolume;
     [SerializeField] AreaTrigger areaTrigger;
+    [SerializeField] GameObject indicator;
+    [SerializeField] GameObject visualBorder;
     [Header("GPU dirt")]
     [SerializeField] bool initializeGpuPaintablesOnAwake = true;
     [Tooltip("Optional baked dirt mask per tri-planar axis for child ZoneDirtMap. When set, overrides that axis on ZoneDirtMap.")]
@@ -23,6 +25,9 @@ public class DirtArea : MonoBehaviour
     public Texture2D ZoneInitialMaskXZ => zoneInitialMaskXZ;
     public Texture2D ZoneInitialMaskXY => zoneInitialMaskXY;
     public Texture2D ZoneInitialMaskYZ => zoneInitialMaskYZ;
+
+    [Header("Job")]
+    [SerializeField, Range(0f, 1f)] float jobCompletionFraction = 1f;
 
     [Header("Debug")]
     [SerializeField, Range(0f, 100f)] float debugCleanPercent = 10f;
@@ -42,8 +47,13 @@ public class DirtArea : MonoBehaviour
     int completedRadioactivetargets;
 
     bool subscribed;
+    bool playerInsideArea;
+    bool jobTargetActive;
+    bool jobCompleted;
 
     public float NormalizedProgress { get; private set; }
+    public float JobCompletionFraction => jobCompletionFraction;
+    public bool IsJobTargetActive => jobTargetActive;
 
     void Awake()
     {
@@ -69,6 +79,7 @@ public class DirtArea : MonoBehaviour
         SyncAlreadyCompletedAtStart();
         PushProgress();
         radioactivePostProcessVolume.gameObject.SetActive(true);
+        RefreshJobIndicator();
     }
 
     void OnDestroy()
@@ -78,14 +89,56 @@ public class DirtArea : MonoBehaviour
 
     void OnPlayerEnteredArea()
     {
+        playerInsideArea = true;
         RefreshProgressAndPushUi();
         Managers.UI.ShowZoneProgress(true);
+
+        if (visualBorder != null && !jobCompleted)
+            visualBorder.SetActive(true);
+
+        RefreshJobIndicator();
     }
 
     void OnPlayerExitedArea()
     {
+        playerInsideArea = false;
         Managers.UI.ShowZoneProgress(false);
-    
+
+        if (visualBorder != null)
+            visualBorder.SetActive(false);
+
+        RefreshJobIndicator();
+    }
+
+    public void SetJobTargetActive(bool active)
+    {
+        jobTargetActive = active;
+        if (active)
+            jobCompleted = false;
+
+        RefreshJobIndicator();
+        areaTrigger.gameObject.SetActive(true);
+    }
+
+    public void SetJobCompleted()
+    {
+        jobTargetActive = false;
+        jobCompleted = true;
+
+        if (indicator != null)
+            indicator.SetActive(false);
+
+        if (visualBorder != null)
+            visualBorder.SetActive(false);
+    }
+
+    public void RefreshJobIndicator()
+    {
+        if (indicator == null || jobCompleted)
+            return;
+
+        bool showIndicator = jobTargetActive && !playerInsideArea && NormalizedProgress < 1f;
+        indicator.SetActive(showIndicator);
     }
 
     void DiscoverTargets()
@@ -229,7 +282,60 @@ public class DirtArea : MonoBehaviour
         PushProgress();
     }
 
+    public void CompleteAllRemainingTargets()
+    {
+        foreach (GPUPaintableObject paintableObject in paintables)
+        {
+            if (paintableObject == null || paintableObject.isClean)
+                continue;
+
+            if (!paintableObject.IsInitialized)
+                paintableObject.Initialize(128);
+
+            paintableObject.SetClean();
+        }
+
+        foreach (GooHitGrowable gooGrowable in gooGrowables)
+        {
+            if (gooGrowable != null && !gooGrowable.IsFullyGrown)
+                gooGrowable.DebugSetFullyGrown();
+        }
+
+        foreach (SplitableObject splitableObject in splitables)
+        {
+            if (splitableObject != null)
+                splitableObject.DebugDestroyNow();
+        }
+
+        foreach (SplitableObject radioactiveObject in radioactives)
+        {
+            if (radioactiveObject != null)
+                radioactiveObject.DebugDestroyNow();
+        }
+    }
+
     public void DebugCleanFixedPercent()
+    {
+        List<System.Action> completionActions = CollectIncompleteTargetActions();
+        int incompleteTargetsCount = completionActions.Count;
+        if (incompleteTargetsCount == 0)
+            return;
+
+        float cleanFraction = debugCleanPercent / 100f;
+        int targetsToClean = Mathf.CeilToInt(totalTargets * cleanFraction);
+        targetsToClean = Mathf.Clamp(targetsToClean, 0, incompleteTargetsCount);
+
+        for (int index = completionActions.Count - 1; index > 0; index--)
+        {
+            int randomIndex = Random.Range(0, index + 1);
+            (completionActions[index], completionActions[randomIndex]) = (completionActions[randomIndex], completionActions[index]);
+        }
+
+        for (int index = 0; index < targetsToClean; index++)
+            completionActions[index].Invoke();
+    }
+
+    List<System.Action> CollectIncompleteTargetActions()
     {
         List<System.Action> completionActions = new();
 
@@ -262,22 +368,7 @@ public class DirtArea : MonoBehaviour
                 completionActions.Add(radioactiveObject.DebugDestroyNow);
         }
 
-        int incompleteTargetsCount = completionActions.Count;
-        if (incompleteTargetsCount == 0)
-            return;
-
-        float cleanFraction = debugCleanPercent / 100f;
-        int targetsToClean = Mathf.CeilToInt(totalTargets * cleanFraction);
-        targetsToClean = Mathf.Clamp(targetsToClean, 0, incompleteTargetsCount);
-
-        for (int index = completionActions.Count - 1; index > 0; index--)
-        {
-            int randomIndex = Random.Range(0, index + 1);
-            (completionActions[index], completionActions[randomIndex]) = (completionActions[randomIndex], completionActions[index]);
-        }
-
-        for (int index = 0; index < targetsToClean; index++)
-            completionActions[index].Invoke();
+        return completionActions;
     }
 
     void PushProgress()
@@ -289,5 +380,7 @@ public class DirtArea : MonoBehaviour
         Managers.UI.SetZoneCleanProgressBarPercent(NormalizedProgress * 100f);
         if (totalRadioactivetargets > 0)
             Managers.UI.SetRadioactivesProgressBarPercent((1 - completedRadioactivetargets / (float)totalRadioactivetargets) * 100f);
+
+        RefreshJobIndicator();
     }
 }
