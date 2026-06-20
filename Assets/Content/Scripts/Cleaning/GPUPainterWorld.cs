@@ -1,9 +1,12 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Cysharp.Threading.Tasks;
 
 public class GPUPainterWorld : MonoBehaviour
 {
+    const int OverlapBufferSize = 32;
+
     [Header("Setup")]
     [SerializeField] Camera cam;
     [SerializeField] LayerMask paintMask;
@@ -13,6 +16,9 @@ public class GPUPainterWorld : MonoBehaviour
     [SerializeField] Texture2D brushTexture;
     [SerializeField] float brushWorldSize = 0.5f;
     [SerializeField] float cleanSpeed = 4f;
+
+    readonly Collider[] overlapColliders = new Collider[OverlapBufferSize];
+    readonly HashSet<GPUPaintableObject> paintablesInBrush = new();
 
     Material localPaintMaterial;
     float nextUpdateTime;
@@ -36,13 +42,42 @@ public class GPUPainterWorld : MonoBehaviour
         GPUPaintableObject paintable = hit.collider.GetComponentInParent<GPUPaintableObject>();
         if (paintable != null)
         {
-            PaintLocalMask(paintable, hit.point, cleanSpeed * Time.deltaTime);
+            PaintBrushAt(hit.point, cleanSpeed * Time.deltaTime);
             return;
         }
 
         DirtNest dirtNest = hit.collider.GetComponentInParent<DirtNest>();
         if (dirtNest != null && waterTool != null)
             dirtNest.ApplyDamageOverTime(waterTool.DamagePerSecond);
+    }
+
+    void PaintBrushAt(Vector3 brushCenter, float cleanStrength)
+    {
+        int hitCount = Physics.OverlapSphereNonAlloc(
+            brushCenter,
+            brushWorldSize,
+            overlapColliders,
+            paintMask,
+            QueryTriggerInteraction.Ignore);
+
+        paintablesInBrush.Clear();
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            GPUPaintableObject paintable = overlapColliders[i].GetComponentInParent<GPUPaintableObject>();
+            if (paintable == null || !paintablesInBrush.Add(paintable))
+                continue;
+
+            ApplyBrushStroke(paintable, brushCenter, cleanStrength);
+        }
+
+        if (paintablesInBrush.Count == 0 || Time.time <= nextUpdateTime)
+            return;
+
+        nextUpdateTime = Time.time + 0.1f;
+
+        foreach (GPUPaintableObject paintable in paintablesInBrush)
+            UpdatePaintableTracking(paintable, brushCenter);
     }
 
     public void Bind(WaterSprayTool tool)
@@ -60,13 +95,10 @@ public class GPUPainterWorld : MonoBehaviour
         isPainting = false;
     }
 
-    void PaintLocalMask(GPUPaintableObject paintable, Vector3 hitPos, float cleanStrength)
+    void ApplyBrushStroke(GPUPaintableObject paintable, Vector3 brushCenter, float cleanStrength)
     {
         if (paintable.isClean)
-        {
-            Managers.UI.SetCleanProgressBarPercent(100f);
             return;
-        }
 
         if (!paintable.IsInitialized)
             paintable.Initialize(textureResolution);
@@ -75,7 +107,7 @@ public class GPUPainterWorld : MonoBehaviour
         if (targetRenderer == null)
             return;
 
-        localPaintMaterial.SetVector("_BrushWorldPos", hitPos);
+        localPaintMaterial.SetVector("_BrushWorldPos", brushCenter);
         localPaintMaterial.SetFloat("_BrushSize", brushWorldSize);
         localPaintMaterial.SetFloat("_Strength", cleanStrength);
         localPaintMaterial.SetTexture("_BrushTex", brushTexture);
@@ -92,19 +124,24 @@ public class GPUPainterWorld : MonoBehaviour
         Graphics.ExecuteCommandBuffer(commandBuffer);
         commandBuffer.Release();
         RenderTexture.ReleaseTemporary(temp);
+    }
 
-        if (Time.time <= nextUpdateTime)
+    void UpdatePaintableTracking(GPUPaintableObject paintable, Vector3 brushCenter)
+    {
+        if (paintable.isClean)
+        {
+            Managers.UI.SetCleanProgressBarPercent(100f);
             return;
+        }
 
-        paintable.UpdateTracking(hitPos);
-        nextUpdateTime = Time.time + 0.1f;
+        paintable.UpdateTracking(brushCenter);
 
         if (!paintable.isClean)
             return;
 
-        Vector3 dirToPlayer = (transform.position - hitPos).normalized;
+        Vector3 dirToPlayer = (transform.position - brushCenter).normalized;
         dirToPlayer.y = 1f;
-        Vector3 coinSpawnPos = paintable.CoinSpawnPos == null ? hitPos : paintable.CoinSpawnPos.position;
+        Vector3 coinSpawnPos = paintable.CoinSpawnPos == null ? brushCenter : paintable.CoinSpawnPos.position;
         coinSpawnPos += dirToPlayer * 0.25f;
         Managers.Spawning.SpawnCoins(paintable.winCoins, coinSpawnPos, dirToPlayer).Forget();
     }

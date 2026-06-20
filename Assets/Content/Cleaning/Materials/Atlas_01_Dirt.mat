@@ -66,7 +66,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DirtMap:
-        m_Texture: {fileID: 2800000, guid: d542e34faeeb86e4d88affeafc70d71c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 05d0156ae696bfb4191073f4a1cb7a25, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DirtMask:
@@ -204,11 +204,11 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _BaseTint: {r: 0.8301887, g: 0.8301887, b: 0.8301887, a: 1}
+    - _BaseTint: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DirtDefaultTiling: {r: 1, g: 1, b: 0, a: 0}
     - _DirtTiling: {r: 5, g: 5, b: 0, a: 0}
-    - _DirtTint: {r: 0.8867924, g: 0.8867924, b: 0.8867924, a: 1}
+    - _DirtTint: {r: 0.5377358, g: 0.2341929, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MaskOffset: {r: 0, g: 0, b: 0, a: 0}
     - _PatternTiling: {r: 1, g: 1, b: 0, a: 0}

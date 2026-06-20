@@ -12,7 +12,7 @@ public class GPUPaintableObject : MonoBehaviour
     public UnityAction OnInitialize;
     public UnityAction OnProgress;
     public UnityAction OnCleaned;
-    public int winCoins = 3;
+    public int winCoins = 1;
     public int winDirt = 3;
     public List<GPUPaintableObject> AdditionalObjectsToClean = new();
     public Transform CoinSpawnPos;

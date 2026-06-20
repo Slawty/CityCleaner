@@ -476,8 +476,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 62046717}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7242696, z: -0, w: -0.6895169}
-  m_LocalPosition: {x: 82.80901, y: 1.7312621, z: 195.15677}
+  m_LocalRotation: {x: 0, y: -0.6895168, z: 0, w: -0.72426975}
+  m_LocalPosition: {x: 56.10431, y: 2.716033, z: 237.40945}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23323,11 +23323,26 @@ PrefabInstance:
       propertyPath: m_text
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 8583678383058082738, guid: b562e8014b4c9b94bae0891d033290eb, type: 3}
+      propertyPath: toolIndex
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b562e8014b4c9b94bae0891d033290eb, type: 3}
+--- !u!114 &957881529 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8583678383058082738, guid: b562e8014b4c9b94bae0891d033290eb, type: 3}
+  m_PrefabInstance: {fileID: 957881528}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f701780af0472240b36ab426b3bb6ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ToolSlot
 --- !u!1 &977524217
 GameObject:
   m_ObjectHideFlags: 0
@@ -23438,7 +23453,7 @@ MonoBehaviour:
   MaxAmmo: 100
   AmmoDrainPerSecond: 5
   RechargePerSecond: 10
-  DamagePerSecond: 100
+  DamagePerSecond: 200
   sprayEffects:
   - {fileID: 1220991249}
   ammoBar: {fileID: 1354618827}
@@ -24141,11 +24156,26 @@ PrefabInstance:
       propertyPath: m_text
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 8583678383058082738, guid: b562e8014b4c9b94bae0891d033290eb, type: 3}
+      propertyPath: toolIndex
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b562e8014b4c9b94bae0891d033290eb, type: 3}
+--- !u!114 &1171152370 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8583678383058082738, guid: b562e8014b4c9b94bae0891d033290eb, type: 3}
+  m_PrefabInstance: {fileID: 1171152369}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f701780af0472240b36ab426b3bb6ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ToolSlot
 --- !u!114 &1179216095 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6405502511729371591, guid: b562e8014b4c9b94bae0891d033290eb, type: 3}
@@ -34579,8 +34609,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1518474217}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.7242696, z: -0, w: -0.6895169}
-  m_LocalPosition: {x: 82.80901, y: 1.1192621, z: 195.15677}
+  m_LocalRotation: {x: -0, y: -0.6895168, z: -0, w: -0.72426975}
+  m_LocalPosition: {x: 56.10431, y: 2.104033, z: 237.40945}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -34591,7 +34621,7 @@ Transform:
   - {fileID: 1379156951}
   - {fileID: 1915682489}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 267.184, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 447.184, z: 0}
 --- !u!114 &1518474222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34620,15 +34650,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToolsController
   tools:
+  - {fileID: 977524221}
   - {fileID: 8777165808046631629}
   - {fileID: 1038422204}
-  - {fileID: 977524221}
   vacuum: {fileID: 696942973}
   WaterSprayer: {fileID: 8777165808046631629}
   Lasergun: {fileID: 977524221}
   GooGun: {fileID: 1038422204}
-  nextToolAction: {fileID: 7476244043514120974, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
-  prevToolAction: {fileID: 2411907206095950430, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  toolSlots:
+  - {fileID: 1799463851385510715}
+  - {fileID: 957881529}
+  - {fileID: 1171152370}
+  nextToolAction: {fileID: -8878704847213959957, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  prevToolAction: {fileID: 5766316853376839344, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  tool1Action: {fileID: 2411907206095950430, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  tool2Action: {fileID: 7476244043514120974, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  tool3Action: {fileID: -5328973138650959184, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   vacuumInteractAction: {fileID: -6824443882261655076, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   vacuumReleaseAction: {fileID: -1913020635853912389, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   vacuumShootAction: {fileID: 1120369429361536294, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
@@ -61628,11 +61665,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8583678383058082738, guid: b562e8014b4c9b94bae0891d033290eb, type: 3}
+      propertyPath: toolIndex
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b562e8014b4c9b94bae0891d033290eb, type: 3}
+--- !u!114 &1799463851385510715 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8583678383058082738, guid: b562e8014b4c9b94bae0891d033290eb, type: 3}
+  m_PrefabInstance: {fileID: 1799463851385510714}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f701780af0472240b36ab426b3bb6ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ToolSlot
 --- !u!1 &4984019092729872339
 GameObject:
   m_ObjectHideFlags: 0

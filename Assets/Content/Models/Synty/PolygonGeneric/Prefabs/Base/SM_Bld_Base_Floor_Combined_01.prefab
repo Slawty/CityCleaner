@@ -82,11 +82,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
   winCoins: 1
+  winDirt: 3
   AdditionalObjectsToClean: []
   CoinSpawnPos: {fileID: 3944838928710686581}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.7
+  allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}

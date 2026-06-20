@@ -65,12 +65,12 @@ public class SplitableObject : MonoBehaviour
 
         float scaleOffset = scaleCurve.Evaluate(curveTime) * hitScaleStrength;
         transform.localScale = baseScale * (1f + scaleOffset);
-        flashTimeCounter += Time.deltaTime;
-        if (flashTimeCounter > maxFlashPerSeond)
-        {
-            flashMaterial.SetFloat("_FlashStartTime", Time.time);
-            flashTimeCounter = 0f;
-        }
+        // flashTimeCounter += Time.deltaTime;
+        // if (flashTimeCounter > maxFlashPerSeond)
+        // {
+        //     flashMaterial.SetFloat("_FlashStartTime", Time.time);
+        //     flashTimeCounter = 0f;
+        // }
 
         if (Health <= 0)
         {

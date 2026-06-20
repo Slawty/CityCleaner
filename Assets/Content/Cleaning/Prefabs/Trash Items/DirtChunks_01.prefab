@@ -50,8 +50,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SplitableObject
   Health: 100
+  OnDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+  IsRadioactive: 0
   hitScaleStrength: 0.075
   hitScaleFrequency: 5
+  maxFlashPerSeond: 0.1
   scaleCurve:
     serializedVersion: 2
     m_Curve:
@@ -242,8 +247,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SplitableObject
   Health: 100
+  OnDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+  IsRadioactive: 0
   hitScaleStrength: 0.075
   hitScaleFrequency: 5
+  maxFlashPerSeond: 0.1
   scaleCurve:
     serializedVersion: 2
     m_Curve:
@@ -394,7 +404,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4120424555985203460}
   m_Layer: 0
-  m_Name: PoopChunks_01
+  m_Name: DirtChunks_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -471,8 +481,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SplitableObject
   Health: 100
+  OnDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+  IsRadioactive: 0
   hitScaleStrength: 0.075
   hitScaleFrequency: 5
+  maxFlashPerSeond: 0.1
   scaleCurve:
     serializedVersion: 2
     m_Curve:
@@ -787,8 +802,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SplitableObject
   Health: 100
+  OnDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+  IsRadioactive: 0
   hitScaleStrength: 0.075
   hitScaleFrequency: 5
+  maxFlashPerSeond: 0.1
   scaleCurve:
     serializedVersion: 2
     m_Curve:
@@ -1010,8 +1030,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SplitableObject
   Health: 100
+  OnDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+  IsRadioactive: 0
   hitScaleStrength: 0.075
   hitScaleFrequency: 5
+  maxFlashPerSeond: 0.1
   scaleCurve:
     serializedVersion: 2
     m_Curve:
@@ -1233,8 +1258,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SplitableObject
   Health: 100
+  OnDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+  IsRadioactive: 0
   hitScaleStrength: 0.075
   hitScaleFrequency: 5
+  maxFlashPerSeond: 0.1
   scaleCurve:
     serializedVersion: 2
     m_Curve:

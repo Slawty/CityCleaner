@@ -115,7 +115,25 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Previous",
+                    "name": "Next Tool",
+                    "type": "Value",
+                    "id": "bf66292a-270c-453c-ab46-c67c0d68f64c",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Prev Tool",
+                    "type": "Value",
+                    "id": "9af41a94-9a63-4c38-9548-dee628ac5f4c",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Tool 1",
                     "type": "Button",
                     "id": "2776c80d-3c14-4091-8c56-d04ced07a2b0",
                     "expectedControlType": "",
@@ -124,9 +142,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Next",
+                    "name": "Tool 2",
                     "type": "Button",
                     "id": "b7230bb6-fc9b-4f52-8b25-f5e19cb2c2ba",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Tool 3",
+                    "type": "Button",
+                    "id": "c4ff6dac-3077-4656-8d50-1e939c67b7a0",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -405,7 +432,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Next",
+                    "action": "Tool 2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -416,42 +443,31 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Next",
+                    "action": "Tool 2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "1D Axis",
-                    "id": "80f3e7cf-f64a-4f6a-9370-b763b0b06b00",
-                    "path": "1DAxis",
+                    "name": "",
+                    "id": "08876b63-122a-482d-ae12-4c0e68e0547f",
+                    "path": "<Keyboard>/3",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "Next",
-                    "isComposite": true,
+                    "groups": "Keyboard&Mouse",
+                    "action": "Tool 3",
+                    "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "negative",
-                    "id": "1009f3b5-dd42-4267-a947-7ec8c7afda81",
-                    "path": "<Mouse>/scroll/down",
+                    "name": "",
+                    "id": "948bf661-333d-4f60-ad45-7134e8454123",
+                    "path": "<Gamepad>/dpad/up",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "Next",
+                    "groups": "Gamepad",
+                    "action": "Tool 3",
                     "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "positive",
-                    "id": "78b35a6b-48fb-4a28-8a13-435a01554dd6",
-                    "path": "<Mouse>/scroll/up",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Next",
-                    "isComposite": false,
-                    "isPartOfComposite": true
+                    "isPartOfComposite": false
                 },
                 {
                     "name": "",
@@ -504,7 +520,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Previous",
+                    "action": "Tool 1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -515,7 +531,29 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Previous",
+                    "action": "Tool 1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1854396c-5c9a-41d5-b480-dc3fba04fd7d",
+                    "path": "<Mouse>/scroll/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Next Tool",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3fe1091f-9e61-4755-8bcb-3ab34e7b5e00",
+                    "path": "<Mouse>/scroll/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Prev Tool",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
