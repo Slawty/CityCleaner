@@ -78,6 +78,7 @@ public class DirtArea : MonoBehaviour
         Subscribe();
         SyncAlreadyCompletedAtStart();
         PushProgress();
+        if(radioactivePostProcessVolume != null)
         radioactivePostProcessVolume.gameObject.SetActive(true);
         RefreshJobIndicator();
     }
@@ -272,6 +273,7 @@ public class DirtArea : MonoBehaviour
 
         if (completedRadioactivetargets == totalRadioactivetargets)
         {
+            if(radioactivePostProcessVolume != null)
             radioactivePostProcessVolume.gameObject.SetActive(false);
             Managers.UI.ShowInfoText("Air Cleared");
         }

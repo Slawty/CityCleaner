@@ -21,7 +21,11 @@ public class ZoneDirtMap : MonoBehaviour
     static readonly int StrengthId = Shader.PropertyToID("_Strength");
     static readonly int ProjectionModeId = Shader.PropertyToID("_ProjectionMode");
 
-    const string DefaultZoneDirtSurfaceShaderName = "Shader Graphs/SG_ObjectDirtSimpleWorld";
+    static readonly string[] DefaultZoneDirtSurfaceShaderNames =
+    {
+        "Shader Graphs/SG_ObjectDirtSimpleWorld",
+        "Shader Graphs/SG_ObjectDirtSimpleWorld_Transparent",
+    };
 
     [Header("Zone Bounds")]
     [SerializeField] BoxCollider zoneBoundsCollider;
@@ -37,9 +41,11 @@ public class ZoneDirtMap : MonoBehaviour
 
     [Header("Targets")]
     [SerializeField] bool autoCollectTargetRenderers = true;
-    [Tooltip("Materials using this shader receive zone dirt masks. Leave empty to resolve SG_ObjectDirtSimpleWorld by name.")]
+    [Tooltip("Materials using these shaders receive zone dirt masks. Leave empty to resolve SG_ObjectDirtSimpleWorld shaders by name.")]
     [SerializeField] Shader zoneDirtSurfaceShader;
     [SerializeField] List<Renderer> targetRenderers = new();
+
+    readonly List<Shader> resolvedZoneDirtSurfaceShaders = new();
 
     [Header("Brush")]
     [SerializeField] Shader zoneBrushShader;
@@ -147,11 +153,11 @@ public class ZoneDirtMap : MonoBehaviour
     public void CollectTargetRenderers()
     {
         targetRenderers.Clear();
-        EnsureZoneDirtSurfaceShader();
-        if (zoneDirtSurfaceShader == null)
+        ResolveZoneDirtSurfaceShaders();
+        if (resolvedZoneDirtSurfaceShaders.Count == 0)
         {
             Debug.LogWarning(
-                $"ZoneDirtMap on {name}: zone dirt surface shader not found ({DefaultZoneDirtSurfaceShaderName}). Assign Zone Dirt Surface Shader on this component.",
+                $"ZoneDirtMap on {name}: no zone dirt surface shaders found. Assign Zone Dirt Surface Shader on this component.",
                 this);
             return;
         }
@@ -159,7 +165,7 @@ public class ZoneDirtMap : MonoBehaviour
         Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
         foreach (Renderer renderer in renderers)
         {
-            if (renderer == null || !RendererUsesShader(renderer, zoneDirtSurfaceShader))
+            if (renderer == null || !RendererUsesAnyShader(renderer, resolvedZoneDirtSurfaceShaders))
                 continue;
 
             if (!targetRenderers.Contains(renderer))
@@ -167,21 +173,37 @@ public class ZoneDirtMap : MonoBehaviour
         }
     }
 
-    void EnsureZoneDirtSurfaceShader()
+    void ResolveZoneDirtSurfaceShaders()
     {
-        if (zoneDirtSurfaceShader != null)
-            return;
+        resolvedZoneDirtSurfaceShaders.Clear();
 
-        zoneDirtSurfaceShader = Shader.Find(DefaultZoneDirtSurfaceShaderName);
+        if (zoneDirtSurfaceShader != null)
+        {
+            resolvedZoneDirtSurfaceShaders.Add(zoneDirtSurfaceShader);
+            return;
+        }
+
+        foreach (string shaderName in DefaultZoneDirtSurfaceShaderNames)
+        {
+            Shader shader = Shader.Find(shaderName);
+            if (shader != null)
+                resolvedZoneDirtSurfaceShaders.Add(shader);
+        }
     }
 
-    static bool RendererUsesShader(Renderer renderer, Shader shader)
+    static bool RendererUsesAnyShader(Renderer renderer, List<Shader> shaders)
     {
         Material[] materials = renderer.sharedMaterials;
         foreach (Material material in materials)
         {
-            if (material != null && material.shader == shader)
-                return true;
+            if (material == null)
+                continue;
+
+            foreach (Shader shader in shaders)
+            {
+                if (material.shader == shader)
+                    return true;
+            }
         }
 
         return false;
@@ -275,7 +297,7 @@ public class ZoneDirtMap : MonoBehaviour
         RenderTexture zoneTexture = new RenderTexture(textureResolution, textureResolution, 0, RenderTextureFormat.R8)
         {
             name = $"{name}_ZoneDirtRT_{suffix}",
-            filterMode = FilterMode.Bilinear,
+            filterMode = FilterMode.Point,
             wrapMode = TextureWrapMode.Clamp
         };
         zoneTexture.Create();
