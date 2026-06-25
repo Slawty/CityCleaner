@@ -128,7 +128,7 @@ MonoBehaviour:
   CoinSpawnPos: {fileID: 7492360693097252125}
   trackingResolution: 128
   cleanThreshold: 200
-  cleanPercentage: 0.85
+  cleanPercentage: 0.7
   allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}

@@ -27,16 +27,12 @@ public class IntroSequenceController : MonoBehaviour
 
     void Awake()
     {
-        ResolveReferences();
-
         if (!useIntro)
         {
             introFinished = true;
             DisableIntroCamera();
             return;
         }
-
-        LockGameplayForIntro();
     }
 
     void Start()
@@ -44,13 +40,7 @@ public class IntroSequenceController : MonoBehaviour
         if (!useIntro)
             return;
 
-        if (!HasRequiredReferences())
-        {
-            Debug.LogError($"{nameof(IntroSequenceController)} on {name}: missing intro references.", this);
-            ReleaseGameplay();
-            return;
-        }
-
+        LockGameplayForIntro();
         PlayIntro();
     }
 
@@ -60,21 +50,6 @@ public class IntroSequenceController : MonoBehaviour
 
         if (!introFinished)
             ReleaseGameplay();
-    }
-
-    void ResolveReferences()
-    {
-        if (introCamera == null)
-            introCamera = transform.Find("CM_Intro_Overview")?.GetComponent<CinemachineCamera>();
-        if (cameraRig == null)
-            cameraRig = transform.Find("Intro_Overview_Pos");
-        if (endPosition == null)
-            endPosition = transform.Find("Intro_Target_Pos");
-    }
-
-    bool HasRequiredReferences()
-    {
-        return introCamera != null && cameraRig != null && endPosition != null;
     }
 
     void DisableIntroCamera()

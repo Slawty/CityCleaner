@@ -7,6 +7,7 @@ public class ProgressBar : MonoBehaviour
     [Header("UI References")]
     [SerializeField] Image fillImage;
     [SerializeField] TextMeshProUGUI percentText;
+    [SerializeField] TextMeshProUGUI descriptionText;
 
     [Header("Animation")]
     [SerializeField] bool smooth = true;
@@ -55,14 +56,34 @@ public class ProgressBar : MonoBehaviour
     // Call this from anywhere
     // --------------------------------------------------
 
-    public void SetPercent(float percent)
+    public void SetPercent(float percent, bool onlyIncrease = false)
     {
-        targetPercent = Mathf.Clamp(percent, 0f, 100f);
+        percent = Mathf.Clamp(percent, 0f, 100f);
+        if (onlyIncrease && percent < targetPercent)
+            return;
+
+        targetPercent = percent;
+    }
+
+    public void ResetProgress()
+    {
+        targetPercent = 0f;
+        displayedPercent = 0f;
+        UpdateUI(0f);
     }
 
     public void SetFillImage(Image image)
     {
         fillImage = image;
+    }
+
+    public void SetDescription(string description)
+    {
+        if (descriptionText == null)
+            return;
+
+        descriptionText.text = description;
+        descriptionText.gameObject.SetActive(!string.IsNullOrEmpty(description));
     }
 
     // --------------------------------------------------

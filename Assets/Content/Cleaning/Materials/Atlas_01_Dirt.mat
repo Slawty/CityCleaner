@@ -169,11 +169,11 @@ Material:
     - _DetailNormalMapScale: 1
     - _DirtAmount: 1
     - _DirtMetallic: 0
-    - _DirtMetallicStrength: 0
+    - _DirtMetallicStrength: 0.418
     - _DirtNoiseOffset: 1.995
     - _DirtNoiseScale: 1.8
     - _DirtNormalStrength: 1
-    - _DirtSmoothStrength: 0
+    - _DirtSmoothStrength: 0.266
     - _DirtSmoothness: 0
     - _DirtStrength: 1
     - _DirtTiling: 1
@@ -208,7 +208,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DirtDefaultTiling: {r: 1, g: 1, b: 0, a: 0}
     - _DirtTiling: {r: 5, g: 5, b: 0, a: 0}
-    - _DirtTint: {r: 0.5377358, g: 0.2341929, b: 0, a: 1}
+    - _DirtTint: {r: 0.38679248, g: 0.16939816, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MaskOffset: {r: 0, g: 0, b: 0, a: 0}
     - _PatternTiling: {r: 1, g: 1, b: 0, a: 0}

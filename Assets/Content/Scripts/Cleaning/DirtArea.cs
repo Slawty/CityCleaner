@@ -54,27 +54,28 @@ public class DirtArea : MonoBehaviour
     public float NormalizedProgress { get; private set; }
     public float JobCompletionFraction => jobCompletionFraction;
     public bool IsJobTargetActive => jobTargetActive;
+    public ZoneDirtMap ZoneDirtMap { get; private set; }
 
     void Awake()
     {
         DiscoverTargets();
+        ZoneDirtMap = GetComponentInChildren<ZoneDirtMap>();
                 totalTargets = paintables.Count + gooGrowables.Count + splitables.Count + radioactives.Count;
         totalRadioactivetargets = radioactives.Count;
         Debug.Log($"Area {name} Total targets: {totalTargets} Radioactive targets: {totalRadioactivetargets}");
-
-        if (initializeGpuPaintablesOnAwake)
-        {
-            foreach (GPUPaintableObject p in paintables)
-            {
-                if (p != null && !p.IsInitialized)
-                    p.Initialize(128);
-            }
-        }
-
     }
 
     void Start()
     {
+        if (initializeGpuPaintablesOnAwake)
+        {
+            foreach (GPUPaintableObject paintable in paintables)
+            {
+                if (paintable != null && !paintable.IsInitialized)
+                    paintable.Initialize(128);
+            }
+        }
+
         Subscribe();
         SyncAlreadyCompletedAtStart();
         PushProgress();
@@ -92,7 +93,7 @@ public class DirtArea : MonoBehaviour
     {
         playerInsideArea = true;
         RefreshProgressAndPushUi();
-        Managers.UI.ShowZoneProgress(true);
+        RefreshRadioactivesHud();
 
         if (visualBorder != null && !jobCompleted)
             visualBorder.SetActive(true);
@@ -103,7 +104,7 @@ public class DirtArea : MonoBehaviour
     void OnPlayerExitedArea()
     {
         playerInsideArea = false;
-        Managers.UI.ShowZoneProgress(false);
+        Managers.UI.ShowRadioactivesProgress(false);
 
         if (visualBorder != null)
             visualBorder.SetActive(false);
@@ -276,12 +277,22 @@ public class DirtArea : MonoBehaviour
             if(radioactivePostProcessVolume != null)
             radioactivePostProcessVolume.gameObject.SetActive(false);
             Managers.UI.ShowInfoText("Air Cleared");
+            Managers.UI.ShowRadioactivesProgress(false);
         }
     }
 
     public void RefreshProgressAndPushUi()
     {
         PushProgress();
+    }
+
+    public void CollectIncompletePaintables(List<GPUPaintableObject> results)
+    {
+        foreach (GPUPaintableObject paintable in paintables)
+        {
+            if (paintable != null && !paintable.isClean)
+                results.Add(paintable);
+        }
     }
 
     public void CompleteAllRemainingTargets()
@@ -373,16 +384,23 @@ public class DirtArea : MonoBehaviour
         return completionActions;
     }
 
+    void RefreshRadioactivesHud()
+    {
+        bool showRadioactives = totalRadioactivetargets > 0
+            && completedRadioactivetargets < totalRadioactivetargets;
+        Managers.UI.ShowRadioactivesProgress(showRadioactives);
+    }
+
     void PushProgress()
     {
         NormalizedProgress = totalTargets > 0 ? (float)completedTargets / totalTargets : 1f;
 
         OnAreaProgressChanged?.Invoke(NormalizedProgress);
 
-        Managers.UI.SetZoneCleanProgressBarPercent(NormalizedProgress * 100f);
-        if (totalRadioactivetargets > 0)
+        if (playerInsideArea && totalRadioactivetargets > 0)
             Managers.UI.SetRadioactivesProgressBarPercent((1 - completedRadioactivetargets / (float)totalRadioactivetargets) * 100f);
 
+        RefreshRadioactivesHud();
         RefreshJobIndicator();
     }
 }

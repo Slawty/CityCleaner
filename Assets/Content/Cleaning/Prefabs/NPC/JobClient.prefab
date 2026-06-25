@@ -115,7 +115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253420f5dcb6e334e811d3c144f8e822, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::JobClient
-  targetArea: {fileID: 0}
+  job: {fileID: 0}
   dialogue: Hey, can you please help me?
   completionDialogue: Thanks man!
   jobAvailableSymbol: {fileID: 9178566164299144942}

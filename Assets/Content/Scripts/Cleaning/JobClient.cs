@@ -15,7 +15,7 @@ public class JobClient : MonoBehaviour, IInteractable
     const string DefaultCompletionDialogue = "Thanks for completing the job!";
     const string ActiveJobDialogue = "Keep cleaning — you're not done yet!";
 
-    [SerializeField] DirtArea targetArea;
+    [SerializeField] Job job;
     [SerializeField] string dialogue;
     [SerializeField] string completionDialogue;
     [Header("Symbols")]
@@ -29,11 +29,16 @@ public class JobClient : MonoBehaviour, IInteractable
     JobClientState state = JobClientState.Available;
 
     public JobClientState State => state;
-    public DirtArea TargetArea => targetArea;
+    public Job Job => job;
     public string OfferDialogue => string.IsNullOrEmpty(dialogue) ? DefaultOfferDialogue : dialogue;
     public string CompletionDialogue => string.IsNullOrEmpty(completionDialogue) ? DefaultCompletionDialogue : completionDialogue;
 
     public string Prompt => "Talk";
+
+    void Awake()
+    {
+        ResolveJobReference();
+    }
 
     void Start()
     {
@@ -42,9 +47,9 @@ public class JobClient : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
-        if (targetArea == null)
+        if (job == null)
         {
-            Debug.LogError($"{nameof(JobClient)} on {name}: {nameof(targetArea)} is not assigned.", this);
+            Debug.LogError($"{nameof(JobClient)} on {name}: {nameof(job)} is not assigned.", this);
             return;
         }
 
@@ -79,6 +84,16 @@ public class JobClient : MonoBehaviour, IInteractable
         Vector3 spawnPos = coinSpawnPoint != null ? coinSpawnPoint.position : transform.position + Vector3.up;
         Vector3 spawnDirection = coinSpawnPoint != null ? coinSpawnPoint.forward : transform.forward;
         Managers.Spawning.SpawnCoins(rewardCoinCount, spawnPos, spawnDirection).Forget();
+    }
+
+    void ResolveJobReference()
+    {
+        if (job != null)
+            return;
+
+        job = GetComponent<Job>();
+        if (job == null)
+            job = GetComponentInChildren<Job>();
     }
 
     void RefreshSymbols()

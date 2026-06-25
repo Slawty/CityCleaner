@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using TMPro;
 
 public class UIManager : MonoBehaviour
@@ -6,7 +7,8 @@ public class UIManager : MonoBehaviour
     private const float DefaultInfoTextDurationSeconds = 2f;
 
     [SerializeField] ProgressBar cleanProgressBar;
-    [SerializeField] ProgressBar zoneCleanProgressBar;
+    [FormerlySerializedAs("zoneCleanProgressBar")]
+    [SerializeField] ProgressBar jobProgressBar;
     [SerializeField] ProgressBar radioactivesProgressBar;
     [SerializeField] InfoTextPanel infoTextPanel;
     [SerializeField] private TMP_Text interactText;
@@ -14,7 +16,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text poopValueText;
     [SerializeField] GameObject hudRoot;
 
-
+    void Start()
+    {
+        ShowJobProgress(false);
+        ShowRadioactivesProgress(false);
+    }
 
     public void ShowInteractText(string text)
     {
@@ -38,10 +44,14 @@ public class UIManager : MonoBehaviour
         infoTextPanel?.HideText();
     }
 
-    public void ShowZoneProgress(bool b)
+    public void ShowJobProgress(bool visible)
     {
-        zoneCleanProgressBar.gameObject.SetActive(b);
-        radioactivesProgressBar.gameObject.SetActive(b);
+        jobProgressBar.gameObject.SetActive(visible);
+    }
+
+    public void ShowRadioactivesProgress(bool visible)
+    {
+        radioactivesProgressBar.gameObject.SetActive(visible);
     }
 
     public void HideInteractText()
@@ -56,14 +66,19 @@ public class UIManager : MonoBehaviour
 
     public void SetCleanProgressBarPercent(float value)
     {
-        // Debug.Log($"SetCleanProgressBarPercent: {value}");
         cleanProgressBar.SetPercent(value);
     }
 
-    public void SetZoneCleanProgressBarPercent(float value)
+    public void SetJobProgress(float percent, string description = null)
     {
-        // Debug.Log($"SetCleanProgressBarPercent: {value}");
-        zoneCleanProgressBar.SetPercent(value);
+        jobProgressBar.SetPercent(percent, onlyIncrease: true);
+        if (description != null)
+            jobProgressBar.SetDescription(description);
+    }
+
+    public void ResetJobProgress()
+    {
+        jobProgressBar.ResetProgress();
     }
 
     public void SetRadioactivesProgressBarPercent(float value)

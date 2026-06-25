@@ -7,8 +7,9 @@ public class AreaTrigger : MonoBehaviour
      public UnityAction OnPlayerEnter;
     public UnityAction OnPlayerExit;
 
-    void Reset()
+    void Awake()
     {
+        if(dirtArea == null)
         dirtArea = GetComponentInParent<DirtArea>();
     }
 

@@ -20,6 +20,7 @@ public class ZoneDirtMap : MonoBehaviour
     static readonly int BrushSizeId = Shader.PropertyToID("_BrushSize");
     static readonly int StrengthId = Shader.PropertyToID("_Strength");
     static readonly int ProjectionModeId = Shader.PropertyToID("_ProjectionMode");
+    static readonly int UseZoneDirtId = Shader.PropertyToID("_UseZoneDirt");
 
     static readonly string[] DefaultZoneDirtSurfaceShaderNames =
     {
@@ -51,8 +52,15 @@ public class ZoneDirtMap : MonoBehaviour
     [SerializeField] Shader zoneBrushShader;
 
     public RenderTexture ZoneTexture { get; private set; }
+    public RenderTexture ZoneTextureXZ => zoneTextureXZ;
+    public RenderTexture ZoneTextureXY => zoneTextureXY;
+    public RenderTexture ZoneTextureYZ => zoneTextureYZ;
     public Vector2 ZoneMinXZ => zoneMinXZ;
     public Vector2 ZoneMaxXZ => zoneMaxXZ;
+    public Vector2 ZoneMinXY => zoneMinXY;
+    public Vector2 ZoneMaxXY => zoneMaxXY;
+    public Vector2 ZoneMinYZ => zoneMinYZ;
+    public Vector2 ZoneMaxYZ => zoneMaxYZ;
 
     Material brushMaterial;
     MaterialPropertyBlock propertyBlock;
@@ -207,6 +215,20 @@ public class ZoneDirtMap : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void BindToBakeMaterial(Material material)
+    {
+        material.SetTexture(ZoneDirtTexXZId, zoneTextureXZ);
+        material.SetTexture(ZoneDirtTexXYId, zoneTextureXY);
+        material.SetTexture(ZoneDirtTexYZId, zoneTextureYZ);
+        material.SetVector(ZoneMinXZId, zoneMinXZ);
+        material.SetVector(ZoneMaxXZId, zoneMaxXZ);
+        material.SetVector(ZoneMinXYId, zoneMinXY);
+        material.SetVector(ZoneMaxXYId, zoneMaxXY);
+        material.SetVector(ZoneMinYZId, zoneMinYZ);
+        material.SetVector(ZoneMaxYZId, zoneMaxYZ);
+        material.SetFloat(UseZoneDirtId, 1f);
     }
 
     public void ApplyToTargetRenderers()

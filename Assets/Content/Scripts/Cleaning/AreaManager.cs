@@ -21,7 +21,7 @@ public class AreaManager : MonoBehaviour
             return;
 
         currentArea = null;
-        Managers.UI.SetZoneCleanProgressBarPercent(0f);
+        Managers.UI.ShowRadioactivesProgress(false);
         Managers.UI.SetRadioactivesProgressBarPercent(0f);
     }
 }

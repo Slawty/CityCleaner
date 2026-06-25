@@ -9,12 +9,15 @@ public enum JobSpeechAction
 
 public class JobManager : MonoBehaviour
 {
+    [SerializeField] JobTargetHighlighter targetHighlighter;
+
     JobClient pendingClient;
     JobSpeechAction pendingSpeechAction;
     JobClient activeClient;
-    DirtArea activeArea;
+    Job activeJob;
 
-    public DirtArea ActiveArea => activeArea;
+    public Job ActiveJob => activeJob;
+    public DirtArea ActiveArea => (activeJob as DirtAreaJob)?.TargetArea;
     public bool HasActiveJob => activeClient != null && activeClient.State == JobClientState.Active;
 
     public void OfferJob(JobClient client)
@@ -41,6 +44,19 @@ public class JobManager : MonoBehaviour
         pendingClient = client;
         pendingSpeechAction = JobSpeechAction.TurnInJob;
         Managers.Speech.Show(client.CompletionDialogue);
+    }
+
+    public void StartJob(JobClient client)
+    {
+        if (client == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(StartJob)}: client is required.", this);
+            return;
+        }
+
+        pendingClient = client;
+        AcceptNewJob();
+        pendingClient = null;
     }
 
     public void ClearPendingOffer()
@@ -70,18 +86,24 @@ public class JobManager : MonoBehaviour
         if (pendingClient == null)
             return;
 
+        if (pendingClient.Job == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(AcceptNewJob)}: {nameof(JobClient.Job)} is not assigned on {pendingClient.name}.", pendingClient);
+            return;
+        }
+
         if (activeClient != null && activeClient != pendingClient)
         {
             activeClient.SetState(JobClientState.Available);
-            StopTrackingActiveArea();
+            StopTrackingActiveJob();
         }
 
         activeClient = pendingClient;
-        activeArea = activeClient.TargetArea;
+        activeJob = activeClient.Job;
         activeClient.SetState(JobClientState.Active);
 
-        activeArea.SetJobTargetActive(true);
-        activeArea.OnAreaProgressChanged.AddListener(OnActiveAreaProgressChanged);
+        activeJob.OnProgressChanged += OnActiveJobProgressChanged;
+        activeJob.StartTracking();
     }
 
     void TurnInJob()
@@ -96,12 +118,12 @@ public class JobManager : MonoBehaviour
             activeClient = null;
     }
 
-    void OnActiveAreaProgressChanged(float progress)
+    void OnActiveJobProgressChanged(float progress)
     {
-        if (activeArea == null || activeClient == null)
+        if (activeJob == null || activeClient == null)
             return;
 
-        if (progress < activeArea.JobCompletionFraction)
+        if (progress < activeJob.CompletionFraction)
             return;
 
         FinishJobObjectives();
@@ -109,26 +131,34 @@ public class JobManager : MonoBehaviour
 
     void FinishJobObjectives()
     {
-        if (activeArea == null || activeClient == null)
+        if (activeJob == null || activeClient == null)
             return;
 
-        activeArea.OnAreaProgressChanged.RemoveListener(OnActiveAreaProgressChanged);
-        activeArea.CompleteAllRemainingTargets();
-        activeArea.SetJobCompleted();
+        activeJob.OnProgressChanged -= OnActiveJobProgressChanged;
+        activeJob.CompleteRemaining();
+        activeJob.MarkCompleted();
 
         activeClient.SetState(JobClientState.CompletedPendingTurnIn);
         Managers.UI.ShowInfoText("Job Completed");
 
-        activeArea = null;
+        activeJob = null;
+        ClearTargetHighlights();
     }
 
-    void StopTrackingActiveArea()
+    void StopTrackingActiveJob()
     {
-        if (activeArea == null)
+        if (activeJob == null)
             return;
 
-        activeArea.OnAreaProgressChanged.RemoveListener(OnActiveAreaProgressChanged);
-        activeArea.SetJobTargetActive(false);
-        activeArea = null;
+        activeJob.OnProgressChanged -= OnActiveJobProgressChanged;
+        activeJob.StopTracking();
+        activeJob = null;
+        ClearTargetHighlights();
+    }
+
+    void ClearTargetHighlights()
+    {
+        if (targetHighlighter != null)
+            targetHighlighter.StopHighlight();
     }
 }

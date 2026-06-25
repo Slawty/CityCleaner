@@ -1,6 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using System.Collections.Generic;
 using UnityEngine.Events;
 using Unity.Collections;
 using Cysharp.Threading.Tasks;
@@ -9,6 +10,12 @@ using Cysharp.Threading.Tasks;
 [RequireComponent(typeof(MeshFilter))]
 public class GPUPaintableObject : MonoBehaviour
 {
+    static readonly int DirtMaskShaderId = Shader.PropertyToID("_DirtMask");
+    static readonly int LocalCleanMaskShaderId = Shader.PropertyToID("_LocalCleanMask");
+    static readonly int UseZoneDirtShaderId = Shader.PropertyToID("_UseZoneDirt");
+    static readonly int JobHighlightShaderId = Shader.PropertyToID("_JobHighlight");
+    static readonly int CleanFlashShaderId = Shader.PropertyToID("_CleanFlash");
+
     public UnityAction OnInitialize;
     public UnityAction OnProgress;
     public UnityAction OnCleaned;
@@ -24,6 +31,9 @@ public class GPUPaintableObject : MonoBehaviour
     [SerializeField] float cleanPercentage = 0.85f;
     [Header("Tool Interaction")]
     [SerializeField] bool allowGooCleaning = false;
+    [Header("Clean Flash")]
+    const float cleanFlashDuration = 1f;
+    const float cleanFlashPeak = 1f;
     public RenderTexture maskTexture;
     public RenderTexture coverageTexture;
     public Texture2D coverageReadable;
@@ -38,12 +48,11 @@ public class GPUPaintableObject : MonoBehaviour
     Mesh mesh;
     Renderer cachedRenderer;
     MaterialPropertyBlock propertyBlock;
-    static readonly int DirtMaskShaderId = Shader.PropertyToID("_DirtMask");
-    static readonly int LocalCleanMaskShaderId = Shader.PropertyToID("_LocalCleanMask");
     public bool IsInitialized { get; private set; }
     float nextDirtSpawn = 0f;
     float dirtSpawnStep;
     int dirtSpawnedCount = 0;
+    Coroutine cleanFlashRoutine;
 
     void Awake()
     {
@@ -62,7 +71,7 @@ public class GPUPaintableObject : MonoBehaviour
         maskTexture = runtimeMask;
         BindMaskToRenderer(maskTexture);
 
-        CreateCoverageTexture();
+        BakeCoverageAndDirt();
         InitializeTracking();
 
         maskReadable = new Texture2D(trackingResolution, trackingResolution, TextureFormat.R8, false);
@@ -97,39 +106,80 @@ public class GPUPaintableObject : MonoBehaviour
         cachedRenderer.SetPropertyBlock(propertyBlock);
     }
 
+    public void SetJobHighlight(float amount)
+    {
+        cachedRenderer.GetPropertyBlock(propertyBlock);
+        propertyBlock.SetFloat(JobHighlightShaderId, Mathf.Clamp01(amount));
+        cachedRenderer.SetPropertyBlock(propertyBlock);
+    }
+
+    public void SetCleanFlash(float amount)
+    {
+        cachedRenderer.GetPropertyBlock(propertyBlock);
+        propertyBlock.SetFloat(CleanFlashShaderId, Mathf.Clamp01(amount));
+        cachedRenderer.SetPropertyBlock(propertyBlock);
+    }
+
+    ZoneDirtMap ResolveZoneDirtMap()
+    {
+        DirtArea dirtArea = GetComponentInParent<DirtArea>();
+        if (dirtArea != null)
+            return dirtArea.ZoneDirtMap;
+
+        return GetComponentInParent<ZoneDirtMap>();
+    }
+
     // ----------------------------------------------------
-    // CREATE UV COVERAGE MASK (UNCHANGED)
+    // BAKE UV COVERAGE + ZONE DIRT (one draw, one readback)
     // ----------------------------------------------------
 
-    void CreateCoverageTexture()
+    void BakeCoverageAndDirt()
     {
         coverageTexture = new RenderTexture(trackingResolution, trackingResolution, 0, RenderTextureFormat.ARGB32);
-
         coverageTexture.Create();
 
-        Material mat = new Material(Shader.Find("Hidden/CoverageMask"));
+        Shader bakeShader = Shader.Find("Hidden/CoverageDirtMask");
+        Material bakeMaterial = new Material(bakeShader);
+
+        ZoneDirtMap zoneDirtMap = ResolveZoneDirtMap();
+        if (zoneDirtMap != null)
+            zoneDirtMap.BindToBakeMaterial(bakeMaterial);
+        else
+            bakeMaterial.SetFloat(UseZoneDirtShaderId, 0f);
 
         CommandBuffer cmd = new CommandBuffer();
-
         cmd.SetRenderTarget(coverageTexture);
-
         cmd.ClearRenderTarget(false, true, Color.black);
-
-        cmd.DrawMesh(mesh, Matrix4x4.identity, mat);
-
+        cmd.DrawMesh(mesh, transform.localToWorldMatrix, bakeMaterial);
         Graphics.ExecuteCommandBuffer(cmd);
+        cmd.Release();
+        Destroy(bakeMaterial);
 
         RenderTexture.active = coverageTexture;
 
-        coverageReadable = new Texture2D(trackingResolution, trackingResolution, TextureFormat.R8, false);
-
+        coverageReadable = new Texture2D(trackingResolution, trackingResolution, TextureFormat.RGBA32, false);
         coverageReadable.ReadPixels(new Rect(0, 0, trackingResolution, trackingResolution), 0, 0);
-
         coverageReadable.Apply();
 
         RenderTexture.active = null;
 
-        coverageData = coverageReadable.GetRawTextureData<byte>();
+        NativeArray<byte> rawPixels = coverageReadable.GetRawTextureData<byte>();
+        int pixelCount = trackingResolution * trackingResolution;
+        coverageData = new NativeArray<byte>(pixelCount, Allocator.Persistent);
+
+        for (int pixelIndex = 0; pixelIndex < pixelCount; pixelIndex++)
+        {
+            int byteIndex = pixelIndex * 4;
+            coverageData[pixelIndex] = rawPixels[byteIndex];
+        }
+
+        rawPixels.Dispose();
+    }
+
+    void OnDestroy()
+    {
+        if (coverageData.IsCreated)
+            coverageData.Dispose();
     }
 
     // ----------------------------------------------------
@@ -145,15 +195,32 @@ public class GPUPaintableObject : MonoBehaviour
         pixelsToCleanCount = 0;
         cleanedPixelCount = 0;
 
-        for (int i = 0; i < size; i++)
+        NativeArray<byte> rawPixels = coverageReadable.GetRawTextureData<byte>();
+        bool usesZoneDirt = ResolveZoneDirtMap() != null;
+
+        for (int pixelIndex = 0; pixelIndex < size; pixelIndex++)
         {
-            if (coverageData[i] > 0)
+            int byteIndex = pixelIndex * 4;
+            bool hasCoverage = rawPixels[byteIndex] > 0;
+            byte initialDirt = rawPixels[byteIndex + 1];
+            bool hasDirt = usesZoneDirt ? initialDirt > cleanThreshold : hasCoverage;
+
+            if (hasCoverage && hasDirt)
                 pixelsToCleanCount++;
+            else
+                cleanedPixels[pixelIndex] = true;
         }
 
-        Debug.Log($"{name} real cleanable pixels: {pixelsToCleanCount}");
-        pixelsToCleanCount = Mathf.RoundToInt(pixelsToCleanCount * cleanPercentage);
-        Debug.Log($"{name} reduced to {cleanPercentage}%: {pixelsToCleanCount}. Total Size: {size}");
+        Debug.Log($"{name} dirty pixels: {pixelsToCleanCount} (zone-aware: {usesZoneDirt})");
+
+        if (pixelsToCleanCount == 0)
+        {
+            isClean = true;
+            return;
+        }
+
+        pixelsToCleanCount = Mathf.Max(Mathf.RoundToInt(pixelsToCleanCount * cleanPercentage), 1);
+        Debug.Log($"{name} target after {cleanPercentage:P0}: {pixelsToCleanCount}");
     }
 
     // ----------------------------------------------------
@@ -168,16 +235,17 @@ public class GPUPaintableObject : MonoBehaviour
         if (pixelsToCleanCount == 0)
             return;
 
-        // Downscale GPU mask
-        Graphics.Blit(maskTexture, coverageTexture);
+        RenderTexture maskDownscale = RenderTexture.GetTemporary(trackingResolution, trackingResolution, 0, RenderTextureFormat.ARGB32);
+        Graphics.Blit(maskTexture, maskDownscale);
 
-        RenderTexture.active = coverageTexture;
+        RenderTexture.active = maskDownscale;
 
         maskReadable.ReadPixels(new Rect(0, 0, trackingResolution, trackingResolution), 0, 0);
 
         maskReadable.Apply();
 
         RenderTexture.active = null;
+        RenderTexture.ReleaseTemporary(maskDownscale);
 
         var maskData = maskReadable.GetRawTextureData<byte>();
 
@@ -185,7 +253,6 @@ public class GPUPaintableObject : MonoBehaviour
 
         for (int i = 0; i < size; i++)
         {
-            // Only count valid UV pixels
             if (!cleanedPixels[i] && maskData[i] <= cleanThreshold)
             {
                 cleanedPixels[i] = true;
@@ -229,7 +296,33 @@ public class GPUPaintableObject : MonoBehaviour
         RenderTexture.active = maskTexture;
         GL.Clear(true, true, Color.black);
         RenderTexture.active = null;
+        PlayCleanFlash();
         OnCleaned?.Invoke();
+    }
+
+    void PlayCleanFlash()
+    {
+        if (cleanFlashRoutine != null)
+            StopCoroutine(cleanFlashRoutine);
+
+        cleanFlashRoutine = StartCoroutine(CleanFlashRoutine());
+    }
+
+    IEnumerator CleanFlashRoutine()
+    {
+        float elapsed = 0f;
+
+        while (elapsed < cleanFlashDuration)
+        {
+            elapsed += Time.deltaTime;
+            float normalizedTime = elapsed / cleanFlashDuration;
+            float fade = 1f - normalizedTime;
+            SetCleanFlash(cleanFlashPeak * fade * fade);
+            yield return null;
+        }
+
+        SetCleanFlash(0f);
+        cleanFlashRoutine = null;
     }
 
     void SpawnDirtChunk(Vector3 hitPos)

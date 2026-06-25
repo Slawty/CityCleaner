@@ -155,8 +155,8 @@ Material:
     - _AlphaToMask: 0
     - _BaseMetallic: 0
     - _BaseSmoothness: 0
-    - _Base_Metallic: 0
-    - _Base_Smoothness: 0
+    - _Base_Metallic: 0.763
+    - _Base_Smoothness: 0.799
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
