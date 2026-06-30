@@ -15,19 +15,18 @@ public abstract class Job : MonoBehaviour
 
     protected void BeginJobProgressUi()
     {
-        Managers.UI.ShowJobProgress(true);
-        Managers.UI.ResetJobProgress();
+        Managers.UI.RegisterJobProgress(this);
         PushJobProgressUi();
     }
 
     protected void EndJobProgressUi()
     {
-        Managers.UI.ShowJobProgress(false);
+        Managers.UI.UnregisterJobProgress(this);
     }
 
     protected void PushJobProgressUi()
     {
-        Managers.UI.SetJobProgress(NormalizedProgress * 100f, progressDescription);
+        Managers.UI.SetJobProgress(this, NormalizedProgress * 100f, progressDescription);
     }
 
     protected void NotifyProgressChanged(float normalizedProgress)

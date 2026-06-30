@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum JobSpeechAction
@@ -9,16 +11,49 @@ public enum JobSpeechAction
 
 public class JobManager : MonoBehaviour
 {
+    sealed class TrackedJob
+    {
+        public Job Job;
+        public JobClient Client;
+        public Action<float> ProgressHandler;
+        public Action OnObjectivesCompleted;
+        public bool IsSequenceStep;
+    }
+
     [SerializeField] JobTargetHighlighter targetHighlighter;
+
+    readonly List<TrackedJob> activeJobs = new();
+    readonly List<Job> activeJobsScratch = new();
 
     JobClient pendingClient;
     JobSpeechAction pendingSpeechAction;
-    JobClient activeClient;
-    Job activeJob;
 
-    public Job ActiveJob => activeJob;
-    public DirtArea ActiveArea => (activeJob as DirtAreaJob)?.TargetArea;
-    public bool HasActiveJob => activeClient != null && activeClient.State == JobClientState.Active;
+    public Job ActiveJob => activeJobs.Count > 0 ? activeJobs[activeJobs.Count - 1].Job : null;
+    public IReadOnlyList<Job> ActiveJobs => GetActiveJobsSnapshot();
+    public DirtArea ActiveArea
+    {
+        get
+        {
+            for (int index = activeJobs.Count - 1; index >= 0; index--)
+            {
+                if (activeJobs[index].Job is DirtAreaJob dirtAreaJob)
+                    return dirtAreaJob.TargetArea;
+            }
+
+            return null;
+        }
+    }
+
+    public bool HasActiveJob => activeJobs.Count > 0;
+
+    public void CompleteActiveJobDebug()
+    {
+        if (activeJobs.Count == 0)
+            return;
+
+        TrackedJob tracked = activeJobs[activeJobs.Count - 1];
+        OnJobProgressChanged(tracked, 1f);
+    }
 
     public void OfferJob(JobClient client)
     {
@@ -59,6 +94,46 @@ public class JobManager : MonoBehaviour
         pendingClient = null;
     }
 
+    public void StartGuidanceJob(Job job)
+    {
+        if (job == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(StartGuidanceJob)}: job is required.", this);
+            return;
+        }
+
+        if (IsTrackingJob(job))
+            return;
+
+        BeginTracking(new TrackedJob { Job = job, Client = null });
+    }
+
+    public void StartSequenceJob(Job job, JobClient client, Action onObjectivesCompleted)
+    {
+        if (job == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(StartSequenceJob)}: job is required.", this);
+            return;
+        }
+
+        if (IsTrackingJob(job))
+            return;
+
+        if (client != null)
+            client.SetState(JobClientState.Active);
+
+        BeginTracking(new TrackedJob
+        {
+            Job = job,
+            Client = client,
+            IsSequenceStep = true,
+            OnObjectivesCompleted = onObjectivesCompleted
+        });
+
+        if (targetHighlighter != null)
+            targetHighlighter.HighlightActiveJobTargets();
+    }
+
     public void ClearPendingOffer()
     {
         pendingClient = null;
@@ -92,18 +167,14 @@ public class JobManager : MonoBehaviour
             return;
         }
 
-        if (activeClient != null && activeClient != pendingClient)
-        {
-            activeClient.SetState(JobClientState.Available);
-            StopTrackingActiveJob();
-        }
+        if (IsTrackingJob(pendingClient.Job))
+            return;
 
-        activeClient = pendingClient;
-        activeJob = activeClient.Job;
-        activeClient.SetState(JobClientState.Active);
+        pendingClient.SetState(JobClientState.Active);
+        BeginTracking(new TrackedJob { Job = pendingClient.Job, Client = pendingClient });
 
-        activeJob.OnProgressChanged += OnActiveJobProgressChanged;
-        activeJob.StartTracking();
+        if (targetHighlighter != null)
+            targetHighlighter.HighlightActiveJobTargets();
     }
 
     void TurnInJob()
@@ -113,52 +184,88 @@ public class JobManager : MonoBehaviour
 
         pendingClient.PayReward();
         pendingClient.SetState(JobClientState.TurnedIn);
-
-        if (activeClient == pendingClient)
-            activeClient = null;
     }
 
-    void OnActiveJobProgressChanged(float progress)
+    void BeginTracking(TrackedJob tracked)
     {
-        if (activeJob == null || activeClient == null)
-            return;
-
-        if (progress < activeJob.CompletionFraction)
-            return;
-
-        FinishJobObjectives();
+        tracked.ProgressHandler = progress => OnJobProgressChanged(tracked, progress);
+        tracked.Job.OnProgressChanged += tracked.ProgressHandler;
+        tracked.Job.StartTracking();
+        activeJobs.Add(tracked);
     }
 
-    void FinishJobObjectives()
+    void OnJobProgressChanged(TrackedJob tracked, float progress)
     {
-        if (activeJob == null || activeClient == null)
+        if (progress < tracked.Job.CompletionFraction)
             return;
 
-        activeJob.OnProgressChanged -= OnActiveJobProgressChanged;
-        activeJob.CompleteRemaining();
-        activeJob.MarkCompleted();
+        if (tracked.IsSequenceStep)
+            FinishSequenceJob(tracked);
+        else if (tracked.Client != null)
+            FinishClientJobObjectives(tracked);
+        else
+            FinishGuidanceJob(tracked);
+    }
 
-        activeClient.SetState(JobClientState.CompletedPendingTurnIn);
+    void FinishSequenceJob(TrackedJob tracked)
+    {
+        StopTracking(tracked);
+        tracked.Job.CompleteRemaining();
+        tracked.Job.MarkCompleted();
+        tracked.OnObjectivesCompleted?.Invoke();
+        ClearTargetHighlightsIfNeeded();
+    }
+
+    void FinishClientJobObjectives(TrackedJob tracked)
+    {
+        StopTracking(tracked);
+        tracked.Job.CompleteRemaining();
+        tracked.Job.MarkCompleted();
+        tracked.Client.SetState(JobClientState.CompletedPendingTurnIn);
         Managers.UI.ShowInfoText("Job Completed");
-
-        activeJob = null;
-        ClearTargetHighlights();
+        ClearTargetHighlightsIfNeeded();
     }
 
-    void StopTrackingActiveJob()
+    void FinishGuidanceJob(TrackedJob tracked)
     {
-        if (activeJob == null)
+        StopTracking(tracked);
+        tracked.Job.CompleteRemaining();
+        tracked.Job.MarkCompleted();
+        Managers.UI.ShowInfoText("Task Completed");
+    }
+
+    void StopTracking(TrackedJob tracked)
+    {
+        tracked.Job.OnProgressChanged -= tracked.ProgressHandler;
+        tracked.Job.StopTracking();
+        activeJobs.Remove(tracked);
+    }
+
+    bool IsTrackingJob(Job job)
+    {
+        foreach (TrackedJob tracked in activeJobs)
+        {
+            if (tracked.Job == job)
+                return true;
+        }
+
+        return false;
+    }
+
+    IReadOnlyList<Job> GetActiveJobsSnapshot()
+    {
+        activeJobsScratch.Clear();
+        foreach (TrackedJob tracked in activeJobs)
+            activeJobsScratch.Add(tracked.Job);
+        return activeJobsScratch;
+    }
+
+    void ClearTargetHighlightsIfNeeded()
+    {
+        if (targetHighlighter == null)
             return;
 
-        activeJob.OnProgressChanged -= OnActiveJobProgressChanged;
-        activeJob.StopTracking();
-        activeJob = null;
-        ClearTargetHighlights();
-    }
-
-    void ClearTargetHighlights()
-    {
-        if (targetHighlighter != null)
+        if (activeJobs.Count == 0)
             targetHighlighter.StopHighlight();
     }
 }

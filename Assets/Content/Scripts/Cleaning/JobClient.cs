@@ -16,6 +16,7 @@ public class JobClient : MonoBehaviour, IInteractable
     const string ActiveJobDialogue = "Keep cleaning — you're not done yet!";
 
     [SerializeField] Job job;
+    [SerializeField] JobSequence jobSequence;
     [SerializeField] string dialogue;
     [SerializeField] string completionDialogue;
     [Header("Symbols")]
@@ -30,6 +31,7 @@ public class JobClient : MonoBehaviour, IInteractable
 
     public JobClientState State => state;
     public Job Job => job;
+    public JobSequence Sequence => jobSequence;
     public string OfferDialogue => string.IsNullOrEmpty(dialogue) ? DefaultOfferDialogue : dialogue;
     public string CompletionDialogue => string.IsNullOrEmpty(completionDialogue) ? DefaultCompletionDialogue : completionDialogue;
 
@@ -47,23 +49,41 @@ public class JobClient : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
-        if (job == null)
-        {
-            Debug.LogError($"{nameof(JobClient)} on {name}: {nameof(job)} is not assigned.", this);
-            return;
-        }
-
         switch (state)
         {
             case JobClientState.TurnedIn:
                 return;
             case JobClientState.CompletedPendingTurnIn:
+                if (jobSequence != null)
+                {
+                    jobSequence.OfferCurrentStepOutro(this);
+                    break;
+                }
+
+                if (job == null)
+                {
+                    Debug.LogError($"{nameof(JobClient)} on {name}: {nameof(job)} is not assigned.", this);
+                    return;
+                }
+
                 Managers.Jobs.OfferTurnIn(this);
                 break;
             case JobClientState.Active:
                 Managers.Speech.Show(ActiveJobDialogue);
                 break;
             default:
+                if (jobSequence != null)
+                {
+                    jobSequence.StartSequence();
+                    break;
+                }
+
+                if (job == null)
+                {
+                    Debug.LogError($"{nameof(JobClient)} on {name}: assign {nameof(job)} or {nameof(jobSequence)}.", this);
+                    return;
+                }
+
                 Managers.Jobs.OfferJob(this);
                 break;
         }

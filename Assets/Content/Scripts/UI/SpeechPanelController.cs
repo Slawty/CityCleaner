@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -13,6 +15,9 @@ public class SpeechPanelController : MonoBehaviour
     [SerializeField] Button acceptButton;
 
     bool isOpen;
+    Action pendingOnAccept;
+    string[] pendingLines;
+    int pendingLineIndex;
     Coroutine enableGameplayInputRoutine;
 
     void Awake()
@@ -27,14 +32,45 @@ public class SpeechPanelController : MonoBehaviour
         StopEnableGameplayInputRoutine();
     }
 
-    public void Show(string text = null)
+    public void Show(string text = null, Action onAccept = null)
     {
         if (isOpen)
             return;
 
+        pendingLines = null;
+        pendingLineIndex = 0;
+        pendingOnAccept = onAccept;
+        OpenPanel(string.IsNullOrEmpty(text) ? DefaultDialogue : text);
+    }
+
+    public void ShowDialogueSequence(string[] lines, Action onFinished = null)
+    {
+        if (lines == null || lines.Length == 0)
+        {
+            onFinished?.Invoke();
+            return;
+        }
+
+        pendingLines = lines;
+        pendingLineIndex = 0;
+        pendingOnAccept = onFinished;
+
+        if (isOpen)
+        {
+            dialogueText.text = lines[0];
+            ResetAcceptButtonState();
+            return;
+        }
+
+        OpenPanel(lines[0]);
+    }
+
+    void OpenPanel(string text)
+    {
         StopEnableGameplayInputRoutine();
         isOpen = true;
-        dialogueText.text = string.IsNullOrEmpty(text) ? DefaultDialogue : text;
+        dialogueText.text = text;
+        ResetAcceptButtonState();
         panelRoot.SetActive(true);
 
         Managers.UI.HideInteractText();
@@ -52,6 +88,10 @@ public class SpeechPanelController : MonoBehaviour
 
         Managers.Jobs.ClearPendingOffer();
         isOpen = false;
+        pendingOnAccept = null;
+        pendingLines = null;
+        pendingLineIndex = 0;
+        ResetAcceptButtonState();
         panelRoot.SetActive(false);
 
         Managers.UI.SetHudVisible(true);
@@ -62,7 +102,27 @@ public class SpeechPanelController : MonoBehaviour
 
     void OnAcceptClicked()
     {
-        Managers.Jobs.OnSpeechAccepted();
+        if (pendingLines != null && pendingLineIndex < pendingLines.Length - 1)
+        {
+            pendingLineIndex++;
+            dialogueText.text = pendingLines[pendingLineIndex];
+            ResetAcceptButtonState();
+            return;
+        }
+
+        Action onAccept = pendingOnAccept;
+        pendingOnAccept = null;
+        pendingLines = null;
+        pendingLineIndex = 0;
+
+        if (onAccept != null)
+            onAccept();
+        else
+            Managers.Jobs.OnSpeechAccepted();
+
+        if (pendingLines != null)
+            return;
+
         Close();
     }
 
@@ -88,5 +148,15 @@ public class SpeechPanelController : MonoBehaviour
 
         StopCoroutine(enableGameplayInputRoutine);
         enableGameplayInputRoutine = null;
+    }
+
+    void ResetAcceptButtonState()
+    {
+        if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject == acceptButton.gameObject)
+            EventSystem.current.SetSelectedGameObject(null);
+
+        Graphic graphic = acceptButton.targetGraphic;
+        if (graphic != null)
+            graphic.CrossFadeColor(acceptButton.colors.normalColor, 0f, true, true);
     }
 }

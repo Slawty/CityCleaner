@@ -6,18 +6,25 @@ using UnityEngine;
 
 public class InfoTextPanel : MonoBehaviour
 {
+    [SerializeField] private GameObject panelRoot;
     [SerializeField] private TMP_Text infoText;
+    [SerializeField] private float basePanelHeight = 125f;
+    [SerializeField] private float extraHeightPerLine = 60f;
+    [SerializeField] private float lettersPerLine = 24f;
     [SerializeField] private float popDurationSeconds = 0.22f;
     [SerializeField] private float popStartScale = 0.85f;
     [SerializeField] private float popOvershootScale = 1.08f;
 
     private CancellationTokenSource hideTextCts;
+    private RectTransform panelRect;
     private RectTransform infoTextRect;
     private Vector3 baseScale = Vector3.one;
     private Tween popTween;
 
     private void Awake()
     {
+        panelRect = transform as RectTransform;
+
         if (infoText != null)
         {
             infoTextRect = infoText.rectTransform;
@@ -42,7 +49,9 @@ public class InfoTextPanel : MonoBehaviour
         KillPopTween();
 
         infoText.text = text;
-        infoText.gameObject.SetActive(true);
+        if (panelRoot != null)
+            UpdatePanelHeight();
+        SetPanelVisible(true);
         PlayPopAnimation();
 
         if (durationSeconds <= 0f)
@@ -75,14 +84,66 @@ public class InfoTextPanel : MonoBehaviour
 
     private void HideTextImmediate()
     {
-        if (infoText == null)
+        if (infoText != null)
+        {
+            if (infoTextRect != null)
+                infoTextRect.localScale = baseScale;
+
+            infoText.text = string.Empty;
+        }
+
+        ResetPanelHeight();
+        SetPanelVisible(false);
+    }
+
+    private void UpdatePanelHeight()
+    {
+        if (panelRect == null || infoText == null)
             return;
 
-        if (infoTextRect != null)
-            infoTextRect.localScale = baseScale;
+        int lineCount = GetEstimatedLineCount(infoText.text);
+        Vector2 size = panelRect.sizeDelta;
+        size.y = basePanelHeight + (lineCount - 1) * extraHeightPerLine;
+        panelRect.sizeDelta = size;
+    }
 
-        infoText.text = string.Empty;
-        infoText.gameObject.SetActive(false);
+    private int GetEstimatedLineCount(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return 1;
+
+        int letterCount = 0;
+        foreach (char character in text)
+        {
+            if (character == '\n' || character == '\r')
+                continue;
+
+            letterCount++;
+        }
+
+        return Mathf.Max(1, Mathf.CeilToInt(letterCount / lettersPerLine));
+    }
+
+    private void ResetPanelHeight()
+    {
+        if (panelRect == null)
+            return;
+
+        Vector2 size = panelRect.sizeDelta;
+        size.y = basePanelHeight;
+        panelRect.sizeDelta = size;
+    }
+
+    private void SetPanelVisible(bool visible)
+    {
+        if (panelRoot != null)
+        {
+            panelRoot.SetActive(visible);
+            return;
+        }
+
+        if (infoText != null)
+            infoText.gameObject.SetActive(visible);
     }
 
     private void CancelHideTask()

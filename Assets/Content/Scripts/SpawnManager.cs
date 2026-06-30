@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 
@@ -14,6 +15,8 @@ public class SpawnManager : MonoBehaviour
     [SerializeField] private float multipleSpawnDelay = 0.2f;
     [SerializeField] private Vector2 spinForceMinMax = new Vector2(1f, 3f);
 
+    public UnityAction OnCoinSpawned;
+
     public void SpawnCoin(Vector3 spawnPos, Vector3 spawnDirection)
     {
         ParticleSystem.EmitParams emit = new ParticleSystem.EmitParams();
@@ -22,6 +25,7 @@ public class SpawnManager : MonoBehaviour
         emit.velocity = spawnDirection * Random.Range(1.5f, 3f);
 
         coinParticles.Emit(emit, 1);
+        OnCoinSpawned?.Invoke();
     }
 
     public async UniTask SpawnCoins(int amount, Vector3 spawnPos, Vector3 spawnDirection)

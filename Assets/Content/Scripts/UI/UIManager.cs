@@ -7,10 +7,11 @@ public class UIManager : MonoBehaviour
     private const float DefaultInfoTextDurationSeconds = 2f;
 
     [SerializeField] ProgressBar cleanProgressBar;
-    [FormerlySerializedAs("zoneCleanProgressBar")]
-    [SerializeField] ProgressBar jobProgressBar;
+    [FormerlySerializedAs("jobProgressBar")]
+    [SerializeField] JobsProgressUI jobsProgressUI;
     [SerializeField] ProgressBar radioactivesProgressBar;
-    [SerializeField] InfoTextPanel infoTextPanel;
+    [SerializeField] InfoTextPanel popupInfoText;
+    [SerializeField] InfoTextPanel tutorialInfoPanel;
     [SerializeField] private TMP_Text interactText;
     [SerializeField] private TMP_Text coinValueText;
     [SerializeField] private TMP_Text poopValueText;
@@ -18,20 +19,18 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        ShowJobProgress(false);
         ShowRadioactivesProgress(false);
     }
 
     public void ShowInteractText(string text)
     {
-        // Debug.Log($"ShowInteractText: {text}");
         interactText.text = text;
         interactText.gameObject.SetActive(true);
     }
 
     public void ShowInfoText(string text, float durationSeconds)
     {
-        infoTextPanel?.ShowText(text, durationSeconds);
+        popupInfoText?.ShowText(text, durationSeconds);
     }
 
     public void ShowInfoText(string text)
@@ -39,14 +38,24 @@ public class UIManager : MonoBehaviour
         ShowInfoText(text, DefaultInfoTextDurationSeconds);
     }
 
-    public void HideInfoText()
+    public void ShowTutorialInfoText(string text, float durationSeconds)
     {
-        infoTextPanel?.HideText();
+        tutorialInfoPanel?.ShowText(text, durationSeconds);
     }
 
-    public void ShowJobProgress(bool visible)
+    public void ShowTutorialInfoText(string text)
     {
-        jobProgressBar.gameObject.SetActive(visible);
+        ShowTutorialInfoText(text, 0f);
+    }
+
+    public void HideTutorialInfoText()
+    {
+        tutorialInfoPanel?.HideText();
+    }
+
+    public void HideInfoText()
+    {
+        popupInfoText?.HideText();
     }
 
     public void ShowRadioactivesProgress(bool visible)
@@ -69,21 +78,28 @@ public class UIManager : MonoBehaviour
         cleanProgressBar.SetPercent(value);
     }
 
-    public void SetJobProgress(float percent, string description = null)
+    public void RegisterJobProgress(Job job)
     {
-        jobProgressBar.SetPercent(percent, onlyIncrease: true);
-        if (description != null)
-            jobProgressBar.SetDescription(description);
+        jobsProgressUI.RegisterJob(job);
     }
 
-    public void ResetJobProgress()
+    public void UnregisterJobProgress(Job job)
     {
-        jobProgressBar.ResetProgress();
+        jobsProgressUI.UnregisterJob(job);
+    }
+
+    public void SetJobProgress(Job job, float percent, string description = null)
+    {
+        jobsProgressUI.SetJobProgress(job, percent, description);
+    }
+
+    public void ResetJobProgress(Job job)
+    {
+        jobsProgressUI.ResetJobProgress(job);
     }
 
     public void SetRadioactivesProgressBarPercent(float value)
     {
-        // Debug.Log($"Radioactives Progress: {value}");
         radioactivesProgressBar.SetPercent(value);
     }
 

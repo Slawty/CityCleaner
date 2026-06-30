@@ -18,6 +18,12 @@ public class DebugManager : MonoBehaviour
             interactAction.action.performed -= OnDebugButton01Pressed;
     }
 
+    void Update()
+    {
+        if (Keyboard.current != null && Keyboard.current.f12Key.wasPressedThisFrame)
+            Managers.Jobs.CompleteActiveJobDebug();
+    }
+
     void OnDebugButton01Pressed(InputAction.CallbackContext context)
     {
         Debug.Log("Debug button pressed (hook tools here if needed).");

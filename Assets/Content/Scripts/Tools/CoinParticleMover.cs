@@ -1,8 +1,11 @@
 using UnityEngine;
+using UnityEngine.Events;
 using System.Collections.Generic;
 
 public class CoinParticleMover : MonoBehaviour
 {
+    public static UnityAction OnCoinCollected;
+
     public RessourceType Type;
     public ParticleSystem ps;
     public Transform vacuumPoint;
@@ -61,9 +64,11 @@ public class CoinParticleMover : MonoBehaviour
 
     void AddValue(int amount)
     {
-        Debug.Log("Coin collected");
         if (Type == RessourceType.Coin)
+        {
             Managers.Inventory.IncreaseCoins(amount);
+            OnCoinCollected?.Invoke();
+        }
         else if (Type == RessourceType.Poop)
             Managers.Inventory.IncreasePoop(amount);
     }

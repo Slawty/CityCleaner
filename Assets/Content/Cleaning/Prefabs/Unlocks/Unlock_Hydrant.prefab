@@ -341,6 +341,7 @@ MonoBehaviour:
   spawnRadius: 3
   spawnInterval: 6
   MaxDriplings: 3
+  spawnOnStart: 1
 --- !u!33 &2802873044581474937
 MeshFilter:
   m_ObjectHideFlags: 0

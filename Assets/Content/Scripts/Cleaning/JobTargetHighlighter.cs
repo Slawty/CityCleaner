@@ -55,14 +55,17 @@ public class JobTargetHighlighter : MonoBehaviour
         ClearHighlightedTargets();
     }
 
+    public void HighlightActiveJobTargets()
+    {
+        StartHighlight();
+    }
+
     void StartHighlight()
     {
-        Job activeJob = Managers.Jobs.ActiveJob;
-        if (activeJob == null)
-            return;
-
         scratchTargets.Clear();
-        activeJob.CollectIncompletePaintables(scratchTargets);
+        foreach (Job activeJob in Managers.Jobs.ActiveJobs)
+            activeJob.CollectIncompletePaintables(scratchTargets);
+
         if (scratchTargets.Count == 0)
             return;
 

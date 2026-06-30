@@ -9,6 +9,8 @@ public class WaterSource : MonoBehaviour, IInteractable
     public float spawnRadius = 3f;
     public float spawnInterval = 2f;
     public int MaxDriplings = 6;
+    [SerializeField] bool spawnOnStart;
+
     int activeDriplings;
 
     public string Prompt => "Activate";
@@ -16,7 +18,18 @@ public class WaterSource : MonoBehaviour, IInteractable
     bool isActivated;
     float spawnTimer;
 
+    void Start()
+    {
+        if (spawnOnStart)
+            ActivateSpawning();
+    }
+
     public void Interact(GameObject interactor)
+    {
+        ActivateSpawning();
+    }
+
+    void ActivateSpawning()
     {
         if (isActivated)
             return;
@@ -50,8 +63,17 @@ public class WaterSource : MonoBehaviour, IInteractable
         Vector2 offset = Random.insideUnitCircle * spawnRadius;
         Vector3 spawnPos = transform.position + new Vector3(offset.x, 0f, offset.y);
 
-        var dripling = Instantiate(DroplingPrefab, spawnPos, Quaternion.identity).GetComponent<Dirtling>();
+        Dripling dripling = Instantiate(DroplingPrefab, spawnPos, Quaternion.identity).GetComponent<Dripling>();
         dripling.OnConsumed += OnDriplingConsumed;
+
+        NpcWander wander = dripling.GetComponent<NpcWander>();
+        if (wander != null)
+        {
+            wander.SetWanderCenter(transform.position);
+            wander.SetWanderRadius(spawnRadius);
+            wander.Initialize();
+            wander.BeginWandering();
+        }
     }
 
     void OnDriplingConsumed()

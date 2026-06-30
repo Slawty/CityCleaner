@@ -15,7 +15,14 @@ public class WaterSprayTool : Tool
 
     float currentAmmo;
     bool isActive;
+    bool ammoDepletedFired;
     Camera cam;
+
+    public float NormalizedAmmo => MaxAmmo > 0f ? currentAmmo / MaxAmmo : 0f;
+    public bool IsEmpty => currentAmmo <= 0f;
+
+    public event System.Action OnAmmoDepleted;
+    public event System.Action OnAmmoRestored;
 
     public override void Initialize()
     {
@@ -59,7 +66,15 @@ public class WaterSprayTool : Tool
         HandleWaterRay();
 
         if (currentAmmo <= 0f)
+        {
+            if (!ammoDepletedFired)
+            {
+                ammoDepletedFired = true;
+                OnAmmoDepleted?.Invoke();
+            }
+
             OnShootStop();
+        }
     }
 
     void HandleWaterRay()
@@ -87,12 +102,21 @@ public class WaterSprayTool : Tool
     {
         currentAmmo = MaxAmmo;
         ammoBar.SetPercent(100f);
+        ammoDepletedFired = false;
+        OnAmmoRestored?.Invoke();
     }
 
     public void FillWaterAmount(float amount)
     {
+        bool wasEmpty = currentAmmo <= 0f;
         currentAmmo += amount;
         currentAmmo = Mathf.Clamp(currentAmmo, 0f, MaxAmmo);
         ammoBar.SetPercent((currentAmmo / MaxAmmo) * 100f);
+
+        if (currentAmmo > 0f)
+            ammoDepletedFired = false;
+
+        if (wasEmpty && currentAmmo > 0f)
+            OnAmmoRestored?.Invoke();
     }
 }

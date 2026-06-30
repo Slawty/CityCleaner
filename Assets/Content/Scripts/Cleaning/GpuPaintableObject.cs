@@ -1,5 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Events;
@@ -52,7 +52,8 @@ public class GPUPaintableObject : MonoBehaviour
     float nextDirtSpawn = 0f;
     float dirtSpawnStep;
     int dirtSpawnedCount = 0;
-    Coroutine cleanFlashRoutine;
+    CancellationTokenSource cleanFlashCts;
+    bool usesCleanMaterial;
 
     void Awake()
     {
@@ -108,6 +109,9 @@ public class GPUPaintableObject : MonoBehaviour
 
     public void SetJobHighlight(float amount)
     {
+        if (usesCleanMaterial)
+            return;
+
         cachedRenderer.GetPropertyBlock(propertyBlock);
         propertyBlock.SetFloat(JobHighlightShaderId, Mathf.Clamp01(amount));
         cachedRenderer.SetPropertyBlock(propertyBlock);
@@ -115,6 +119,9 @@ public class GPUPaintableObject : MonoBehaviour
 
     public void SetCleanFlash(float amount)
     {
+        if (usesCleanMaterial)
+            return;
+
         cachedRenderer.GetPropertyBlock(propertyBlock);
         propertyBlock.SetFloat(CleanFlashShaderId, Mathf.Clamp01(amount));
         cachedRenderer.SetPropertyBlock(propertyBlock);
@@ -178,6 +185,7 @@ public class GPUPaintableObject : MonoBehaviour
 
     void OnDestroy()
     {
+        CancelCleanFlash();
         if (coverageData.IsCreated)
             coverageData.Dispose();
     }
@@ -290,6 +298,9 @@ public class GPUPaintableObject : MonoBehaviour
 
     public void SetClean()
     {
+        if (isClean)
+            return;
+
         cleanedPixelCount = pixelsToCleanCount;
         isClean = true;
         // Clear visual dirt
@@ -302,27 +313,91 @@ public class GPUPaintableObject : MonoBehaviour
 
     void PlayCleanFlash()
     {
-        if (cleanFlashRoutine != null)
-            StopCoroutine(cleanFlashRoutine);
-
-        cleanFlashRoutine = StartCoroutine(CleanFlashRoutine());
+        CancelCleanFlash();
+        cleanFlashCts = new CancellationTokenSource();
+        PlayCleanFlashAsync(cleanFlashCts.Token).Forget();
     }
 
-    IEnumerator CleanFlashRoutine()
+    async UniTaskVoid PlayCleanFlashAsync(CancellationToken cancellationToken)
     {
-        float elapsed = 0f;
-
-        while (elapsed < cleanFlashDuration)
+        try
         {
-            elapsed += Time.deltaTime;
-            float normalizedTime = elapsed / cleanFlashDuration;
-            float fade = 1f - normalizedTime;
-            SetCleanFlash(cleanFlashPeak * fade * fade);
-            yield return null;
+            float elapsed = 0f;
+
+            while (elapsed < cleanFlashDuration)
+            {
+                elapsed += Time.deltaTime;
+                float normalizedTime = elapsed / cleanFlashDuration;
+                float fade = 1f - normalizedTime;
+                SetCleanFlash(cleanFlashPeak * fade * fade);
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+
+            SetCleanFlash(0f);
+
+            if (CanSwapToCleanMaterial())
+                SwapToCleanMaterial();
+            else
+                ReleaseMaskTexture();
+        }
+        catch (System.OperationCanceledException)
+        {
+        }
+    }
+
+    void CancelCleanFlash()
+    {
+        if (cleanFlashCts == null)
+            return;
+
+        cleanFlashCts.Cancel();
+        cleanFlashCts.Dispose();
+        cleanFlashCts = null;
+    }
+
+    bool CanSwapToCleanMaterial()
+    {
+        Material[] materials = cachedRenderer.sharedMaterials;
+        foreach (Material material in materials)
+        {
+            if (Managers.Materials.TryGetCleanReplacement(material, out _))
+                return true;
         }
 
-        SetCleanFlash(0f);
-        cleanFlashRoutine = null;
+        return false;
+    }
+
+    void SwapToCleanMaterial()
+    {
+        Material[] materials = cachedRenderer.sharedMaterials;
+        bool changed = false;
+
+        for (int materialIndex = 0; materialIndex < materials.Length; materialIndex++)
+        {
+            if (!Managers.Materials.TryGetCleanReplacement(materials[materialIndex], out Material cleanMaterial))
+                continue;
+
+            materials[materialIndex] = cleanMaterial;
+            changed = true;
+        }
+
+        if (!changed)
+            return;
+
+        cachedRenderer.SetPropertyBlock(null);
+        cachedRenderer.sharedMaterials = materials;
+        usesCleanMaterial = true;
+        ReleaseMaskTexture();
+    }
+
+    void ReleaseMaskTexture()
+    {
+        if (maskTexture == null)
+            return;
+
+        maskTexture.Release();
+        Destroy(maskTexture);
+        maskTexture = null;
     }
 
     void SpawnDirtChunk(Vector3 hitPos)

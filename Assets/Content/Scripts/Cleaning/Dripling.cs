@@ -16,12 +16,14 @@ public class Dripling : MonoBehaviour, IVacuumable
     [SerializeField] DriplingChunkConverter chunkConverter;
     [SerializeField] GameObject goolingPrefab;
     NpcNavMovement mover;
+    NpcWander wander;
     bool isRefilling;
     float elapsed;
 
     void Awake()
     {
         mover = GetComponent<NpcNavMovement>();
+        wander = GetComponent<NpcWander>();
     }
 
     void Start()
@@ -29,6 +31,9 @@ public class Dripling : MonoBehaviour, IVacuumable
         transform.localScale = Vector3.one * startScale;
         if (chunkConverter != null)
             chunkConverter.OnAllChunksCollected += OnAllChunksCollected;
+
+        if (wander != null)
+            return;
 
         mover.Follow(Managers.Player.transform);
     }
@@ -48,24 +53,21 @@ public class Dripling : MonoBehaviour, IVacuumable
         float delta = Time.deltaTime;
         elapsed += delta;
 
-        // Give water evenly over the duration
         float ammoPerSecond = totalAmmo / shrinkDuration;
         if (Type == ConsumableType.Water)
-        {
             Managers.Tools.WaterSprayer.FillWaterAmount(ammoPerSecond * delta);
-        }
         else if (Type == ConsumableType.Goo)
             Managers.Tools.GooGun.FillAmmoAmount(ammoPerSecond * delta);
 
-        // Scale based on normalized time
         float t = Mathf.Clamp01(elapsed / shrinkDuration);
         float scale = Mathf.Lerp(startScale, minScale, t);
         transform.localScale = Vector3.one * scale;
 
+        if (wander != null)
+            wander.SetWanderingEnabled(false);
+
         if (elapsed >= shrinkDuration)
-        {
             Destroy(gameObject);
-        }
     }
 
     public bool CanVacuum => true;
@@ -78,12 +80,13 @@ public class Dripling : MonoBehaviour, IVacuumable
     public void VacuumEnd()
     {
         isRefilling = false;
-    }
 
+        if (wander != null)
+            wander.SetWanderingEnabled(true);
+    }
 
     void OnAllChunksCollected()
     {
-        Debug.Log("All chunks collected");
         Dripling gooling = Instantiate(goolingPrefab, transform.position, transform.rotation).GetComponent<Dripling>();
         Destroy(gameObject);
     }
