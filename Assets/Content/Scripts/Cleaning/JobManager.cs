@@ -117,7 +117,24 @@ public class JobManager : MonoBehaviour
         }
 
         if (IsTrackingJob(job))
-            return;
+        {
+            foreach (TrackedJob tracked in activeJobs)
+            {
+                if (tracked.Job != job)
+                    continue;
+
+                tracked.IsSequenceStep = true;
+                tracked.Client = client;
+                tracked.OnObjectivesCompleted = onObjectivesCompleted;
+
+                if (client != null)
+                    client.SetState(JobClientState.Active);
+
+                if (targetHighlighter != null)
+                    targetHighlighter.HighlightActiveJobTargets();
+                return;
+            }
+        }
 
         if (client != null)
             client.SetState(JobClientState.Active);
@@ -212,6 +229,7 @@ public class JobManager : MonoBehaviour
         StopTracking(tracked);
         tracked.Job.CompleteRemaining();
         tracked.Job.MarkCompleted();
+        Managers.UI.ShowInfoText("Job Completed");
         tracked.OnObjectivesCompleted?.Invoke();
         ClearTargetHighlightsIfNeeded();
     }

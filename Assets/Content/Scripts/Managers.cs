@@ -15,6 +15,7 @@ public class Managers : MonoBehaviour
     [SerializeField] SpeechPanelController speechPanelController;
     [SerializeField] JobManager jobManager;
     [SerializeField] MaterialManager materialManager;
+    [SerializeField] TutorialManager tutorialManager;
 
     private void Awake()
     {
@@ -32,4 +33,5 @@ public class Managers : MonoBehaviour
     public static SpeechPanelController Speech => Instance.speechPanelController;
     public static JobManager Jobs => Instance.jobManager;
     public static MaterialManager Materials => Instance.materialManager;
+    public static TutorialManager Tutorial => Instance.tutorialManager;
 }

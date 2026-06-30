@@ -12,26 +12,32 @@ public class InfoTextPanel : MonoBehaviour
     [SerializeField] private float extraHeightPerLine = 60f;
     [SerializeField] private float lettersPerLine = 24f;
     [SerializeField] private float popDurationSeconds = 0.22f;
-    [SerializeField] private float popStartScale = 0.85f;
+    [SerializeField] private float popStartScale = 0.5f;
     [SerializeField] private float popOvershootScale = 1.08f;
 
     private CancellationTokenSource hideTextCts;
     private RectTransform panelRect;
-    private RectTransform infoTextRect;
+    private RectTransform popTargetRect;
     private Vector3 baseScale = Vector3.one;
     private Tween popTween;
+    private bool initialized;
 
     private void Awake()
     {
+        EnsureInitialized();
+    }
+
+    private void EnsureInitialized()
+    {
+        if (initialized)
+            return;
+
+        initialized = true;
         panelRect = transform as RectTransform;
+        popTargetRect = panelRect;
 
-        if (infoText != null)
-        {
-            infoTextRect = infoText.rectTransform;
-            baseScale = infoTextRect.localScale;
-        }
-
-        HideTextImmediate();
+        if (popTargetRect != null)
+            baseScale = popTargetRect.localScale;
     }
 
     private void OnDestroy()
@@ -45,6 +51,7 @@ public class InfoTextPanel : MonoBehaviour
         if (infoText == null)
             return;
 
+        EnsureInitialized();
         CancelHideTask();
         KillPopTween();
 
@@ -63,6 +70,7 @@ public class InfoTextPanel : MonoBehaviour
 
     public void HideText()
     {
+        EnsureInitialized();
         CancelHideTask();
         KillPopTween();
         HideTextImmediate();
@@ -84,13 +92,11 @@ public class InfoTextPanel : MonoBehaviour
 
     private void HideTextImmediate()
     {
-        if (infoText != null)
-        {
-            if (infoTextRect != null)
-                infoTextRect.localScale = baseScale;
+        if (popTargetRect != null)
+            popTargetRect.localScale = baseScale;
 
+        if (infoText != null)
             infoText.text = string.Empty;
-        }
 
         ResetPanelHeight();
         SetPanelVisible(false);
@@ -158,17 +164,14 @@ public class InfoTextPanel : MonoBehaviour
 
     private void PlayPopAnimation()
     {
-        if (infoTextRect == null)
+        if (popTargetRect == null)
             return;
 
-        infoTextRect.localScale = baseScale * popStartScale;
-        popTween = infoTextRect.DOScale(baseScale * popOvershootScale, popDurationSeconds * 0.65f)
-            .SetEase(Ease.OutCubic)
-            .OnComplete(() =>
-            {
-                popTween = infoTextRect.DOScale(baseScale, popDurationSeconds * 0.35f)
-                    .SetEase(Ease.OutBack);
-            });
+        popTargetRect.localScale = baseScale * popStartScale;
+        popTween = DOTween.Sequence()
+            .Append(popTargetRect.DOScale(baseScale * popOvershootScale, popDurationSeconds * 0.65f).SetEase(Ease.OutCubic))
+            .Append(popTargetRect.DOScale(baseScale, popDurationSeconds * 0.35f).SetEase(Ease.OutBack))
+            .SetLink(popTargetRect.gameObject);
     }
 
     private void KillPopTween()

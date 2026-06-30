@@ -12,7 +12,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] ProgressBar radioactivesProgressBar;
     [SerializeField] InfoTextPanel popupInfoText;
     [SerializeField] InfoTextPanel tutorialInfoPanel;
-    [SerializeField] private TMP_Text interactText;
+    [SerializeField] GameObject interactPromptPanel;
+    [FormerlySerializedAs("interactText")]
+    [SerializeField] TMP_Text interactPromptText;
     [SerializeField] private TMP_Text coinValueText;
     [SerializeField] private TMP_Text poopValueText;
     [SerializeField] GameObject hudRoot;
@@ -24,8 +26,8 @@ public class UIManager : MonoBehaviour
 
     public void ShowInteractText(string text)
     {
-        interactText.text = text;
-        interactText.gameObject.SetActive(true);
+        interactPromptText.text = text;
+        interactPromptPanel.SetActive(true);
     }
 
     public void ShowInfoText(string text, float durationSeconds)
@@ -65,7 +67,7 @@ public class UIManager : MonoBehaviour
 
     public void HideInteractText()
     {
-        interactText.gameObject.SetActive(false);
+        interactPromptPanel.SetActive(false);
     }
 
     public void SetHudVisible(bool visible)

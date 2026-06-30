@@ -4,6 +4,7 @@ public class JobSequence : MonoBehaviour
 {
     [SerializeField] JobStep[] steps;
     [SerializeField] bool autoStartOnLoad;
+    [SerializeField] bool triggerTutorialOnComplete;
 
     int currentStepIndex;
     bool sequenceActive;
@@ -71,7 +72,6 @@ public class JobSequence : MonoBehaviour
     {
         JobStep step = steps[currentStepIndex];
         step.onJobCompleted?.Invoke();
-        Managers.UI.ShowInfoText("Job Completed");
 
         if (step.speaker != null)
         {
@@ -122,6 +122,9 @@ public class JobSequence : MonoBehaviour
         }
 
         sequenceActive = false;
+
+        if (triggerTutorialOnComplete)
+            Managers.Tutorial.NotifyJobSequenceCompleted();
     }
 
     static bool HasDialogues(string[] dialogues)
