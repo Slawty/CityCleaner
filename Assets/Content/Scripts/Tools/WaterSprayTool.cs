@@ -7,6 +7,7 @@ public class WaterSprayTool : Tool
     public float AmmoPerSecond = 2f;
     public float DamagePerSecond = 100f;
     [SerializeField] GPUPainterWorld painter;
+    public GPUPainterWorld Painter => painter;
     [SerializeField] List<ParticleSystem> sprayEffects;
     [SerializeField] ProgressBar ammoBar;
     [SerializeField] LayerMask dirtlingHitMask = ~0;

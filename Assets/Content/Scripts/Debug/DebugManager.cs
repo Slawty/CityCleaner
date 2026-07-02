@@ -22,6 +22,9 @@ public class DebugManager : MonoBehaviour
     {
         if (Keyboard.current != null && Keyboard.current.f12Key.wasPressedThisFrame)
             Managers.Jobs.CompleteActiveJobDebug();
+
+        if (Keyboard.current != null && Keyboard.current.f11Key.wasPressedThisFrame && Managers.UpgradeMenu != null)
+            Managers.UpgradeMenu.Open();
     }
 
     void OnDebugButton01Pressed(InputAction.CallbackContext context)

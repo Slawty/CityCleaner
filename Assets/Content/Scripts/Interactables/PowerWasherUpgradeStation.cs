@@ -34,8 +34,7 @@ public class PowerWasherUpgradeStation : MonoBehaviour, IInteractable
         if (!isAvailable)
             return;
 
-        SetAvailable(false);
-        Managers.Tutorial.NotifyPowerWasherUpgraded();
+        Managers.UpgradeMenu.Open();
     }
 
     public void InteractReleased(GameObject interactor)

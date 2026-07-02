@@ -16,6 +16,8 @@ public class Managers : MonoBehaviour
     [SerializeField] JobManager jobManager;
     [SerializeField] MaterialManager materialManager;
     [SerializeField] TutorialManager tutorialManager;
+    [SerializeField] UpgradeProgressManager upgradeProgressManager;
+    [SerializeField] UpgradeMenuController upgradeMenuController;
 
     private void Awake()
     {
@@ -34,4 +36,6 @@ public class Managers : MonoBehaviour
     public static JobManager Jobs => Instance.jobManager;
     public static MaterialManager Materials => Instance.materialManager;
     public static TutorialManager Tutorial => Instance.tutorialManager;
+    public static UpgradeProgressManager Upgrades => Instance.upgradeProgressManager;
+    public static UpgradeMenuController UpgradeMenu => Instance.upgradeMenuController;
 }

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1d2e3f4a5b6478990abcdef12345678, type: 3}
+  m_Name: WasherRadius
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeNodeData
+  id: washer_radius
+  displayName: Cleaning Radius
+  icon: {fileID: 21300000, guid: 133658c8067cab24cbec22f60d8e9000, type: 3}
+  maxRanks: 3
+  ranks:
+  - cost: 25
+    description: Widen your spray so you clean a larger area with each pass.
+    modifiers:
+    - type: 4
+      operation: 0
+      value: 0.05
+  - cost: 50
+    description: Even wider spray coverage for faster wall cleaning.
+    modifiers:
+    - type: 4
+      operation: 0
+      value: 0.05
+  - cost: 100
+    description: Maximum spray width for the power washer.
+    modifiers:
+    - type: 4
+      operation: 0
+      value: 0.08

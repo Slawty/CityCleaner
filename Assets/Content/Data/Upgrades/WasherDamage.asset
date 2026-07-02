@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1d2e3f4a5b6478990abcdef12345678, type: 3}
+  m_Name: WasherDamage
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeNodeData
+  id: washer_damage
+  displayName: Spray Power
+  icon: {fileID: 0}
+  maxRanks: 3
+  ranks:
+  - cost: 40
+    description: Increase damage dealt to tough grime and nests.
+    modifiers:
+    - type: 1
+      operation: 0
+      value: 25
+  - cost: 80
+    description: Stronger spray pressure for faster nest destruction.
+    modifiers:
+    - type: 1
+      operation: 0
+      value: 35
+  - cost: 150
+    description: Peak spray power for the power washer.
+    modifiers:
+    - type: 1
+      operation: 0
+      value: 50

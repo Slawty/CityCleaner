@@ -17,6 +17,18 @@ public class GPUPainterWorld : MonoBehaviour
     [SerializeField] float brushWorldSize = 0.5f;
     [SerializeField] float cleanSpeed = 4f;
 
+    public float BrushWorldSize
+    {
+        get => brushWorldSize;
+        set => brushWorldSize = value;
+    }
+
+    public float CleanSpeed
+    {
+        get => cleanSpeed;
+        set => cleanSpeed = value;
+    }
+
     readonly Collider[] overlapColliders = new Collider[OverlapBufferSize];
     readonly HashSet<GPUPaintableObject> paintablesInBrush = new();
 
