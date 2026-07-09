@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
   winCoins: 1
-  winDirt: 6
+  winDirt: 3
   AdditionalObjectsToClean: []
   CoinSpawnPos: {fileID: 0}
   trackingResolution: 128

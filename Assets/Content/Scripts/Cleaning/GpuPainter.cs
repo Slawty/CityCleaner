@@ -40,8 +40,8 @@ public class GPUPainter : MonoBehaviour
         if (!Physics.Raycast(ray, out RaycastHit hit, 10f, paintMask, QueryTriggerInteraction.Ignore))
             return;
 
-        if (hit.collider.GetComponentInParent<GPUPaintableObject>() != null)
-            PaintAtPosition(hit.point, cleanSpeed * Time.deltaTime);
+        GPUPaintableObject hitPaintable = hit.collider.GetComponentInParent<GPUPaintableObject>();
+        PaintAtPosition(hit.point, hit.normal, cleanSpeed * Time.deltaTime, paintZoneDirt: hitPaintable == null);
     }
 
     public void StartPainting()
@@ -56,11 +56,19 @@ public class GPUPainter : MonoBehaviour
 
     public void Paint(GPUPaintableObject paintable, Vector3 hitPos, float cleanStrength)
     {
-        PaintAtPosition(hitPos, cleanStrength);
+        PaintAtPosition(hitPos, Vector3.up, cleanStrength, paintZoneDirt: false);
     }
 
     public void PaintAtPosition(Vector3 brushCenter, float cleanStrength, bool gooOnly = false)
     {
+        PaintAtPosition(brushCenter, Vector3.up, cleanStrength, gooOnly, paintZoneDirt: false);
+    }
+
+    public void PaintAtPosition(Vector3 brushCenter, Vector3 hitNormal, float cleanStrength, bool gooOnly = false, bool paintZoneDirt = false)
+    {
+        if (paintZoneDirt)
+            PaintZoneDirtMaps(brushCenter, hitNormal, cleanStrength);
+
         int hitCount = Physics.OverlapSphereNonAlloc(
             brushCenter,
             brushWorldSize,
@@ -86,6 +94,17 @@ public class GPUPainter : MonoBehaviour
 
         foreach (GPUPaintableObject paintable in paintablesInBrush)
             UpdatePaintableTracking(paintable, brushCenter);
+    }
+
+    void PaintZoneDirtMaps(Vector3 brushCenter, Vector3 hitNormal, float cleanStrength)
+    {
+        foreach (ZoneDirtMap zoneDirtMap in ZoneDirtMap.ActiveMaps)
+        {
+            if (zoneDirtMap == null || !zoneDirtMap.ContainsWorldPoint(brushCenter))
+                continue;
+
+            zoneDirtMap.PaintAtWorldPos(brushCenter, hitNormal, brushWorldSize, cleanStrength, brushTexture);
+        }
     }
 
     void ApplyBrushStroke(GPUPaintableObject paintable, Vector3 brushCenter, float cleanStrength)

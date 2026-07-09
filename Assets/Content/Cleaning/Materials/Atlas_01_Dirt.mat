@@ -102,7 +102,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: cb07de49363281a4d806d82d9c14a732, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normals:
@@ -172,7 +172,7 @@ Material:
     - _DebugView: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DirtAmount: 0
+    - _DirtAmount: 1
     - _DirtMetallic: 0
     - _DirtMetallicStrength: 0.418
     - _DirtNoiseOffset: 1.995
@@ -193,7 +193,7 @@ Material:
     - _JobHighlight: 0
     - _MaskScale: 1
     - _Metallic: 0
-    - _NormalStrength: 0.08
+    - _NormalStrength: 3
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
@@ -212,6 +212,7 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BaseTint: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _DirtAdditionalTint: {r: 0, g: 0, b: 0, a: 1}
     - _DirtDefaultTiling: {r: 1, g: 1, b: 0, a: 0}
     - _DirtTiling: {r: 5, g: 5, b: 0, a: 0}
     - _DirtTint: {r: 0.38679248, g: 0.16939816, b: 0, a: 1}
@@ -222,6 +223,7 @@ Material:
     - _TilingXY: {r: 1, g: 0.28, b: 0, a: 0}
     - _TilingXZ: {r: 1, g: 1, b: 0, a: 0}
     - _TilingYZ: {r: 0.28, g: 1, b: 0, a: 0}
+    - _UcleanTint: {r: 0, g: 0, b: 0, a: 1}
     - _ZoneMaxXY: {r: 0, g: 0, b: 0, a: 0}
     - _ZoneMaxXZ: {r: 0, g: 0, b: 0, a: 0}
     - _ZoneMaxYZ: {r: 0, g: 0, b: 0, a: 0}

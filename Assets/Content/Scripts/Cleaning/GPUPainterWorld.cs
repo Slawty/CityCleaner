@@ -52,19 +52,21 @@ public class GPUPainterWorld : MonoBehaviour
             return;
 
         GPUPaintableObject paintable = hit.collider.GetComponentInParent<GPUPaintableObject>();
+        PaintBrushAt(hit.point, hit.normal, cleanSpeed * Time.deltaTime, paintZoneDirt: paintable == null);
+
         if (paintable != null)
-        {
-            PaintBrushAt(hit.point, cleanSpeed * Time.deltaTime);
             return;
-        }
 
         DirtNest dirtNest = hit.collider.GetComponentInParent<DirtNest>();
         if (dirtNest != null && waterTool != null)
             dirtNest.ApplyDamageOverTime(waterTool.DamagePerSecond);
     }
 
-    void PaintBrushAt(Vector3 brushCenter, float cleanStrength)
+    void PaintBrushAt(Vector3 brushCenter, Vector3 hitNormal, float cleanStrength, bool paintZoneDirt)
     {
+        if (paintZoneDirt)
+            PaintZoneDirtMaps(brushCenter, hitNormal, cleanStrength);
+
         int hitCount = Physics.OverlapSphereNonAlloc(
             brushCenter,
             brushWorldSize,
@@ -90,6 +92,17 @@ public class GPUPainterWorld : MonoBehaviour
 
         foreach (GPUPaintableObject paintable in paintablesInBrush)
             UpdatePaintableTracking(paintable, brushCenter);
+    }
+
+    void PaintZoneDirtMaps(Vector3 brushCenter, Vector3 hitNormal, float cleanStrength)
+    {
+        foreach (ZoneDirtMap zoneDirtMap in ZoneDirtMap.ActiveMaps)
+        {
+            if (zoneDirtMap == null || !zoneDirtMap.ContainsWorldPoint(brushCenter))
+                continue;
+
+            zoneDirtMap.PaintAtWorldPos(brushCenter, hitNormal, brushWorldSize, cleanStrength, brushTexture);
+        }
     }
 
     public void Bind(WaterSprayTool tool)

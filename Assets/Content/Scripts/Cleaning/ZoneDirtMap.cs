@@ -20,7 +20,9 @@ public class ZoneDirtMap : MonoBehaviour
     static readonly int BrushSizeId = Shader.PropertyToID("_BrushSize");
     static readonly int StrengthId = Shader.PropertyToID("_Strength");
     static readonly int ProjectionModeId = Shader.PropertyToID("_ProjectionMode");
-    static readonly int UseZoneDirtId = Shader.PropertyToID("_UseZoneDirt");
+
+    static readonly List<ZoneDirtMap> activeMaps = new();
+    public static IReadOnlyList<ZoneDirtMap> ActiveMaps => activeMaps;
 
     static readonly string[] DefaultZoneDirtSurfaceShaderNames =
     {
@@ -35,12 +37,12 @@ public class ZoneDirtMap : MonoBehaviour
     [SerializeField] int textureResolution = 1024;
     [SerializeField, Range(0f, 1f)] float initialDirt = 1f;
     [SerializeField] Texture2D initialZoneDirtTexture;
-    [Tooltip("Optional per-axis masks. Parent DirtArea axis masks take priority when non-null.")]
     [SerializeField] Texture2D initialZoneDirtTextureXZ;
     [SerializeField] Texture2D initialZoneDirtTextureXY;
     [SerializeField] Texture2D initialZoneDirtTextureYZ;
 
     [Header("Targets")]
+    [Tooltip("Collect renderers inside the zone bounds collider that use a zone dirt surface shader.")]
     [SerializeField] bool autoCollectTargetRenderers = true;
     [Tooltip("Materials using these shaders receive zone dirt masks. Leave empty to resolve SG_ObjectDirtSimpleWorld shaders by name.")]
     [SerializeField] Shader zoneDirtSurfaceShader;
@@ -94,6 +96,9 @@ public class ZoneDirtMap : MonoBehaviour
 
     void Awake()
     {
+        if (!activeMaps.Contains(this))
+            activeMaps.Add(this);
+
         propertyBlock = new MaterialPropertyBlock();
 
         if (zoneBoundsCollider == null)
@@ -125,6 +130,8 @@ public class ZoneDirtMap : MonoBehaviour
 
     void OnDestroy()
     {
+        activeMaps.Remove(this);
+
         ReleaseTexture(zoneTextureXZ);
         ReleaseTexture(zoneTextureXY);
         ReleaseTexture(zoneTextureYZ);
@@ -161,6 +168,13 @@ public class ZoneDirtMap : MonoBehaviour
     public void CollectTargetRenderers()
     {
         targetRenderers.Clear();
+
+        if (zoneBoundsCollider == null)
+        {
+            Debug.LogWarning($"ZoneDirtMap on {name}: zone bounds collider is missing.", this);
+            return;
+        }
+
         ResolveZoneDirtSurfaceShaders();
         if (resolvedZoneDirtSurfaceShaders.Count == 0)
         {
@@ -170,10 +184,14 @@ public class ZoneDirtMap : MonoBehaviour
             return;
         }
 
-        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+        Bounds zoneBounds = zoneBoundsCollider.bounds;
+        Renderer[] renderers = FindObjectsByType<Renderer>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (Renderer renderer in renderers)
         {
-            if (renderer == null || !RendererUsesAnyShader(renderer, resolvedZoneDirtSurfaceShaders))
+            if (renderer == null || !renderer.bounds.Intersects(zoneBounds))
+                continue;
+
+            if (!RendererUsesAnyShader(renderer, resolvedZoneDirtSurfaceShaders))
                 continue;
 
             if (!targetRenderers.Contains(renderer))
@@ -217,19 +235,7 @@ public class ZoneDirtMap : MonoBehaviour
         return false;
     }
 
-    public void BindToBakeMaterial(Material material)
-    {
-        material.SetTexture(ZoneDirtTexXZId, zoneTextureXZ);
-        material.SetTexture(ZoneDirtTexXYId, zoneTextureXY);
-        material.SetTexture(ZoneDirtTexYZId, zoneTextureYZ);
-        material.SetVector(ZoneMinXZId, zoneMinXZ);
-        material.SetVector(ZoneMaxXZId, zoneMaxXZ);
-        material.SetVector(ZoneMinXYId, zoneMinXY);
-        material.SetVector(ZoneMaxXYId, zoneMaxXY);
-        material.SetVector(ZoneMinYZId, zoneMinYZ);
-        material.SetVector(ZoneMaxYZId, zoneMaxYZ);
-        material.SetFloat(UseZoneDirtId, 1f);
-    }
+    public bool ContainsWorldPoint(Vector3 worldPoint) => zoneBoundsCollider.bounds.Contains(worldPoint);
 
     public void ApplyToTargetRenderers()
     {
@@ -290,15 +296,6 @@ public class ZoneDirtMap : MonoBehaviour
 
     Texture2D ResolveInitialTextureForProjection(string suffix)
     {
-        DirtArea area = GetComponentInParent<DirtArea>();
-        Texture2D fromArea = suffix switch
-        {
-            "XZ" => area != null ? area.ZoneInitialMaskXZ : null,
-            "XY" => area != null ? area.ZoneInitialMaskXY : null,
-            "YZ" => area != null ? area.ZoneInitialMaskYZ : null,
-            _ => null
-        };
-
         Texture2D localAxis = suffix switch
         {
             "XZ" => initialZoneDirtTextureXZ,
@@ -307,8 +304,6 @@ public class ZoneDirtMap : MonoBehaviour
             _ => null
         };
 
-        if (fromArea != null)
-            return fromArea;
         if (localAxis != null)
             return localAxis;
         return initialZoneDirtTexture;

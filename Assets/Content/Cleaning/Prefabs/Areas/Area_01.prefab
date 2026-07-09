@@ -621,6 +621,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProgressBar
   fillImage: {fileID: 6759528163857299704}
   percentText: {fileID: 0}
+  descriptionText: {fileID: 0}
   smooth: 1
   smoothSpeed: 8
 --- !u!1 &2190732378261808678
@@ -921,6 +922,7 @@ MonoBehaviour:
   zoneInitialMaskXZ: {fileID: 0}
   zoneInitialMaskXY: {fileID: 0}
   zoneInitialMaskYZ: {fileID: 0}
+  jobCompletionFraction: 1
   debugCleanPercent: 10
   OnAreaProgressChanged:
     m_PersistentCalls:
@@ -1838,7 +1840,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6063691738839860865
 Transform:
   m_ObjectHideFlags: 0
@@ -1861,7 +1863,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5412928861142981497}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4353aa3f2918cf94697670b39e98595f, type: 3}
   m_Name: 

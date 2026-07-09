@@ -88,10 +88,7 @@ Shader "Hidden/ZoneDirtBrush"
                 float2 worldProjected = lerp(zoneMin, zoneMax, input.uv);
                 float distanceToBrush = distance(worldProjected, brushPos);
                 float falloff = saturate(1.0 - distanceToBrush / max(_BrushSize, 0.0001));
-
-                float2 brushUv = float2(falloff, 0.5);
-                float brushSample = tex2D(_BrushTex, brushUv).r;
-
+                float brushSample = tex2D(_BrushTex, float2(falloff, 0.5)).r;
                 float cleanAmount = brushSample * falloff * _Strength;
                 float next = saturate(current - cleanAmount);
 

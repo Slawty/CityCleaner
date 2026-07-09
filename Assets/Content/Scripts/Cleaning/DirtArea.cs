@@ -17,14 +17,6 @@ public class DirtArea : MonoBehaviour
     [SerializeField] GameObject visualBorder;
     [Header("GPU dirt")]
     [SerializeField] bool initializeGpuPaintablesOnAwake = true;
-    [Tooltip("Optional baked dirt mask per tri-planar axis for child ZoneDirtMap. When set, overrides that axis on ZoneDirtMap.")]
-    [SerializeField] Texture2D zoneInitialMaskXZ;
-    [SerializeField] Texture2D zoneInitialMaskXY;
-    [SerializeField] Texture2D zoneInitialMaskYZ;
-
-    public Texture2D ZoneInitialMaskXZ => zoneInitialMaskXZ;
-    public Texture2D ZoneInitialMaskXY => zoneInitialMaskXY;
-    public Texture2D ZoneInitialMaskYZ => zoneInitialMaskYZ;
 
     [Header("Job")]
     [SerializeField, Range(0f, 1f)] float jobCompletionFraction = 1f;
@@ -54,13 +46,11 @@ public class DirtArea : MonoBehaviour
     public float NormalizedProgress { get; private set; }
     public float JobCompletionFraction => jobCompletionFraction;
     public bool IsJobTargetActive => jobTargetActive;
-    public ZoneDirtMap ZoneDirtMap { get; private set; }
 
     void Awake()
     {
         DiscoverTargets();
-        ZoneDirtMap = GetComponentInChildren<ZoneDirtMap>();
-                totalTargets = paintables.Count + gooGrowables.Count + splitables.Count + radioactives.Count;
+        totalTargets = paintables.Count + gooGrowables.Count + splitables.Count + radioactives.Count;
         totalRadioactivetargets = radioactives.Count;
         Debug.Log($"Area {name} Total targets: {totalTargets} Radioactive targets: {totalRadioactivetargets}");
     }
@@ -148,8 +138,14 @@ public class DirtArea : MonoBehaviour
         paintables.Clear();
         gooGrowables.Clear();
         splitables.Clear();
+        radioactives.Clear();
 
-        paintables.AddRange(GetComponentsInChildren<GPUPaintableObject>());
+        foreach (GPUPaintableObject paintable in GetComponentsInChildren<GPUPaintableObject>())
+        {
+            if (paintable != null && paintable.CountsTowardAreaProgress)
+                paintables.Add(paintable);
+        }
+
         gooGrowables.AddRange(GetComponentsInChildren<GooHitGrowable>());
 
         var splittables = GetComponentsInChildren<SplitableObject>();

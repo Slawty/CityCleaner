@@ -12,7 +12,6 @@ public class GPUPaintableObject : MonoBehaviour
 {
     static readonly int DirtMaskShaderId = Shader.PropertyToID("_DirtMask");
     static readonly int LocalCleanMaskShaderId = Shader.PropertyToID("_LocalCleanMask");
-    static readonly int UseZoneDirtShaderId = Shader.PropertyToID("_UseZoneDirt");
     static readonly int JobHighlightShaderId = Shader.PropertyToID("_JobHighlight");
     static readonly int CleanFlashShaderId = Shader.PropertyToID("_CleanFlash");
 
@@ -29,6 +28,8 @@ public class GPUPaintableObject : MonoBehaviour
     [Header("Clean threshold")]
     [SerializeField] int cleanThreshold = 200;
     [SerializeField] float cleanPercentage = 0.85f;
+    [Header("Area")]
+    [SerializeField] bool countsTowardAreaProgress = true;
     [Header("Tool Interaction")]
     [SerializeField] bool allowGooCleaning = false;
     [Header("Clean Flash")]
@@ -49,6 +50,7 @@ public class GPUPaintableObject : MonoBehaviour
     Renderer cachedRenderer;
     MaterialPropertyBlock propertyBlock;
     public bool IsInitialized { get; private set; }
+    public bool CountsTowardAreaProgress => countsTowardAreaProgress;
     float nextDirtSpawn = 0f;
     float dirtSpawnStep;
     int dirtSpawnedCount = 0;
@@ -72,7 +74,7 @@ public class GPUPaintableObject : MonoBehaviour
         maskTexture = runtimeMask;
         BindMaskToRenderer(maskTexture);
 
-        BakeCoverageAndDirt();
+        BakeCoverage();
         InitializeTracking();
 
         maskReadable = new Texture2D(trackingResolution, trackingResolution, TextureFormat.R8, false);
@@ -127,32 +129,17 @@ public class GPUPaintableObject : MonoBehaviour
         cachedRenderer.SetPropertyBlock(propertyBlock);
     }
 
-    ZoneDirtMap ResolveZoneDirtMap()
-    {
-        DirtArea dirtArea = GetComponentInParent<DirtArea>();
-        if (dirtArea != null)
-            return dirtArea.ZoneDirtMap;
-
-        return GetComponentInParent<ZoneDirtMap>();
-    }
-
     // ----------------------------------------------------
-    // BAKE UV COVERAGE + ZONE DIRT (one draw, one readback)
+    // BAKE UV COVERAGE
     // ----------------------------------------------------
 
-    void BakeCoverageAndDirt()
+    void BakeCoverage()
     {
         coverageTexture = new RenderTexture(trackingResolution, trackingResolution, 0, RenderTextureFormat.ARGB32);
         coverageTexture.Create();
 
         Shader bakeShader = Shader.Find("Hidden/CoverageDirtMask");
         Material bakeMaterial = new Material(bakeShader);
-
-        ZoneDirtMap zoneDirtMap = ResolveZoneDirtMap();
-        if (zoneDirtMap != null)
-            zoneDirtMap.BindToBakeMaterial(bakeMaterial);
-        else
-            bakeMaterial.SetFloat(UseZoneDirtShaderId, 0f);
 
         CommandBuffer cmd = new CommandBuffer();
         cmd.SetRenderTarget(coverageTexture);
@@ -204,22 +191,19 @@ public class GPUPaintableObject : MonoBehaviour
         cleanedPixelCount = 0;
 
         NativeArray<byte> rawPixels = coverageReadable.GetRawTextureData<byte>();
-        bool usesZoneDirt = ResolveZoneDirtMap() != null;
 
         for (int pixelIndex = 0; pixelIndex < size; pixelIndex++)
         {
             int byteIndex = pixelIndex * 4;
             bool hasCoverage = rawPixels[byteIndex] > 0;
-            byte initialDirt = rawPixels[byteIndex + 1];
-            bool hasDirt = usesZoneDirt ? initialDirt > cleanThreshold : hasCoverage;
 
-            if (hasCoverage && hasDirt)
+            if (hasCoverage)
                 pixelsToCleanCount++;
             else
                 cleanedPixels[pixelIndex] = true;
         }
 
-        Debug.Log($"{name} dirty pixels: {pixelsToCleanCount} (zone-aware: {usesZoneDirt})");
+        Debug.Log($"{name} dirty pixels: {pixelsToCleanCount}");
 
         if (pixelsToCleanCount == 0)
         {
