@@ -5,6 +5,7 @@ Shader "Hidden/GPUPaintBrush"
         _MainTex ("Mask", 2D) = "white" {}
         _BrushTex ("Brush", 2D) = "white" {}
         _BrushWorldPos ("BrushPos", Vector) = (0,0,0,0)
+        _BrushWorldNormal ("BrushNormal", Vector) = (0,1,0,0)
         _BrushSize ("Size", Float) = 0.5
         _Strength ("Strength", Float) = 1
     }
@@ -28,6 +29,7 @@ Shader "Hidden/GPUPaintBrush"
             sampler2D _BrushTex;
 
             float3 _BrushWorldPos;
+            float3 _BrushWorldNormal;
             float _BrushSize;
             float _Strength;
 
@@ -43,6 +45,25 @@ Shader "Hidden/GPUPaintBrush"
                 float2 uv : TEXCOORD0;
                 float3 worldPos : TEXCOORD1;
             };
+
+            float2 BrushWorldUv(float3 worldPos)
+            {
+                float3 normal = normalize(_BrushWorldNormal);
+                float3 upReference = abs(normal.y) < 0.999 ? float3(0, 1, 0) : float3(1, 0, 0);
+                float3 tangent = normalize(cross(upReference, normal));
+                float3 bitangent = cross(normal, tangent);
+                float3 delta = worldPos - _BrushWorldPos;
+                float brushDiameter = max(_BrushSize * 2.0, 0.0001);
+                return float2(dot(delta, tangent), dot(delta, bitangent)) / brushDiameter + 0.5;
+            }
+
+            float SampleBrush2D(float2 brushUv)
+            {
+                if (brushUv.x < 0.0 || brushUv.x > 1.0 || brushUv.y < 0.0 || brushUv.y > 1.0)
+                    return 0.0;
+
+                return tex2D(_BrushTex, brushUv).r;
+            }
 
             v2f vert(appdata v)
             {
@@ -63,9 +84,9 @@ Shader "Hidden/GPUPaintBrush"
                 float current = tex2D(_MainTex, i.uv).r;
 
                 float dist = distance(i.worldPos, _BrushWorldPos);
-                float falloff = saturate(1 - dist / _BrushSize);
-                float brush = tex2D(_BrushTex, float2(falloff, 0.5)).r;
-                float clean = brush * falloff * _Strength;
+                float sphereFalloff = saturate(1.0 - dist / _BrushSize);
+                float splat = SampleBrush2D(BrushWorldUv(i.worldPos));
+                float clean = splat * sphereFalloff * _Strength;
                 float result = current * (1 - clean);
 
                 return float4(result, result, result, 1);

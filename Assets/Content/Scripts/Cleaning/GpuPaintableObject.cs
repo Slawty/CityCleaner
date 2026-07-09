@@ -19,7 +19,6 @@ public class GPUPaintableObject : MonoBehaviour
     public UnityAction OnProgress;
     public UnityAction OnCleaned;
     public int winCoins = 1;
-    public int winDirt = 3;
     public List<GPUPaintableObject> AdditionalObjectsToClean = new();
     public Transform CoinSpawnPos;
     [Header("Tracking Resolution")]
@@ -51,9 +50,6 @@ public class GPUPaintableObject : MonoBehaviour
     MaterialPropertyBlock propertyBlock;
     public bool IsInitialized { get; private set; }
     public bool CountsTowardAreaProgress => countsTowardAreaProgress;
-    float nextDirtSpawn = 0f;
-    float dirtSpawnStep;
-    int dirtSpawnedCount = 0;
     CancellationTokenSource cleanFlashCts;
     bool usesCleanMaterial;
 
@@ -88,13 +84,6 @@ public class GPUPaintableObject : MonoBehaviour
         mask.Create();
 
         Graphics.Blit(Texture2D.whiteTexture, mask);
-
-        if (winDirt > 0)
-        {
-            dirtSpawnStep = 1f / winDirt;
-            nextDirtSpawn = dirtSpawnStep;
-            dirtSpawnedCount = 0;
-        }
 
         Initialize(mask);
 
@@ -254,13 +243,6 @@ public class GPUPaintableObject : MonoBehaviour
 
         float currentPercent = GetCleanPercent();
 
-        while (winDirt > 0 && currentPercent >= nextDirtSpawn)
-        {
-            SpawnDirtChunk(hitPos);
-            dirtSpawnedCount++;
-            nextDirtSpawn = dirtSpawnStep * (dirtSpawnedCount + 1);
-        }
-
         if (currentPercent > cleanPercentage)
         {
             SetClean();
@@ -382,14 +364,6 @@ public class GPUPaintableObject : MonoBehaviour
         maskTexture.Release();
         Destroy(maskTexture);
         maskTexture = null;
-    }
-
-    void SpawnDirtChunk(Vector3 hitPos)
-    {
-        Vector3 dirToPlayer = (Managers.Player.transform.position - hitPos).normalized;
-        dirToPlayer.y = 1f;
-        int rngAmount = Random.Range(1, 4);
-        Managers.Spawning.SpawnTempChunks(rngAmount, hitPos + dirToPlayer * 0.15f, Vector3.up).Forget();
     }
 
     // ----------------------------------------------------

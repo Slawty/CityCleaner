@@ -56,7 +56,7 @@ public class GPUPainter : MonoBehaviour
 
     public void Paint(GPUPaintableObject paintable, Vector3 hitPos, float cleanStrength)
     {
-        PaintAtPosition(hitPos, Vector3.up, cleanStrength, paintZoneDirt: false);
+        PaintAtPosition(hitPos, Vector3.up, cleanStrength);
     }
 
     public void PaintAtPosition(Vector3 brushCenter, float cleanStrength, bool gooOnly = false)
@@ -84,7 +84,7 @@ public class GPUPainter : MonoBehaviour
             if (paintable == null || (gooOnly && !paintable.AllowGooCleaning) || !paintablesInBrush.Add(paintable))
                 continue;
 
-            ApplyBrushStroke(paintable, brushCenter, cleanStrength);
+            ApplyBrushStroke(paintable, brushCenter, hitNormal, cleanStrength);
         }
 
         if (paintablesInBrush.Count == 0 || Time.time <= nextUpdateTime)
@@ -107,7 +107,7 @@ public class GPUPainter : MonoBehaviour
         }
     }
 
-    void ApplyBrushStroke(GPUPaintableObject paintable, Vector3 brushCenter, float cleanStrength)
+    void ApplyBrushStroke(GPUPaintableObject paintable, Vector3 brushCenter, Vector3 hitNormal, float cleanStrength)
     {
         if (paintable.isClean)
             return;
@@ -121,6 +121,7 @@ public class GPUPainter : MonoBehaviour
             return;
 
         paintMaterial.SetVector("_BrushWorldPos", brushCenter);
+        paintMaterial.SetVector("_BrushWorldNormal", hitNormal);
         paintMaterial.SetFloat("_BrushSize", brushWorldSize);
         paintMaterial.SetFloat("_Strength", cleanStrength);
         paintMaterial.SetTexture("_BrushTex", brushTexture);

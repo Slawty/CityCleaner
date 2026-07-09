@@ -9,6 +9,9 @@ public class WaterSprayTool : Tool
     [SerializeField] GPUPainterWorld painter;
     public GPUPainterWorld Painter => painter;
     [SerializeField] List<ParticleSystem> sprayEffects;
+    [SerializeField] List<ParticleSystem> impactEffects;
+    [SerializeField] float impactSurfaceOffset = 0.02f;
+    [SerializeField] float impactRayDistance = 10f;
     [SerializeField] ProgressBar ammoBar;
     [SerializeField] LayerMask dirtlingHitMask = ~0;
     [SerializeField] float dirtlingRayDistance = 12f;
@@ -30,6 +33,7 @@ public class WaterSprayTool : Tool
         cam = Managers.MainCam;
         painter.Bind(this);
         RefillWater();
+        StopImpactEffects();
     }
 
     protected override void OnShootStart()
@@ -53,6 +57,7 @@ public class WaterSprayTool : Tool
             effect.Stop();
 
         painter.StopPainting();
+        StopImpactEffects();
     }
 
     void Update()
@@ -64,6 +69,7 @@ public class WaterSprayTool : Tool
         currentAmmo = Mathf.Clamp(currentAmmo, 0f, MaxAmmo);
         ammoBar.SetPercent((currentAmmo / MaxAmmo) * 100f);
 
+        HandleImpactEffects();
         HandleWaterRay();
 
         if (currentAmmo <= 0f)
@@ -75,6 +81,49 @@ public class WaterSprayTool : Tool
             }
 
             OnShootStop();
+        }
+    }
+
+    void HandleImpactEffects()
+    {
+        if (impactEffects == null || impactEffects.Count == 0)
+            return;
+
+        Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+
+        if (!Physics.Raycast(ray, out RaycastHit hit, impactRayDistance, painter.PaintMask, QueryTriggerInteraction.Ignore))
+        {
+            StopImpactEffects();
+            return;
+        }
+
+        Vector3 normal = hit.normal.sqrMagnitude > 0.0001f ? hit.normal.normalized : Vector3.up;
+        Vector3 position = hit.point + normal * impactSurfaceOffset;
+        Quaternion rotation = Quaternion.LookRotation(normal);
+
+        foreach (ParticleSystem impactEffect in impactEffects)
+        {
+            if (impactEffect == null)
+                continue;
+
+            impactEffect.transform.SetPositionAndRotation(position, rotation);
+
+            if (!impactEffect.isPlaying)
+                impactEffect.Play();
+        }
+    }
+
+    void StopImpactEffects()
+    {
+        if (impactEffects == null)
+            return;
+
+        foreach (ParticleSystem impactEffect in impactEffects)
+        {
+            if (impactEffect == null || !impactEffect.isPlaying)
+                continue;
+
+            impactEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         }
     }
 
@@ -97,6 +146,7 @@ public class WaterSprayTool : Tool
     {
         base.OnDisable();
         painter.StopPainting();
+        StopImpactEffects();
     }
 
     public void RefillWater()

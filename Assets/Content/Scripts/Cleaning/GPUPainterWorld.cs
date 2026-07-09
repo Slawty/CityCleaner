@@ -29,6 +29,8 @@ public class GPUPainterWorld : MonoBehaviour
         set => cleanSpeed = value;
     }
 
+    public LayerMask PaintMask => paintMask;
+
     readonly Collider[] overlapColliders = new Collider[OverlapBufferSize];
     readonly HashSet<GPUPaintableObject> paintablesInBrush = new();
 
@@ -82,7 +84,7 @@ public class GPUPainterWorld : MonoBehaviour
             if (paintable == null || !paintablesInBrush.Add(paintable))
                 continue;
 
-            ApplyBrushStroke(paintable, brushCenter, cleanStrength);
+            ApplyBrushStroke(paintable, brushCenter, hitNormal, cleanStrength);
         }
 
         if (paintablesInBrush.Count == 0 || Time.time <= nextUpdateTime)
@@ -120,7 +122,7 @@ public class GPUPainterWorld : MonoBehaviour
         isPainting = false;
     }
 
-    void ApplyBrushStroke(GPUPaintableObject paintable, Vector3 brushCenter, float cleanStrength)
+    void ApplyBrushStroke(GPUPaintableObject paintable, Vector3 brushCenter, Vector3 hitNormal, float cleanStrength)
     {
         if (paintable.isClean)
             return;
@@ -133,6 +135,7 @@ public class GPUPainterWorld : MonoBehaviour
             return;
 
         localPaintMaterial.SetVector("_BrushWorldPos", brushCenter);
+        localPaintMaterial.SetVector("_BrushWorldNormal", hitNormal);
         localPaintMaterial.SetFloat("_BrushSize", brushWorldSize);
         localPaintMaterial.SetFloat("_Strength", cleanStrength);
         localPaintMaterial.SetTexture("_BrushTex", brushTexture);

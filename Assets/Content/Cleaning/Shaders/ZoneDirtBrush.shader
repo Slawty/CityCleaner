@@ -56,6 +56,21 @@ Shader "Hidden/ZoneDirtBrush"
                 float2 uv : TEXCOORD0;
             };
 
+            float2 BrushZoneUv(float2 worldProjected, float2 brushPos)
+            {
+                float2 offset = worldProjected - brushPos;
+                float brushDiameter = max(_BrushSize * 2.0, 0.0001);
+                return offset / brushDiameter + 0.5;
+            }
+
+            float SampleBrush2D(float2 brushUv)
+            {
+                if (brushUv.x < 0.0 || brushUv.x > 1.0 || brushUv.y < 0.0 || brushUv.y > 1.0)
+                    return 0.0;
+
+                return tex2D(_BrushTex, brushUv).r;
+            }
+
             Varyings Vert(Attributes input)
             {
                 Varyings output;
@@ -86,10 +101,10 @@ Shader "Hidden/ZoneDirtBrush"
                 }
 
                 float2 worldProjected = lerp(zoneMin, zoneMax, input.uv);
-                float distanceToBrush = distance(worldProjected, brushPos);
-                float falloff = saturate(1.0 - distanceToBrush / max(_BrushSize, 0.0001));
-                float brushSample = tex2D(_BrushTex, float2(falloff, 0.5)).r;
-                float cleanAmount = brushSample * falloff * _Strength;
+                float dist = distance(worldProjected, brushPos);
+                float sphereFalloff = saturate(1.0 - dist / max(_BrushSize, 0.0001));
+                float splat = SampleBrush2D(BrushZoneUv(worldProjected, brushPos));
+                float cleanAmount = splat * sphereFalloff * _Strength;
                 float next = saturate(current - cleanAmount);
 
                 return float4(next, next, next, 1);
