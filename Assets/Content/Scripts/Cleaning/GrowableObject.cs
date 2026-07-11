@@ -33,6 +33,26 @@ public class GrowableObject : GooHitGrowable
         CleanShaders();
     }
 
+    protected override void OnDebugResetGrowth()
+    {
+        DirtyShaders();
+    }
+
+    void DirtyShaders()
+    {
+        foreach (Renderer renderer in cleanRenderers)
+        {
+            if (renderer == null)
+                continue;
+
+            foreach (Material material in renderer.materials)
+            {
+                if (material.HasProperty("_DirtAmount"))
+                    material.SetFloat("_DirtAmount", 1f);
+            }
+        }
+    }
+
     protected override void ApplyGrowth(float progress, float hitMultiplier)
     {
         if (growObject == null)

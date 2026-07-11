@@ -34,6 +34,8 @@ public class GPUPaintableObject : MonoBehaviour
     [Header("Clean Flash")]
     const float cleanFlashDuration = 1f;
     const float cleanFlashPeak = 1f;
+    const string OutlineLayerName = "Outline";
+    static int outlineLayer = -1;
     public RenderTexture maskTexture;
     public RenderTexture coverageTexture;
     public Texture2D coverageReadable;
@@ -45,6 +47,7 @@ public class GPUPaintableObject : MonoBehaviour
 
     int pixelsToCleanCount;
     int cleanedPixelCount;
+    int defaultLayer;
     Mesh mesh;
     Renderer cachedRenderer;
     MaterialPropertyBlock propertyBlock;
@@ -58,6 +61,38 @@ public class GPUPaintableObject : MonoBehaviour
         mesh = GetComponent<MeshFilter>().sharedMesh;
         cachedRenderer = GetComponent<Renderer>();
         propertyBlock = new MaterialPropertyBlock();
+        defaultLayer = gameObject.layer;
+    }
+
+    public void SetAimOutline(bool enabled)
+    {
+        gameObject.layer = enabled ? GetOutlineLayer() : defaultLayer;
+    }
+
+    static int GetOutlineLayer()
+    {
+        if (outlineLayer >= 0)
+            return outlineLayer;
+
+        outlineLayer = LayerMask.NameToLayer(OutlineLayerName);
+        if (outlineLayer < 0)
+            throw new System.InvalidOperationException($"Layer '{OutlineLayerName}' is missing. Add it in Project Settings > Tags and Layers.");
+
+        return outlineLayer;
+    }
+
+    public static LayerMask IncludeOutlineLayer(LayerMask mask)
+    {
+        int layer = LayerMask.NameToLayer(OutlineLayerName);
+        if (layer < 0)
+            return mask;
+
+        return mask | (1 << layer);
+    }
+
+    void OnDisable()
+    {
+        SetAimOutline(false);
     }
 
     // ----------------------------------------------------

@@ -21,41 +21,61 @@ public class GrassPatch : GooHitGrowable
 
     void Awake()
     {
-        mpb = new MaterialPropertyBlock();
+        EnsureMpb();
         InitializeGrowable();
+    }
+
+    void EnsureMpb()
+    {
+        mpb ??= new MaterialPropertyBlock();
     }
 
     protected override void ApplyGrowth(float progress, float hitMultiplier)
     {
+        EnsureMpb();
+
         float baseStrength = Mathf.Lerp(minStrength, maxStrength, progress);
         float bumpedStrength = Mathf.Clamp01(baseStrength * hitMultiplier);
         mpb.SetFloat(growStrengthID, bumpedStrength);
 
-        for (int i = 0; i < growableRenderers.Count; i++)
+        if (growableRenderers != null)
         {
-            if (growableRenderers[i] == null)
-                continue;
+            for (int i = 0; i < growableRenderers.Count; i++)
+            {
+                if (growableRenderers[i] == null)
+                    continue;
 
-            growableRenderers[i].SetPropertyBlock(mpb);
+                growableRenderers[i].SetPropertyBlock(mpb);
+            }
         }
 
-
         mpb.SetFloat(dirtStrengthID, 1 - progress);
-        foreach (var renderer in cleanRenderers)
+        if (cleanRenderers == null)
+            return;
+
+        foreach (Renderer renderer in cleanRenderers)
         {
+            if (renderer == null)
+                continue;
+
             renderer.SetPropertyBlock(mpb);
-            // renderer.material.SetFloat(dirtStrengthID, 0f);
         }
     }
 
     protected override void OnFullyGrown()
     {
-        Debug.Log("OnFullyGrown");
-        foreach (var renderer in cleanRenderers)
+        EnsureMpb();
+
+        if (cleanRenderers == null)
+            return;
+
+        foreach (Renderer renderer in cleanRenderers)
         {
+            if (renderer == null)
+                continue;
+
             mpb.SetFloat(dirtStrengthID, 0);
             renderer.SetPropertyBlock(mpb);
-            // renderer.material.SetFloat(dirtStrengthID, 0f);
         }
     }
 }

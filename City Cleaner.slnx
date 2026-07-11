@@ -1,8 +1,10 @@
 ﻿<Solution>
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Deform.csproj" />
+  <Project Path="LineworkLite.csproj" />
   <Project Path="DeformEditor.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="LineworkLite.Editor.csproj" />
   <Project Path="Beans.Unity.Editor.csproj" />
   <Project Path="Beans.Unity.Mathematics.csproj" />
   <Project Path="Beans.Unity.Collections.csproj" />

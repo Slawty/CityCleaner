@@ -6424,7 +6424,7 @@ MonoBehaviour:
   materials:
   - {fileID: 2100000, guid: 945bfbb1de35f854eab5a26c7844fbc9, type: 2}
   - {fileID: 2100000, guid: dafa4dc716ce7aa42ad0ad427503dfde, type: 2}
-  previewDirty: 1
+  previewDirty: 0
 --- !u!1 &343724865
 GameObject:
   m_ObjectHideFlags: 0
@@ -36866,6 +36866,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1607882684}
   - component: {fileID: 1607882683}
+  - component: {fileID: 1607882685}
   m_Layer: 0
   m_Name: Job Target Highlighter
   m_TagString: Untagged
@@ -36904,6 +36905,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 100014701}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1607882685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1607882682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c4e9a1b2d3f4056a8b9c0d1e2f3a4b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PaintTargetHighlighter
+  painter: {fileID: 8777165808046631630}
+  rayDistance: 12
 --- !u!1 &1619599511
 GameObject:
   m_ObjectHideFlags: 0

@@ -30,6 +30,7 @@ public class GPUPainterWorld : MonoBehaviour
     }
 
     public LayerMask PaintMask => paintMask;
+    public bool IsPainting => isPainting;
 
     readonly Collider[] overlapColliders = new Collider[OverlapBufferSize];
     readonly HashSet<GPUPaintableObject> paintablesInBrush = new();
@@ -42,6 +43,7 @@ public class GPUPainterWorld : MonoBehaviour
     void Awake()
     {
         localPaintMaterial = new Material(Shader.Find("Hidden/GPUPaintBrush"));
+        paintMask = GPUPaintableObject.IncludeOutlineLayer(paintMask);
     }
 
     void Update()

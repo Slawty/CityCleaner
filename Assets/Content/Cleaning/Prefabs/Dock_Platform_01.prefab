@@ -172,6 +172,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d97888bd447058141b94b9b41444fd26, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8638771196471028272}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d97888bd447058141b94b9b41444fd26, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5220236530665812739}
   m_SourcePrefab: {fileID: 100100000, guid: d97888bd447058141b94b9b41444fd26, type: 3}
 --- !u!1 &1185794862696735970 stripped
 GameObject:
@@ -191,12 +194,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
   winCoins: 1
-  winDirt: 3
   AdditionalObjectsToClean: []
   CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
   allowGooCleaning: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
@@ -225,6 +228,26 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -5343242045132012130, guid: d97888bd447058141b94b9b41444fd26, type: 3}
+--- !u!114 &5220236530665812739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185794862696735970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 0
+  m_AffectedAgents: ffffffff
 --- !u!4 &1963317140504575576 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d97888bd447058141b94b9b41444fd26, type: 3}

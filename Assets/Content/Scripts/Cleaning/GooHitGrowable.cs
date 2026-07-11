@@ -65,6 +65,21 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
         OnFullyGrownCompleted?.Invoke();
     }
 
+    public void DebugResetGrowth()
+    {
+        if (growthProgress <= 0f && !fullyGrown)
+            return;
+
+        bumpTween?.Kill();
+        bumpMultiplier = 1f;
+        gooHitCount = 0;
+        growthProgress = 0f;
+        fullyGrown = false;
+
+        ApplyGrowth(growthProgress, bumpMultiplier);
+        OnDebugResetGrowth();
+    }
+
     public void OnGooHit(Vector3 hitPoint, GameObject source)
     {
         HashSet<GooHitGrowable> visited = new();
@@ -132,6 +147,8 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
     }
 
     protected virtual void OnFullyGrown() { }
+
+    protected virtual void OnDebugResetGrowth() { }
 
     protected abstract void ApplyGrowth(float progress, float hitMultiplier);
 }
