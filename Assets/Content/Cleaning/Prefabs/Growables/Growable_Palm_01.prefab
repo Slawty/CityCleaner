@@ -98,15 +98,15 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2777551037330341244, guid: c28a58f122338a044a5275de005e86e7, type: 3}
-      propertyPath: cleanRenderers.Array.size
-      value: 3
+      propertyPath: growableDirtRenderers.Array.size
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2777551037330341244, guid: c28a58f122338a044a5275de005e86e7, type: 3}
-      propertyPath: 'cleanRenderers.Array.data[1]'
+      propertyPath: growableDirtRenderers.Array.data[0]
       value: 
       objectReference: {fileID: 7201613990192087751}
     - target: {fileID: 2777551037330341244, guid: c28a58f122338a044a5275de005e86e7, type: 3}
-      propertyPath: 'cleanRenderers.Array.data[2]'
+      propertyPath: growableDirtRenderers.Array.data[1]
       value: 
       objectReference: {fileID: 149489076919405953}
     - target: {fileID: 7518720188399448207, guid: c28a58f122338a044a5275de005e86e7, type: 3}

@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using System.Threading;
-using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Events;
 using Unity.Collections;
-using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Renderer))]
 [RequireComponent(typeof(MeshFilter))]
@@ -14,6 +12,7 @@ public class GPUPaintableObject : MonoBehaviour
     static readonly int LocalCleanMaskShaderId = Shader.PropertyToID("_LocalCleanMask");
     static readonly int JobHighlightShaderId = Shader.PropertyToID("_JobHighlight");
     static readonly int CleanFlashShaderId = Shader.PropertyToID("_CleanFlash");
+    static readonly int GooReadyGlowShaderId = Shader.PropertyToID("_GooReadyGlow");
 
     public UnityAction OnInitialize;
     public UnityAction OnProgress;
@@ -31,9 +30,9 @@ public class GPUPaintableObject : MonoBehaviour
     [SerializeField] bool countsTowardAreaProgress = true;
     [Header("Tool Interaction")]
     [SerializeField] bool allowGooCleaning = false;
-    [Header("Clean Flash")]
-    const float cleanFlashDuration = 1f;
-    const float cleanFlashPeak = 1f;
+    [Header("Growable")]
+    [SerializeField] bool deferCleanMaterialSwapUntilGrowComplete;
+
     const string OutlineLayerName = "Outline";
     static int outlineLayer = -1;
     public RenderTexture maskTexture;
@@ -53,14 +52,23 @@ public class GPUPaintableObject : MonoBehaviour
     MaterialPropertyBlock propertyBlock;
     public bool IsInitialized { get; private set; }
     public bool CountsTowardAreaProgress => countsTowardAreaProgress;
-    CancellationTokenSource cleanFlashCts;
+    public bool DeferCleanMaterialSwapUntilGrowComplete
+    {
+        get => deferCleanMaterialSwapUntilGrowComplete;
+        set => deferCleanMaterialSwapUntilGrowComplete = value;
+    }
+
+    readonly CleanFlashPlayer cleanFlashPlayer = new();
+    Renderer[] flashRenderers;
     bool usesCleanMaterial;
+    bool pendingMaterialFinalize;
 
     void Awake()
     {
         mesh = GetComponent<MeshFilter>().sharedMesh;
         cachedRenderer = GetComponent<Renderer>();
         propertyBlock = new MaterialPropertyBlock();
+        flashRenderers = new[] { cachedRenderer };
         defaultLayer = gameObject.layer;
     }
 
@@ -153,6 +161,48 @@ public class GPUPaintableObject : MonoBehaviour
         cachedRenderer.SetPropertyBlock(propertyBlock);
     }
 
+    public void SetGooReadyGlow(float amount)
+    {
+        if (usesCleanMaterial)
+            return;
+
+        cachedRenderer.GetPropertyBlock(propertyBlock);
+        propertyBlock.SetFloat(GooReadyGlowShaderId, Mathf.Clamp01(amount));
+        cachedRenderer.SetPropertyBlock(propertyBlock);
+    }
+
+    public void FinalizeCleanMaterial()
+    {
+        SetGooReadyGlow(0f);
+
+        if (usesCleanMaterial)
+            return;
+
+        PlayCleanFlash(finalizeAfterFlash: true);
+    }
+
+    public void FinalizeCleanMaterialWithoutFlash()
+    {
+        SetGooReadyGlow(0f);
+
+        if (usesCleanMaterial)
+            return;
+
+        if (CanSwapToCleanMaterial())
+            SwapToCleanMaterial();
+        else
+            ReleaseMaskTexture();
+    }
+
+    public void StopCleanFlash()
+    {
+        cleanFlashPlayer.Stop(invalidateRunning: true);
+        if (!usesCleanMaterial && flashRenderers != null)
+            cleanFlashPlayer.ResetFlash(flashRenderers);
+    }
+
+    public Renderer GetFlashRenderer() => cachedRenderer;
+
     // ----------------------------------------------------
     // BAKE UV COVERAGE
     // ----------------------------------------------------
@@ -196,7 +246,10 @@ public class GPUPaintableObject : MonoBehaviour
 
     void OnDestroy()
     {
-        CancelCleanFlash();
+        cleanFlashPlayer.Stop(invalidateRunning: true);
+        if (!usesCleanMaterial && flashRenderers != null)
+            cleanFlashPlayer.ResetFlash(flashRenderers);
+
         if (coverageData.IsCreated)
             coverageData.Dispose();
     }
@@ -308,52 +361,38 @@ public class GPUPaintableObject : MonoBehaviour
         RenderTexture.active = maskTexture;
         GL.Clear(true, true, Color.black);
         RenderTexture.active = null;
-        PlayCleanFlash();
+        if (!deferCleanMaterialSwapUntilGrowComplete)
+            PlayCleanFlash();
+
         OnCleaned?.Invoke();
     }
 
-    void PlayCleanFlash()
+    void PlayCleanFlash(bool finalizeAfterFlash = false)
     {
-        CancelCleanFlash();
-        cleanFlashCts = new CancellationTokenSource();
-        PlayCleanFlashAsync(cleanFlashCts.Token).Forget();
+        if (usesCleanMaterial)
+            return;
+
+        pendingMaterialFinalize = finalizeAfterFlash;
+        cleanFlashPlayer.Play(flashRenderers, OnCleanFlashComplete);
     }
 
-    async UniTaskVoid PlayCleanFlashAsync(CancellationToken cancellationToken)
+    void OnCleanFlashComplete()
     {
-        try
+        if (pendingMaterialFinalize)
         {
-            float elapsed = 0f;
-
-            while (elapsed < cleanFlashDuration)
-            {
-                elapsed += Time.deltaTime;
-                float normalizedTime = elapsed / cleanFlashDuration;
-                float fade = 1f - normalizedTime;
-                SetCleanFlash(cleanFlashPeak * fade * fade);
-                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
-            }
-
-            SetCleanFlash(0f);
+            pendingMaterialFinalize = false;
 
             if (CanSwapToCleanMaterial())
                 SwapToCleanMaterial();
             else
                 ReleaseMaskTexture();
         }
-        catch (System.OperationCanceledException)
-        {
-        }
-    }
-
-    void CancelCleanFlash()
-    {
-        if (cleanFlashCts == null)
-            return;
-
-        cleanFlashCts.Cancel();
-        cleanFlashCts.Dispose();
-        cleanFlashCts = null;
+        else if (deferCleanMaterialSwapUntilGrowComplete)
+            ReleaseMaskTexture();
+        else if (CanSwapToCleanMaterial())
+            SwapToCleanMaterial();
+        else
+            ReleaseMaskTexture();
     }
 
     bool CanSwapToCleanMaterial()

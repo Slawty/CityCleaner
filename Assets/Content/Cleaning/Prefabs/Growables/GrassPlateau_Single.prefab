@@ -83,14 +83,12 @@ PrefabInstance:
       insertIndex: 1
       addedObject: {fileID: 7286229025738350371}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: eb4ce500d40a74e43a4741f3cabba401, type: 3}
+      insertIndex: 2
+      addedObject: {fileID: 5332805013245762691}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: eb4ce500d40a74e43a4741f3cabba401, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8358561476041726029}
+      addedObject: {fileID: -8891682282931336797}
   m_SourcePrefab: {fileID: 100100000, guid: eb4ce500d40a74e43a4741f3cabba401, type: 3}
---- !u!23 &473598736246196669 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: eb4ce500d40a74e43a4741f3cabba401, type: 3}
-  m_PrefabInstance: {fileID: 1248370294950057273}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1646526729417175762 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: eb4ce500d40a74e43a4741f3cabba401, type: 3}
@@ -120,17 +118,43 @@ MonoBehaviour:
   bumpPeakAt: 0.35
   bumpUpEase: 27
   bumpDownEase: 6
+  prerequisiteCleanables:
+  - {fileID: 5332805013245762691}
   linkedGrowables: []
   growableRenderers:
   - {fileID: 6216325578573635327}
-  cleanRenderers:
-  - {fileID: 473598736246196669}
+  growableDirtRenderers:
+  - {fileID: 6216325578573635327}
   minStrength: 0
   maxStrength: 1
-  cleanStrengthWhileGrowing: 0
-  cleanStrengthWhenFullyGrown: 1
---- !u!65 &8358561476041726029
-BoxCollider:
+--- !u!114 &5332805013245762691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130893094208989288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
+  winCoins: 1
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
+  trackingResolution: 128
+  cleanThreshold: 200
+  cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
+  allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
+  maskTexture: {fileID: 0}
+  coverageTexture: {fileID: 0}
+  coverageReadable: {fileID: 0}
+  maskReadable: {fileID: 0}
+  isClean: 0
+--- !u!64 &-8891682282931336797
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -147,9 +171,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.5, y: 0.22381617, z: 2.500002}
-  m_Center: {x: -1.2499993, y: 0.10912136, z: 1.2500019}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 7728355666621819869, guid: eb4ce500d40a74e43a4741f3cabba401, type: 3}
 --- !u!1001 &4721257352780366459
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -83,8 +83,11 @@ PrefabInstance:
       insertIndex: 1
       addedObject: {fileID: 7208381808756612936}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 29d29ec6475aa8e4b8e2ed5580a11248, type: 3}
+      insertIndex: 2
+      addedObject: {fileID: -1131028874922064015}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 29d29ec6475aa8e4b8e2ed5580a11248, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 815156486452928989}
+      addedObject: {fileID: 3603023595001936118}
   m_SourcePrefab: {fileID: 100100000, guid: 29d29ec6475aa8e4b8e2ed5580a11248, type: 3}
 --- !u!1 &236382252799077752 stripped
 GameObject:
@@ -110,17 +113,43 @@ MonoBehaviour:
   bumpPeakAt: 0.35
   bumpUpEase: 27
   bumpDownEase: 6
+  prerequisiteCleanables:
+  - {fileID: -1131028874922064015}
   linkedGrowables: []
   growableRenderers:
   - {fileID: 8024460985096928829}
-  cleanRenderers:
-  - {fileID: 1749419860563332269}
+  growableDirtRenderers:
+  - {fileID: 8024460985096928829}
   minStrength: 0
   maxStrength: 1
-  cleanStrengthWhileGrowing: 0
-  cleanStrengthWhenFullyGrown: 1
---- !u!65 &815156486452928989
-BoxCollider:
+--- !u!114 &-1131028874922064015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236382252799077752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
+  winCoins: 1
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
+  trackingResolution: 128
+  cleanThreshold: 200
+  cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
+  allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
+  maskTexture: {fileID: 0}
+  coverageTexture: {fileID: 0}
+  coverageReadable: {fileID: 0}
+  maskReadable: {fileID: 0}
+  isClean: 0
+--- !u!64 &3603023595001936118
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -137,17 +166,13 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.5, y: 0.22381617, z: 2.500002}
-  m_Center: {x: -1.2499993, y: 0.10912136, z: 1.2500019}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 1589138809138916731, guid: 29d29ec6475aa8e4b8e2ed5580a11248, type: 3}
 --- !u!4 &579870082511665090 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 29d29ec6475aa8e4b8e2ed5580a11248, type: 3}
-  m_PrefabInstance: {fileID: 1118763775550722089}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &1749419860563332269 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 29d29ec6475aa8e4b8e2ed5580a11248, type: 3}
   m_PrefabInstance: {fileID: 1118763775550722089}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8691113172138746553

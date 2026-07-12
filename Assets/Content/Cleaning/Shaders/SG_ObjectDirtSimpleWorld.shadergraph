@@ -2841,10 +2841,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -445.99993896484377,
-            "y": 970.0000610351563,
-            "width": 159.99996948242188,
-            "height": 33.9998779296875
+            "x": -381.0,
+            "y": 1023.0000610351563,
+            "width": 160.0,
+            "height": 34.00006103515625
         }
     },
     "m_Slots": [
@@ -3220,6 +3220,9 @@
             "m_Id": "3bde0a4208c740a48ebe97b73850a64a"
         },
         {
+            "m_Id": "bd122edb15b24415888d377464c09ec1"
+        },
+        {
             "m_Id": "21ad295e27c04b769825f02604cb8ed9"
         },
         {
@@ -3246,14 +3249,16 @@
         "b1f5f12a-433d-4ef9-9678-5295a7b08fa7",
         "a4602794-792f-418c-8b33-7c500620e0ad",
         "45eb952f-a507-4397-8aa3-c2b9a76fe77a",
-        "28bdabb5-0bf6-4892-9ea0-84a2414a0d19"
+        "28bdabb5-0bf6-4892-9ea0-84a2414a0d19",
+        "4262fa2d-2666-4245-a2c4-6f60ea515259"
     ],
     "m_PropertyIds": [
         1633924426,
         -841909722,
         410012982,
         -983958523,
-        -609858916
+        -609858916,
+        958023939
     ],
     "m_Dropdowns": [],
     "m_DropdownSelectedEntries": []
@@ -6191,12 +6196,12 @@
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "3bde0a4208c740a48ebe97b73850a64a",
     "m_Id": -609858916,
-    "m_DisplayName": "_RepeatSpeed",
+    "m_DisplayName": "_SweepDuration",
     "m_SlotType": 0,
     "m_Hidden": false,
-    "m_ShaderOutputName": "_RepeatSpeed",
+    "m_ShaderOutputName": "_SweepDuration",
     "m_StageCapability": 3,
-    "m_Value": 0.25,
+    "m_Value": 2.0,
     "m_DefaultValue": 0.0,
     "m_Labels": [],
     "m_LiteralMode": false
@@ -8772,7 +8777,7 @@
     "m_Title": "XZ (top down) projection world UV",
     "m_Position": {
         "x": -4842.0,
-        "y": -1567.9998779296875
+        "y": -1567.999755859375
     }
 }
 
@@ -10035,7 +10040,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "_SweepSpeed",
     "m_StageCapability": 3,
-    "m_Value": 0.33000001311302187,
+    "m_Value": 1.0,
     "m_DefaultValue": 0.0,
     "m_Labels": [],
     "m_LiteralMode": false
@@ -12161,7 +12166,7 @@
     "m_Title": "Triplanar weights from world normal",
     "m_Position": {
         "x": -4950.0,
-        "y": 117.00001525878906
+        "y": 116.99998474121094
     }
 }
 
@@ -13466,6 +13471,22 @@
 }
 
 {
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "bd122edb15b24415888d377464c09ec1",
+    "m_Id": 958023939,
+    "m_DisplayName": "_PauseDuration",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "_PauseDuration",
+    "m_StageCapability": 3,
+    "m_Value": 0.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": [],
+    "m_LiteralMode": false
+}
+
+{
     "m_SGVersion": 1,
     "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
     "m_ObjectId": "bd13c89e9d954be484d7b6b8a748e195",
@@ -13740,7 +13761,7 @@
     "m_Title": "Debug View: 0 = Final, 1 = GlobalDirt, 2 = localDirt",
     "m_Position": {
         "x": -2550.0,
-        "y": 934.9999389648438
+        "y": 935.0
     }
 }
 

@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Atlas_2Sided
-  m_Shader: {fileID: -6465566751694194690, guid: eebc13ac7bc4c534dba49d481f788c87, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 6952a00f9b0dc154cadb0298a2cb7923, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -101,6 +101,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Normals:
         m_Texture: {fileID: 2800000, guid: 2c30882dd19aae44fa6673b751720d31, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -160,6 +164,7 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
+    - _CleanFlash: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -167,7 +172,7 @@ Material:
     - _DebugView: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DirtAmount: 0
+    - _DirtAmount: 1
     - _DirtMetallic: 0
     - _DirtMetallicStrength: 0
     - _DirtNoiseOffset: 1.995
@@ -185,10 +190,13 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _GooReadyGlow: 0
+    - _JobHighlight: 0
     - _MaskScale: 1
     - _Metallic: 0
     - _NormalStrength: 0.08
     - _OcclusionStrength: 1
+    - _OutlineSize: 0
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -204,6 +212,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseTint: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DirtDefaultTiling: {r: 1, g: 1, b: 0, a: 0}
     - _DirtTiling: {r: 5, g: 5, b: 0, a: 0}

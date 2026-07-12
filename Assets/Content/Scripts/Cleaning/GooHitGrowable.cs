@@ -16,11 +16,15 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
     [SerializeField] Ease bumpUpEase = Ease.OutBack;
     [SerializeField] Ease bumpDownEase = Ease.OutQuad;
 
+    [Header("Clean Before Goo")]
+    [SerializeField] protected List<GPUPaintableObject> prerequisiteCleanables = new();
+
     [Header("Linked Growables")]
     [SerializeField] List<GooHitGrowable> linkedGrowables = new();
 
     int gooHitCount;
     bool fullyGrown;
+    bool prerequisitesSubscribed;
     float bumpMultiplier = 1f;
     Tween bumpTween;
 
@@ -29,11 +33,12 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
 
     public bool IsFullyGrown => fullyGrown;
 
+    public bool IsReadyForGoo => prerequisiteCleanables.Count == 0 || AllPrerequisitesClean();
+
     public UnityAction OnGrowthProgressChanged;
 
     /// <summary>Fires once when growth reaches 100% (including linked propagation).</summary>
     public UnityAction OnFullyGrownCompleted;
-
 
     protected void InitializeGrowable()
     {
@@ -43,9 +48,23 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
             gooHitCount = Mathf.Max(1, hitsToFullGrowth);
     }
 
+    void Start()
+    {
+        ConfigurePrerequisitePaintables();
+        SubscribePrerequisites();
+        SyncGooReadyVisualState();
+    }
+
+    protected virtual void OnEnable()
+    {
+        SubscribePrerequisites();
+        SyncGooReadyVisualState();
+    }
+
     protected virtual void OnDisable()
     {
         bumpTween?.Kill();
+        UnsubscribePrerequisites();
     }
 
     public void DebugSetFullyGrown()
@@ -78,10 +97,14 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
 
         ApplyGrowth(growthProgress, bumpMultiplier);
         OnDebugResetGrowth();
+        SyncGooReadyVisualState();
     }
 
     public void OnGooHit(Vector3 hitPoint, GameObject source)
     {
+        if (!IsReadyForGoo)
+            return;
+
         HashSet<GooHitGrowable> visited = new();
         PropagateHit(visited);
     }
@@ -89,6 +112,9 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
     void PropagateHit(HashSet<GooHitGrowable> visited)
     {
         if (!visited.Add(this))
+            return;
+
+        if (!IsReadyForGoo)
             return;
 
         ApplyHit();
@@ -146,7 +172,193 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
             }, 1f, downDuration).SetEase(bumpDownEase));
     }
 
-    protected virtual void OnFullyGrown() { }
+    protected virtual void ConfigurePrerequisitePaintables()
+    {
+        for (int i = 0; i < prerequisiteCleanables.Count; i++)
+        {
+            GPUPaintableObject paintable = prerequisiteCleanables[i];
+            if (paintable == null)
+                continue;
+
+            paintable.DeferCleanMaterialSwapUntilGrowComplete = true;
+        }
+    }
+
+    void SubscribePrerequisites()
+    {
+        if (prerequisitesSubscribed)
+            return;
+
+        prerequisitesSubscribed = true;
+
+        for (int i = 0; i < prerequisiteCleanables.Count; i++)
+        {
+            GPUPaintableObject paintable = prerequisiteCleanables[i];
+            if (paintable == null)
+                continue;
+
+            paintable.OnCleaned += OnPrerequisiteCleaned;
+        }
+    }
+
+    void UnsubscribePrerequisites()
+    {
+        if (!prerequisitesSubscribed)
+            return;
+
+        prerequisitesSubscribed = false;
+
+        for (int i = 0; i < prerequisiteCleanables.Count; i++)
+        {
+            GPUPaintableObject paintable = prerequisiteCleanables[i];
+            if (paintable == null)
+                continue;
+
+            paintable.OnCleaned -= OnPrerequisiteCleaned;
+        }
+    }
+
+    void OnPrerequisiteCleaned()
+    {
+        if (fullyGrown)
+            return;
+
+        OnPrerequisiteCleanedVisual();
+        EnableGooReadyGlow();
+    }
+
+    protected virtual void OnPrerequisiteCleanedVisual() { }
+
+    void SyncGooReadyVisualState()
+    {
+        if (fullyGrown)
+        {
+            DisableGooReadyGlow();
+            FinalizePrerequisiteCleanables();
+            return;
+        }
+
+        if (IsReadyForGoo)
+            EnableGooReadyGlow();
+        else
+            DisableGooReadyGlow();
+    }
+
+    bool AllPrerequisitesClean()
+    {
+        for (int i = 0; i < prerequisiteCleanables.Count; i++)
+        {
+            GPUPaintableObject paintable = prerequisiteCleanables[i];
+            if (paintable != null && !paintable.isClean)
+                return false;
+        }
+
+        return true;
+    }
+
+    void EnableGooReadyGlow()
+    {
+        for (int i = 0; i < prerequisiteCleanables.Count; i++)
+        {
+            GPUPaintableObject paintable = prerequisiteCleanables[i];
+            if (paintable == null || !paintable.isClean)
+                continue;
+
+            paintable.SetGooReadyGlow(1f);
+        }
+    }
+
+    void DisableGooReadyGlow()
+    {
+        for (int i = 0; i < prerequisiteCleanables.Count; i++)
+        {
+            GPUPaintableObject paintable = prerequisiteCleanables[i];
+            if (paintable == null)
+                continue;
+
+            paintable.SetGooReadyGlow(0f);
+        }
+    }
+
+    void FinalizePrerequisiteCleanables()
+    {
+        for (int i = 0; i < prerequisiteCleanables.Count; i++)
+        {
+            GPUPaintableObject paintable = prerequisiteCleanables[i];
+            if (paintable == null || !paintable.isClean)
+                continue;
+
+            paintable.FinalizeCleanMaterial();
+        }
+    }
+
+    protected IReadOnlyList<GooHitGrowable> LinkedGrowables => linkedGrowables;
+
+    protected void CollectPrerequisiteFlashRenderers(List<Renderer> buffer)
+    {
+        for (int i = 0; i < prerequisiteCleanables.Count; i++)
+        {
+            GPUPaintableObject paintable = prerequisiteCleanables[i];
+            if (paintable == null)
+                continue;
+
+            Renderer renderer = paintable.GetFlashRenderer();
+            if (renderer == null || buffer.Contains(renderer))
+                continue;
+
+            buffer.Add(renderer);
+        }
+    }
+
+    protected static void AddUniqueRenderers(List<Renderer> buffer, List<Renderer> renderers)
+    {
+        if (renderers == null)
+            return;
+
+        for (int i = 0; i < renderers.Count; i++)
+        {
+            Renderer renderer = renderers[i];
+            if (renderer == null || buffer.Contains(renderer))
+                continue;
+
+            buffer.Add(renderer);
+        }
+    }
+
+    protected void StopPrerequisiteCleanFlashes()
+    {
+        for (int i = 0; i < prerequisiteCleanables.Count; i++)
+        {
+            GPUPaintableObject paintable = prerequisiteCleanables[i];
+            if (paintable == null)
+                continue;
+
+            paintable.StopCleanFlash();
+        }
+    }
+
+    protected void FinalizePrerequisiteCleanablesWithoutFlash()
+    {
+        for (int i = 0; i < prerequisiteCleanables.Count; i++)
+        {
+            GPUPaintableObject paintable = prerequisiteCleanables[i];
+            if (paintable == null || !paintable.isClean)
+                continue;
+
+            paintable.FinalizeCleanMaterialWithoutFlash();
+        }
+    }
+
+    protected void DisablePrerequisiteGlow()
+    {
+        DisableGooReadyGlow();
+    }
+
+    protected virtual void OnFullyGrown()
+    {
+        DisableGooReadyGlow();
+        FinalizePrerequisiteCleanables();
+    }
 
     protected virtual void OnDebugResetGrowth() { }
 

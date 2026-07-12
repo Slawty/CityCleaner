@@ -110,6 +110,7 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
+    - _CleanFlash: 0
     - _CleanStrength: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
@@ -127,6 +128,7 @@ Material:
     - _GlossyReflections: 0
     - _GrowStrength: 0
     - _GrowthBaseY: 0
+    - _JobHighlight: 0
     - _MaskScale: 0.2
     - _MaxHeight: 0.75
     - _Metallic: 0

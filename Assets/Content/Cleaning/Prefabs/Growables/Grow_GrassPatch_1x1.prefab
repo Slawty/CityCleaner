@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 222163358268968832}
   - component: {fileID: 5038553866092946813}
   - component: {fileID: 1394713169489305368}
+  - component: {fileID: 4182746193847291836}
   - component: {fileID: 6297561829878118210}
   m_Layer: 0
   m_Name: Grow_GrassPatch_1x1
@@ -58,14 +59,13 @@ MonoBehaviour:
   bumpUpEase: 27
   bumpDownEase: 6
   linkedGrowables: []
+  prerequisiteCleanables:
+  - {fileID: 4182746193847291836}
   growableRenderers:
   - {fileID: 1853561475143949766}
-  cleanRenderers:
-  - {fileID: 5038553866092946813}
+  growableDirtRenderers: []
   minStrength: 0
   maxStrength: 1
-  cleanStrengthWhileGrowing: 0
-  cleanStrengthWhenFullyGrown: 1
 --- !u!33 &222163358268968832
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -144,6 +144,32 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.4999914, y: 0.10060741, z: 2.4999998}
   m_Center: {x: -1.2499957, y: -0.04221289, z: 1.2499999}
+--- !u!114 &4182746193847291836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7639681660555044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
+  winCoins: 1
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 5816493177959900294}
+  trackingResolution: 128
+  cleanThreshold: 200
+  cleanPercentage: 0.85
+  countsTowardAreaProgress: 0
+  allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 1
+  maskTexture: {fileID: 0}
+  coverageTexture: {fileID: 0}
+  coverageReadable: {fileID: 0}
+  maskReadable: {fileID: 0}
+  isClean: 0
 --- !u!114 &6297561829878118210
 MonoBehaviour:
   m_ObjectHideFlags: 0
