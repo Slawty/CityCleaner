@@ -28,13 +28,14 @@ public class GPUPaintableObject : MonoBehaviour
     [SerializeField] float cleanPercentage = 0.85f;
     [Header("Area")]
     [SerializeField] bool countsTowardAreaProgress = true;
+    [SerializeField] bool useContinuousProgress;
     [Header("Tool Interaction")]
     [SerializeField] bool allowGooCleaning = false;
     [Header("Growable")]
     [SerializeField] bool deferCleanMaterialSwapUntilGrowComplete;
 
-    const string OutlineLayerName = "Outline";
-    static int outlineLayer = -1;
+    const string OutlineRenderingLayerName = "Outline";
+    static uint outlineRenderingLayerMask;
     public RenderTexture maskTexture;
     public RenderTexture coverageTexture;
     public Texture2D coverageReadable;
@@ -46,12 +47,13 @@ public class GPUPaintableObject : MonoBehaviour
 
     int pixelsToCleanCount;
     int cleanedPixelCount;
-    int defaultLayer;
+    uint defaultRenderingLayerMask;
     Mesh mesh;
     Renderer cachedRenderer;
     MaterialPropertyBlock propertyBlock;
     public bool IsInitialized { get; private set; }
     public bool CountsTowardAreaProgress => countsTowardAreaProgress;
+    public bool UseContinuousProgress => useContinuousProgress;
     public bool DeferCleanMaterialSwapUntilGrowComplete
     {
         get => deferCleanMaterialSwapUntilGrowComplete;
@@ -63,39 +65,41 @@ public class GPUPaintableObject : MonoBehaviour
     bool usesCleanMaterial;
     bool pendingMaterialFinalize;
 
+    MaterialPropertyBlock PropertyBlock => propertyBlock ??= new MaterialPropertyBlock();
+
+    void EnsureRenderer()
+    {
+        if (cachedRenderer != null)
+            return;
+
+        cachedRenderer = GetComponent<Renderer>();
+        flashRenderers = new[] { cachedRenderer };
+        defaultRenderingLayerMask = cachedRenderer.renderingLayerMask;
+    }
+
     void Awake()
     {
         mesh = GetComponent<MeshFilter>().sharedMesh;
-        cachedRenderer = GetComponent<Renderer>();
-        propertyBlock = new MaterialPropertyBlock();
-        flashRenderers = new[] { cachedRenderer };
-        defaultLayer = gameObject.layer;
+        EnsureRenderer();
+        _ = PropertyBlock;
     }
 
     public void SetAimOutline(bool enabled)
     {
-        gameObject.layer = enabled ? GetOutlineLayer() : defaultLayer;
+        EnsureRenderer();
+        cachedRenderer.renderingLayerMask = enabled ? GetOutlineRenderingLayerMask() : defaultRenderingLayerMask;
     }
 
-    static int GetOutlineLayer()
+    static uint GetOutlineRenderingLayerMask()
     {
-        if (outlineLayer >= 0)
-            return outlineLayer;
+        if (outlineRenderingLayerMask != 0)
+            return outlineRenderingLayerMask;
 
-        outlineLayer = LayerMask.NameToLayer(OutlineLayerName);
-        if (outlineLayer < 0)
-            throw new System.InvalidOperationException($"Layer '{OutlineLayerName}' is missing. Add it in Project Settings > Tags and Layers.");
+        outlineRenderingLayerMask = RenderingLayerMask.GetMask(OutlineRenderingLayerName);
+        if (outlineRenderingLayerMask == 0)
+            throw new System.InvalidOperationException($"Rendering layer '{OutlineRenderingLayerName}' is missing. Add it in Project Settings > Tags and Layers > Rendering Layers.");
 
-        return outlineLayer;
-    }
-
-    public static LayerMask IncludeOutlineLayer(LayerMask mask)
-    {
-        int layer = LayerMask.NameToLayer(OutlineLayerName);
-        if (layer < 0)
-            return mask;
-
-        return mask | (1 << layer);
+        return outlineRenderingLayerMask;
     }
 
     void OnDisable()
@@ -135,10 +139,11 @@ public class GPUPaintableObject : MonoBehaviour
 
     void BindMaskToRenderer(RenderTexture runtimeMask)
     {
-        cachedRenderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.SetTexture(DirtMaskShaderId, runtimeMask);
-        propertyBlock.SetTexture(LocalCleanMaskShaderId, runtimeMask);
-        cachedRenderer.SetPropertyBlock(propertyBlock);
+        EnsureRenderer();
+        cachedRenderer.GetPropertyBlock(PropertyBlock);
+        PropertyBlock.SetTexture(DirtMaskShaderId, runtimeMask);
+        PropertyBlock.SetTexture(LocalCleanMaskShaderId, runtimeMask);
+        cachedRenderer.SetPropertyBlock(PropertyBlock);
     }
 
     public void SetJobHighlight(float amount)
@@ -146,9 +151,10 @@ public class GPUPaintableObject : MonoBehaviour
         if (usesCleanMaterial)
             return;
 
-        cachedRenderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.SetFloat(JobHighlightShaderId, Mathf.Clamp01(amount));
-        cachedRenderer.SetPropertyBlock(propertyBlock);
+        EnsureRenderer();
+        cachedRenderer.GetPropertyBlock(PropertyBlock);
+        PropertyBlock.SetFloat(JobHighlightShaderId, Mathf.Clamp01(amount));
+        cachedRenderer.SetPropertyBlock(PropertyBlock);
     }
 
     public void SetCleanFlash(float amount)
@@ -156,9 +162,10 @@ public class GPUPaintableObject : MonoBehaviour
         if (usesCleanMaterial)
             return;
 
-        cachedRenderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.SetFloat(CleanFlashShaderId, Mathf.Clamp01(amount));
-        cachedRenderer.SetPropertyBlock(propertyBlock);
+        EnsureRenderer();
+        cachedRenderer.GetPropertyBlock(PropertyBlock);
+        PropertyBlock.SetFloat(CleanFlashShaderId, Mathf.Clamp01(amount));
+        cachedRenderer.SetPropertyBlock(PropertyBlock);
     }
 
     public void SetGooReadyGlow(float amount)
@@ -166,9 +173,10 @@ public class GPUPaintableObject : MonoBehaviour
         if (usesCleanMaterial)
             return;
 
-        cachedRenderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.SetFloat(GooReadyGlowShaderId, Mathf.Clamp01(amount));
-        cachedRenderer.SetPropertyBlock(propertyBlock);
+        EnsureRenderer();
+        cachedRenderer.GetPropertyBlock(PropertyBlock);
+        PropertyBlock.SetFloat(GooReadyGlowShaderId, Mathf.Clamp01(amount));
+        cachedRenderer.SetPropertyBlock(PropertyBlock);
     }
 
     public void FinalizeCleanMaterial()
@@ -196,12 +204,17 @@ public class GPUPaintableObject : MonoBehaviour
 
     public void StopCleanFlash()
     {
+        EnsureRenderer();
         cleanFlashPlayer.Stop(invalidateRunning: true);
-        if (!usesCleanMaterial && flashRenderers != null)
+        if (!usesCleanMaterial)
             cleanFlashPlayer.ResetFlash(flashRenderers);
     }
 
-    public Renderer GetFlashRenderer() => cachedRenderer;
+    public Renderer GetFlashRenderer()
+    {
+        EnsureRenderer();
+        return cachedRenderer;
+    }
 
     // ----------------------------------------------------
     // BAKE UV COVERAGE
@@ -247,7 +260,7 @@ public class GPUPaintableObject : MonoBehaviour
     void OnDestroy()
     {
         cleanFlashPlayer.Stop(invalidateRunning: true);
-        if (!usesCleanMaterial && flashRenderers != null)
+        if (!usesCleanMaterial && cachedRenderer != null)
             cleanFlashPlayer.ResetFlash(flashRenderers);
 
         if (coverageData.IsCreated)
@@ -372,6 +385,7 @@ public class GPUPaintableObject : MonoBehaviour
         if (usesCleanMaterial)
             return;
 
+        EnsureRenderer();
         pendingMaterialFinalize = finalizeAfterFlash;
         cleanFlashPlayer.Play(flashRenderers, OnCleanFlashComplete);
     }
@@ -397,6 +411,7 @@ public class GPUPaintableObject : MonoBehaviour
 
     bool CanSwapToCleanMaterial()
     {
+        EnsureRenderer();
         Material[] materials = cachedRenderer.sharedMaterials;
         foreach (Material material in materials)
         {
@@ -409,6 +424,7 @@ public class GPUPaintableObject : MonoBehaviour
 
     void SwapToCleanMaterial()
     {
+        EnsureRenderer();
         Material[] materials = cachedRenderer.sharedMaterials;
         bool changed = false;
 
@@ -453,6 +469,14 @@ public class GPUPaintableObject : MonoBehaviour
             return 1f;
 
         return (float)cleanedPixelCount / (float)pixelsToCleanCount;
+    }
+
+    public float GetProgressContribution()
+    {
+        if (useContinuousProgress)
+            return GetCleanPercent();
+
+        return isClean ? 1f : 0f;
     }
 
     public bool AllowGooCleaning => allowGooCleaning;

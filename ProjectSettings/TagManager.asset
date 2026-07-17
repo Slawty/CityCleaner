@@ -15,7 +15,7 @@ TagManager:
   - GooHitTarget
   - OnlyPlayer
   - Npc
-  - Outline
+  - 
   - 
   - 
   - 
@@ -43,3 +43,4 @@ TagManager:
     locked: 0
   m_RenderingLayers:
   - Default
+  - Outline

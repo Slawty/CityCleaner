@@ -78,6 +78,20 @@ public class GrassPatch : GooHitGrowable
         });
     }
 
+    protected override void OnDebugSetFullyGrown()
+    {
+        dirtCleanFlash.Stop(invalidateRunning: true);
+        dirtCleanFlash.ResetFlash(growableDirtRenderers);
+        ApplyGrowth(1f, 1f);
+    }
+
+    protected override void OnDebugResetGrowth()
+    {
+        dirtCleanFlash.Stop(invalidateRunning: true);
+        dirtCleanFlash.ResetFlash(growableDirtRenderers);
+        ApplyGrowth(0f, 1f);
+    }
+
     protected override void ApplyGrowth(float progress, float hitMultiplier)
     {
         EnsureMpb();

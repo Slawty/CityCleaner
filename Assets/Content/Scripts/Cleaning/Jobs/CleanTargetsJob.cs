@@ -5,13 +5,11 @@ public class CleanTargetsJob : Job
 {
     [SerializeField] List<GPUPaintableObject> targets = new();
 
-    int completedCount;
     bool tracking;
 
     public IReadOnlyList<GPUPaintableObject> Targets => targets;
 
-    public override float NormalizedProgress =>
-        targets.Count == 0 ? 1f : (float)completedCount / targets.Count;
+    public override float NormalizedProgress => GetTargetsProgress();
 
     public override void StartTracking()
     {
@@ -19,20 +17,20 @@ public class CleanTargetsJob : Job
             return;
 
         tracking = true;
-        completedCount = 0;
 
         foreach (GPUPaintableObject target in targets)
         {
-            if (target == null)
+            if (target == null || target.isClean)
                 continue;
 
-            if (target.isClean)
-                completedCount++;
+            if (target.UseContinuousProgress)
+                target.OnProgress += OnTargetProgressChanged;
             else
                 target.OnCleaned += OnTargetCleaned;
         }
 
         BeginJobProgressUi();
+        PushUi();
     }
 
     public override void StopTracking()
@@ -44,8 +42,11 @@ public class CleanTargetsJob : Job
 
         foreach (GPUPaintableObject target in targets)
         {
-            if (target != null)
-                target.OnCleaned -= OnTargetCleaned;
+            if (target == null)
+                continue;
+
+            target.OnProgress -= OnTargetProgressChanged;
+            target.OnCleaned -= OnTargetCleaned;
         }
 
         EndJobProgressUi();
@@ -70,9 +71,13 @@ public class CleanTargetsJob : Job
         StopTracking();
     }
 
+    void OnTargetProgressChanged()
+    {
+        PushUi();
+    }
+
     void OnTargetCleaned()
     {
-        completedCount++;
         PushUi();
     }
 
@@ -80,6 +85,22 @@ public class CleanTargetsJob : Job
     {
         NotifyProgressChanged(NormalizedProgress);
         PushJobProgressUi();
+    }
+
+    float GetTargetsProgress()
+    {
+        if (targets.Count == 0)
+            return 1f;
+
+        float progressSum = 0f;
+
+        foreach (GPUPaintableObject target in targets)
+        {
+            if (target != null)
+                progressSum += target.GetProgressContribution();
+        }
+
+        return progressSum / targets.Count;
     }
 
     public override void CollectIncompletePaintables(List<GPUPaintableObject> results)

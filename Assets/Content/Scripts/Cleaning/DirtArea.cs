@@ -5,9 +5,9 @@ using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 
 /// <summary>
-/// Root for a neighborhood: counts discrete objectives (GPU cleanables, goo growables, splitables) and drives the HUD while the player is inside an <see cref="AreaTrigger"/>.
-/// Progress advances only when a whole objective completes — no continuous rescans.
-/// Assumes each completion signal fires at most once per objective.
+/// Root for a neighborhood: counts objectives (GPU cleanables, goo growables, splitables) and drives the HUD while the player is inside an <see cref="AreaTrigger"/>.
+/// GPU paintables with <see cref="GPUPaintableObject.UseContinuousProgress"/> contribute partial clean percent on each tracking update.
+/// Other objectives advance only when fully completed.
 /// </summary>
 public class DirtArea : MonoBehaviour
 {
@@ -165,10 +165,15 @@ public class DirtArea : MonoBehaviour
 
         subscribed = true;
 
-        foreach (GPUPaintableObject p in paintables)
+        foreach (GPUPaintableObject paintable in paintables)
         {
-            if (p != null)
-                p.OnCleaned += OnPaintableCleaned;
+            if (paintable == null)
+                continue;
+
+            if (paintable.UseContinuousProgress)
+                paintable.OnProgress += OnPaintableProgressChanged;
+            else
+                paintable.OnCleaned += OnPaintableCleaned;
         }
 
         foreach (GooHitGrowable g in gooGrowables)
@@ -200,10 +205,13 @@ public class DirtArea : MonoBehaviour
 
         subscribed = false;
 
-        foreach (GPUPaintableObject p in paintables)
+        foreach (GPUPaintableObject paintable in paintables)
         {
-            if (p != null)
-                p.OnCleaned -= OnPaintableCleaned;
+            if (paintable == null)
+                continue;
+
+            paintable.OnProgress -= OnPaintableProgressChanged;
+            paintable.OnCleaned -= OnPaintableCleaned;
         }
 
         foreach (GooHitGrowable g in gooGrowables)
@@ -230,22 +238,20 @@ public class DirtArea : MonoBehaviour
 
     void SyncAlreadyCompletedAtStart()
     {
-        foreach (GPUPaintableObject p in paintables)
+        foreach (GooHitGrowable gooGrowable in gooGrowables)
         {
-            if (p != null && p.isClean)
-                completedTargets++;
-        }
-
-        foreach (GooHitGrowable g in gooGrowables)
-        {
-            if (g != null && g.IsFullyGrown)
+            if (gooGrowable != null && gooGrowable.IsFullyGrown)
                 completedTargets++;
         }
     }
 
+    void OnPaintableProgressChanged()
+    {
+        PushProgress();
+    }
+
     void OnPaintableCleaned()
     {
-        completedTargets++;
         PushProgress();
     }
 
@@ -389,7 +395,15 @@ public class DirtArea : MonoBehaviour
 
     void PushProgress()
     {
-        NormalizedProgress = totalTargets > 0 ? (float)completedTargets / totalTargets : 1f;
+        float progressSum = completedTargets;
+
+        foreach (GPUPaintableObject paintable in paintables)
+        {
+            if (paintable != null)
+                progressSum += paintable.GetProgressContribution();
+        }
+
+        NormalizedProgress = totalTargets > 0 ? progressSum / totalTargets : 1f;
 
         OnAreaProgressChanged?.Invoke(NormalizedProgress);
 

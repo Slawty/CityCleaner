@@ -89,13 +89,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
   winCoins: 1
-  winDirt: 3
   AdditionalObjectsToClean: []
   CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
   allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -122,4 +123,4 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -3461848522641387275, guid: 99c13ddce26ea544e95e471f5da55ccc, type: 3}
+  m_Mesh: {fileID: 3813889266840454368, guid: 99c13ddce26ea544e95e471f5da55ccc, type: 3}

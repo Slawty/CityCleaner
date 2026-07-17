@@ -4,6 +4,7 @@ public class PaintTargetHighlighter : MonoBehaviour
 {
     [SerializeField] GPUPainterWorld painter;
     [SerializeField] float rayDistance = 12f;
+    [SerializeField] float sphereCastRadius = 0.15f;
 
     Camera cam;
     GPUPaintableObject currentTarget;
@@ -32,9 +33,11 @@ public class PaintTargetHighlighter : MonoBehaviour
     void UpdateTarget()
     {
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+        Vector3 castOrigin = ray.origin + ray.direction * sphereCastRadius;
+        float castDistance = rayDistance - sphereCastRadius;
 
         GPUPaintableObject hitPaintable = null;
-        if (Physics.Raycast(ray, out RaycastHit hit, rayDistance, GPUPaintableObject.IncludeOutlineLayer(painter.PaintMask), QueryTriggerInteraction.Ignore))
+        if (castDistance > 0f && Physics.SphereCast(castOrigin, sphereCastRadius, ray.direction, out RaycastHit hit, castDistance, painter.PaintMask, QueryTriggerInteraction.Ignore))
             hitPaintable = hit.collider.GetComponentInParent<GPUPaintableObject>();
 
         if (currentTarget == hitPaintable)

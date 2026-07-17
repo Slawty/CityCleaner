@@ -43,7 +43,6 @@ public class GPUPainterWorld : MonoBehaviour
     void Awake()
     {
         localPaintMaterial = new Material(Shader.Find("Hidden/GPUPaintBrush"));
-        paintMask = GPUPaintableObject.IncludeOutlineLayer(paintMask);
     }
 
     void Update()

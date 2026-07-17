@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrowableObject
   hitsToFullGrowth: 15
-  growthProgress: 0
+  startGrowthProgress: 0
   bumpAmount: 0.1
   bumpDuration: 0.1
   bumpPeakAt: 0.35

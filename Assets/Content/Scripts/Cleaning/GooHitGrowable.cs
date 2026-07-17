@@ -7,7 +7,10 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
 {
     [Header("Growth")]
     [SerializeField, Min(1)] int hitsToFullGrowth = 10;
-    [SerializeField, Range(0f, 1f)] float growthProgress = 0f;
+    [Tooltip("Initial growth when play mode starts. Runtime progress is not saved to scenes.")]
+    [SerializeField, Range(0f, 1f)] float startGrowthProgress = 0f;
+
+    float growthProgress;
 
     [Header("Hit Effect")]
     [SerializeField] float bumpAmount = 0.1f;
@@ -42,6 +45,7 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
 
     protected void InitializeGrowable()
     {
+        growthProgress = Mathf.Clamp01(startGrowthProgress);
         ApplyGrowth(growthProgress, 1f);
         fullyGrown = growthProgress >= 1f;
         if (fullyGrown)
@@ -69,9 +73,6 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
 
     public void DebugSetFullyGrown()
     {
-        if (fullyGrown)
-            return;
-
         bumpTween?.Kill();
         bumpMultiplier = 1f;
         gooHitCount = Mathf.Max(1, hitsToFullGrowth);
@@ -79,16 +80,12 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
         fullyGrown = true;
 
         ApplyGrowth(growthProgress, bumpMultiplier);
+        OnDebugSetFullyGrown();
         OnGrowthProgressChanged?.Invoke();
-        OnFullyGrown();
-        OnFullyGrownCompleted?.Invoke();
     }
 
     public void DebugResetGrowth()
     {
-        if (growthProgress <= 0f && !fullyGrown)
-            return;
-
         bumpTween?.Kill();
         bumpMultiplier = 1f;
         gooHitCount = 0;
@@ -359,6 +356,8 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
         DisableGooReadyGlow();
         FinalizePrerequisiteCleanables();
     }
+
+    protected virtual void OnDebugSetFullyGrown() { }
 
     protected virtual void OnDebugResetGrowth() { }
 

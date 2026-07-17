@@ -210,7 +210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrassPatch
   hitsToFullGrowth: 15
-  growthProgress: 0
+  startGrowthProgress: 0
   bumpAmount: 0.15
   bumpDuration: 0.15
   bumpPeakAt: 0.35

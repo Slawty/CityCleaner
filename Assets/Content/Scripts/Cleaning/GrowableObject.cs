@@ -127,6 +127,13 @@ public class GrowableObject : GooHitGrowable
         }
     }
 
+    protected override void OnDebugSetFullyGrown()
+    {
+        cleanFlashPlayer.Stop(invalidateRunning: true);
+        cleanFlashPlayer.ResetFlash(fullGrowthFlashRenderers);
+        CleanShaders();
+    }
+
     protected override void OnDebugResetGrowth()
     {
         cleanFlashPlayer.Stop(invalidateRunning: true);
@@ -140,17 +147,7 @@ public class GrowableObject : GooHitGrowable
             return;
 
         for (int i = 0; i < cleanRenderers.Count; i++)
-        {
-            Renderer renderer = cleanRenderers[i];
-            if (renderer == null)
-                continue;
-
-            foreach (Material material in renderer.materials)
-            {
-                if (material.HasProperty("_DirtAmount"))
-                    material.SetFloat("_DirtAmount", 0f);
-            }
-        }
+            SetDirtAmount(cleanRenderers[i], 0f);
     }
 
     void DirtyShaders()
@@ -159,16 +156,21 @@ public class GrowableObject : GooHitGrowable
             return;
 
         for (int i = 0; i < cleanRenderers.Count; i++)
-        {
-            Renderer renderer = cleanRenderers[i];
-            if (renderer == null)
-                continue;
+            SetDirtAmount(cleanRenderers[i], 1f);
+    }
 
-            foreach (Material material in renderer.materials)
-            {
-                if (material.HasProperty("_DirtAmount"))
-                    material.SetFloat("_DirtAmount", 1f);
-            }
+    void SetDirtAmount(Renderer renderer, float dirtAmount)
+    {
+        if (renderer == null)
+            return;
+
+        Material[] materials = Application.isPlaying ? renderer.materials : renderer.sharedMaterials;
+
+        for (int i = 0; i < materials.Length; i++)
+        {
+            Material material = materials[i];
+            if (material != null && material.HasProperty("_DirtAmount"))
+                material.SetFloat("_DirtAmount", dirtAmount);
         }
     }
 
