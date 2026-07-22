@@ -12077,7 +12077,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &119826731
 Light:
   m_ObjectHideFlags: 0
@@ -105057,12 +105057,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
+  winCoins: 1
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
+  cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
+  useContinuousProgress: 0
+  allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
   maskReadable: {fileID: 0}
+  isClean: 0
 --- !u!1001 &997152490
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -106167,12 +106176,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
+  winCoins: 1
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
+  cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
+  useContinuousProgress: 0
+  allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
   maskReadable: {fileID: 0}
+  isClean: 0
 --- !u!1001 &1005232995
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -123338,12 +123356,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
+  winCoins: 1
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
+  cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
+  useContinuousProgress: 0
+  allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
   maskReadable: {fileID: 0}
+  isClean: 0
 --- !u!1001 &1148839951
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -200568,12 +200595,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
+  winCoins: 1
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
+  cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
+  useContinuousProgress: 0
+  allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
   maskReadable: {fileID: 0}
+  isClean: 0
 --- !u!1001 &1859896353
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -207260,12 +207296,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
+  winCoins: 1
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
+  cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
+  useContinuousProgress: 0
+  allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
   maskReadable: {fileID: 0}
+  isClean: 0
 --- !u!1001 &1916607044
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -214578,12 +214623,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
+  winCoins: 1
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
+  cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
+  useContinuousProgress: 0
+  allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
   maskReadable: {fileID: 0}
+  isClean: 0
 --- !u!1001 &1977300017
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -224321,12 +224375,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c95c13112c8c5da4da70c2e50583f85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
+  winCoins: 1
+  AdditionalObjectsToClean: []
+  CoinSpawnPos: {fileID: 0}
   trackingResolution: 128
   cleanThreshold: 200
+  cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
+  useContinuousProgress: 0
+  allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
   maskReadable: {fileID: 0}
+  isClean: 0
 --- !u!1001 &2073166058
 PrefabInstance:
   m_ObjectHideFlags: 0
