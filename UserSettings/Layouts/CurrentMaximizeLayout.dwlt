@@ -1036,9 +1036,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 63.80749, y: 3.235252, z: 237.66544}
+    m_Target: {x: 72.84043, y: 0.31376472, z: 238.56303}
     speed: 2
-    m_Value: {x: 63.80749, y: 3.235252, z: 237.66544}
+    m_Value: {x: 72.84043, y: 0.31376472, z: 238.56303}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1084,13 +1084,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0
   m_Rotation:
-    m_Target: {x: -0.00017558438, y: -0.98170775, z: 0.19389902, w: 0.0013411534}
+    m_Target: {x: -0.08228852, y: -0.9144434, z: 0.23092453, w: -0.32410738}
     speed: 2
-    m_Value: {x: -0.00017546608, y: -0.98104626, z: 0.19376837, w: 0.0013402498}
+    m_Value: {x: -0.082233034, y: -0.91382676, z: 0.23076883, w: -0.32388884}
   m_Size:
-    m_Target: 0.28050995
+    m_Target: 6.9462585
     speed: 2
-    m_Value: 0.28050995
+    m_Value: 6.9462585
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -2384,7 +2384,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 112}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 19272
+  controlID: 26700
   draggingID: 0
 --- !u!114 &11
 MonoBehaviour:
@@ -2453,11 +2453,11 @@ MonoBehaviour:
     m_DynamicPanelBehavior: 0
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 229}
+      scrollPos: {x: 0, y: 0}
       m_SelectedIDs:
-      - m_Data: 61528
+      - m_Data: -1298
       m_LastClickedID:
-        m_Data: 61528
+        m_Data: -1298
       m_ExpandedIDs:
       - m_Data: -91064
       - m_Data: -89812
@@ -2476,6 +2476,19 @@ MonoBehaviour:
       - m_Data: 71082
       - m_Data: 71438
       - m_Data: 71500
+      - m_Data: 448434
+      - m_Data: 448646
+      - m_Data: 449032
+      - m_Data: 449396
+      - m_Data: 499024
+      - m_Data: 499236
+      - m_Data: 499622
+      - m_Data: 499986
+      - m_Data: 665040
+      - m_Data: 665252
+      - m_Data: 665638
+      - m_Data: 665806
+      - m_Data: 666004
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -2614,7 +2627,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Content/Cleaning/Materials
+    - Assets/Settings
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -2624,7 +2637,7 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Content/Cleaning/Materials
+  - Assets/Settings
   m_LastFoldersGridSize: 16
   m_LastProjectPath: E:\Unity Projects\GIT\City Cleaner
   m_LockTracker:
@@ -2633,9 +2646,9 @@ MonoBehaviour:
   m_FolderTreeState:
     scrollPos: {x: 0, y: 47}
     m_SelectedIDs:
-    - m_Data: 131628
+    - m_Data: 81904
     m_LastClickedID:
-      m_Data: 131628
+      m_Data: 81904
     m_ExpandedIDs:
     - m_Data: 0
     - m_Data: 49290
@@ -2686,7 +2699,6 @@ MonoBehaviour:
     - m_Data: 81634
     - m_Data: 81636
     - m_Data: 81638
-    - m_Data: 81640
     - m_Data: 81894
     - m_Data: 81908
     - m_Data: 81974
@@ -2772,7 +2784,6 @@ MonoBehaviour:
     - m_Data: 81634
     - m_Data: 81636
     - m_Data: 81638
-    - m_Data: 81640
     - m_Data: 81894
     - m_Data: 81908
     - m_Data: 81974
@@ -2805,8 +2816,8 @@ MonoBehaviour:
       m_ResourceFile: 
   m_ListAreaState:
     m_SelectedInstanceIDs:
-    - m_Data: 61528
-    m_LastClickedInstanceID: 61528
+    - m_Data: -1298
+    m_LastClickedInstanceID: -1298
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs:
     - m_Data: 83296
@@ -3254,6 +3265,7 @@ MonoBehaviour:
     - m_Data: 81200
     - m_Data: 80498
     - m_Data: 334760
+    - m_Data: 914
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -3279,7 +3291,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 370}
+    m_ScrollPosition: {x: 0, y: 50}
     m_GridSize: 16
   m_SkipHiddenPackages: 0
   m_DirectoriesAreaWidth: 262
@@ -3307,7 +3319,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 112}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 19387
+  controlID: 26911
   draggingID: 0
 --- !u!114 &17
 MonoBehaviour:

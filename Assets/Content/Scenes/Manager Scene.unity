@@ -6509,7 +6509,7 @@ MonoBehaviour:
   materials:
   - {fileID: 2100000, guid: 945bfbb1de35f854eab5a26c7844fbc9, type: 2}
   - {fileID: 2100000, guid: dafa4dc716ce7aa42ad0ad427503dfde, type: 2}
-  previewDirty: 0
+  previewDirty: 1
 --- !u!1 &343724865
 GameObject:
   m_ObjectHideFlags: 0
@@ -18349,6 +18349,13 @@ MonoBehaviour:
   shootForce: 12
   particleTriggerCollider: {fileID: 1678286888}
   dirtlingAttachPoint: {fileID: 1855674348}
+  vacuumLoopEvent:
+    Guid:
+      Data1: -979594422
+      Data2: 1207804956
+      Data3: 660169651
+      Data4: 447539785
+    Path: event:/Tools/Vaccuum/Vaccuum_Loop
 --- !u!1 &710676621
 GameObject:
   m_ObjectHideFlags: 0
@@ -36978,6 +36985,7 @@ GameObject:
   - component: {fileID: 1518474220}
   - component: {fileID: 1518474219}
   - component: {fileID: 1518474218}
+  - component: {fileID: 1518474224}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -37112,9 +37120,46 @@ MonoBehaviour:
   tool1Action: {fileID: 2411907206095950430, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   tool2Action: {fileID: 7476244043514120974, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   tool3Action: {fileID: -5328973138650959184, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
-  vacuumInteractAction: {fileID: -6824443882261655076, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  vacuumInteractAction: {fileID: -1913020635853912389, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   vacuumReleaseAction: {fileID: -1913020635853912389, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   vacuumShootAction: {fileID: 1120369429361536294, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+--- !u!114 &1518474224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1518474217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c3e9a1f4b2d5840a6e8c0d2f4a6b8c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSounds
+  movement: {fileID: 1518474219}
+  footstepEvent:
+    Guid:
+      Data1: 1888914805
+      Data2: 1224462737
+      Data3: -563928414
+      Data4: -1102373822
+    Path: event:/Footsteps/Footsteps
+  jumpStartEvent:
+    Guid:
+      Data1: 1546191813
+      Data2: 1188394936
+      Data3: -799402085
+      Data4: -452903539
+    Path: event:/Footsteps/JumpStart
+  jumpLandEvent:
+    Guid:
+      Data1: -25201422
+      Data2: 1287819206
+      Data3: -451740004
+      Data4: -1172495973
+    Path: event:/Footsteps/JumpLand
+  strideDistance: 1.6
+  minMoveSpeed: 0.1
+  minLandSpeed: -3.5
 --- !u!1 &1546378063
 GameObject:
   m_ObjectHideFlags: 0
@@ -70988,6 +71033,27 @@ MonoBehaviour:
     m_Bits: 4294967295
   dirtlingRayDistance: 12
   dirtlingPushForcePerSecond: 10
+  washerStartEvent:
+    Guid:
+      Data1: -2034748620
+      Data2: 1172899297
+      Data3: -1103450976
+      Data4: -1724321692
+    Path: event:/Tools/PowerWasher/Washer_Start
+  washerLoopEvent:
+    Guid:
+      Data1: 955841350
+      Data2: 1093199670
+      Data3: -1690964801
+      Data4: -975766665
+    Path: event:/Tools/PowerWasher/Washer_Loop
+  washerHitLoopEvent:
+    Guid:
+      Data1: -1315314280
+      Data2: 1157786114
+      Data3: -419032164
+      Data4: -1250669046
+    Path: event:/Tools/PowerWasher/Washer_HitLoop
 --- !u!114 &8777165808046631630
 MonoBehaviour:
   m_ObjectHideFlags: 0

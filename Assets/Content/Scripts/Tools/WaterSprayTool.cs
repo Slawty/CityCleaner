@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using FMOD.Studio;
+using FMODUnity;
 using UnityEngine;
 
 public class WaterSprayTool : Tool
@@ -17,10 +19,17 @@ public class WaterSprayTool : Tool
     [SerializeField] float dirtlingRayDistance = 12f;
     [SerializeField] float dirtlingPushForcePerSecond = 10f;
 
+    [Header("Audio")]
+    [SerializeField] EventReference washerStartEvent;
+    [SerializeField] EventReference washerLoopEvent;
+    [SerializeField] EventReference washerHitLoopEvent;
+
     float currentAmmo;
     bool isActive;
     bool ammoDepletedFired;
     Camera cam;
+    EventInstance washerLoopInstance;
+    EventInstance washerHitLoopInstance;
 
     public float NormalizedAmmo => MaxAmmo > 0f ? currentAmmo / MaxAmmo : 0f;
     public bool IsEmpty => currentAmmo <= 0f;
@@ -47,6 +56,73 @@ public class WaterSprayTool : Tool
             effect.Play();
 
         painter.StartPainting();
+        PlayWasherStart();
+        StartWasherLoop();
+    }
+
+    void PlayWasherStart()
+    {
+        if (washerStartEvent.IsNull)
+            throw new System.InvalidOperationException("Washer start FMOD event is not assigned on WaterSprayTool.");
+
+        RuntimeManager.PlayOneShotAttached(washerStartEvent, GetAudioAttachTarget());
+    }
+
+    void StartWasherLoop()
+    {
+        if (washerLoopEvent.IsNull)
+            throw new System.InvalidOperationException("Washer loop FMOD event is not assigned on WaterSprayTool.");
+
+        StopWasherLoop();
+
+        washerLoopInstance = RuntimeManager.CreateInstance(washerLoopEvent);
+        RuntimeManager.AttachInstanceToGameObject(washerLoopInstance, GetAudioAttachTarget().transform);
+        washerLoopInstance.start();
+    }
+
+    void StopWasherLoop()
+    {
+        if (!washerLoopInstance.isValid())
+            return;
+
+        washerLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        washerLoopInstance.release();
+        washerLoopInstance.clearHandle();
+    }
+
+    void StartWasherHitLoop()
+    {
+        if (washerHitLoopEvent.IsNull)
+            throw new System.InvalidOperationException("Washer hit loop FMOD event is not assigned on WaterSprayTool.");
+
+        if (washerHitLoopInstance.isValid())
+            return;
+
+        washerHitLoopInstance = RuntimeManager.CreateInstance(washerHitLoopEvent);
+        washerHitLoopInstance.start();
+    }
+
+    void UpdateWasherHitLoopPosition(Vector3 hitPoint)
+    {
+        if (!washerHitLoopInstance.isValid())
+            return;
+
+        washerHitLoopInstance.set3DAttributes(hitPoint.To3DAttributes());
+    }
+
+    void StopWasherHitLoop()
+    {
+        if (!washerHitLoopInstance.isValid())
+            return;
+
+        washerHitLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        washerHitLoopInstance.release();
+        washerHitLoopInstance.clearHandle();
+    }
+
+    GameObject GetAudioAttachTarget()
+    {
+        return Tip != null ? Tip.gameObject : gameObject;
     }
 
     protected override void OnShootStop()
@@ -58,6 +134,8 @@ public class WaterSprayTool : Tool
 
         painter.StopPainting();
         StopImpactEffects();
+        StopWasherLoop();
+        StopWasherHitLoop();
     }
 
     void Update()
@@ -86,14 +164,12 @@ public class WaterSprayTool : Tool
 
     void HandleImpactEffects()
     {
-        if (impactEffects == null || impactEffects.Count == 0)
-            return;
-
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
 
         if (!Physics.Raycast(ray, out RaycastHit hit, impactRayDistance, painter.PaintMask, QueryTriggerInteraction.Ignore))
         {
             StopImpactEffects();
+            StopWasherHitLoop();
             return;
         }
 
@@ -101,16 +177,22 @@ public class WaterSprayTool : Tool
         Vector3 position = hit.point + normal * impactSurfaceOffset;
         Quaternion rotation = Quaternion.LookRotation(normal);
 
-        foreach (ParticleSystem impactEffect in impactEffects)
+        if (impactEffects != null)
         {
-            if (impactEffect == null)
-                continue;
+            foreach (ParticleSystem impactEffect in impactEffects)
+            {
+                if (impactEffect == null)
+                    continue;
 
-            impactEffect.transform.SetPositionAndRotation(position, rotation);
+                impactEffect.transform.SetPositionAndRotation(position, rotation);
 
-            if (!impactEffect.isPlaying)
-                impactEffect.Play();
+                if (!impactEffect.isPlaying)
+                    impactEffect.Play();
+            }
         }
+
+        StartWasherHitLoop();
+        UpdateWasherHitLoopPosition(hit.point);
     }
 
     void StopImpactEffects()
@@ -147,6 +229,8 @@ public class WaterSprayTool : Tool
         base.OnDisable();
         painter.StopPainting();
         StopImpactEffects();
+        StopWasherLoop();
+        StopWasherHitLoop();
     }
 
     public void RefillWater()

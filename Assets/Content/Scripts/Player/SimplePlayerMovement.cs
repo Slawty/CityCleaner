@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,15 +18,24 @@ public class SimplePlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private bool jumpRequested;
     private Ladder currentLadder;
+    private bool wasGrounded;
 
     public float HorizontalSpeed { get; private set; }
     public float VerticalVelocity => velocity.y;
     public bool IsSprinting { get; private set; }
     public bool IsClimbing => currentLadder != null;
 
+    public event Action OnJumpStarted;
+    public event Action<float> OnLanded;
+
     void Awake()
     {
         controller = GetComponent<CharacterController>();
+    }
+
+    void Start()
+    {
+        wasGrounded = controller.isGrounded;
     }
 
     void OnEnable()
@@ -48,11 +58,8 @@ public class SimplePlayerMovement : MonoBehaviour
 
     private void OnJumpPerformed(InputAction.CallbackContext ctx)
     {
-        // Only accept jump input if grounded
         if (controller.isGrounded)
-        {
             jumpRequested = true;
-        }
     }
 
     void Update()
@@ -62,21 +69,24 @@ public class SimplePlayerMovement : MonoBehaviour
         if (currentLadder != null)
         {
             MoveOnLadder(input);
+            wasGrounded = controller.isGrounded;
             return;
         }
 
-        if (controller.isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f;
-        }
+        bool groundedBeforeMove = controller.isGrounded;
 
-        if (controller.isGrounded && jumpRequested)
+        if (groundedBeforeMove && velocity.y < 0)
+            velocity.y = -2f;
+
+        if (groundedBeforeMove && jumpRequested)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
             jumpRequested = false;
+            OnJumpStarted?.Invoke();
         }
 
         velocity.y += gravity * Time.deltaTime;
+        float verticalVelocityForLand = velocity.y;
 
         Vector3 move = transform.right * input.x + transform.forward * input.y;
 
@@ -86,6 +96,11 @@ public class SimplePlayerMovement : MonoBehaviour
 
         controller.Move(move * speed * Time.deltaTime);
         controller.Move(velocity * Time.deltaTime);
+
+        if (controller.isGrounded && !wasGrounded)
+            OnLanded?.Invoke(verticalVelocityForLand);
+
+        wasGrounded = controller.isGrounded;
     }
 
     void MoveOnLadder(Vector2 input)
@@ -115,5 +130,4 @@ public class SimplePlayerMovement : MonoBehaviour
 
         currentLadder = null;
     }
-
 }
