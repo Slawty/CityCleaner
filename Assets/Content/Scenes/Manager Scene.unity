@@ -541,8 +541,8 @@ GameObject:
   - component: {fileID: 62046724}
   - component: {fileID: 62046721}
   - component: {fileID: 62046719}
-  - component: {fileID: 62046718}
   - component: {fileID: 62046723}
+  - component: {fileID: 62046725}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -550,14 +550,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &62046718
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 62046717}
-  m_Enabled: 1
 --- !u!124 &62046719
 Behaviour:
   m_ObjectHideFlags: 0
@@ -708,6 +700,20 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 11400000, guid: e6c61baf2da2d4347a83cda91c08b226, type: 2}
+--- !u!114 &62046725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62046717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioListener
+  nonRigidbodyVelocity: 0
+  attenuationObject: {fileID: 0}
 --- !u!1 &68915989
 GameObject:
   m_ObjectHideFlags: 0
@@ -2479,7 +2485,7 @@ ParticleSystem:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: 0
+          value: 1
           inSlope: 3.848727
           outSlope: 3.848727
           tangentMode: 0
@@ -18859,7 +18865,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -24698,6 +24704,20 @@ MonoBehaviour:
   hitMask:
     serializedVersion: 2
     m_Bits: 1
+  laserLoopEvent:
+    Guid:
+      Data1: -1967123323
+      Data2: 1253480834
+      Data3: 1267310267
+      Data4: 1654581307
+    Path: event:/Tools/Laser/Laser_Loop
+  laserOffEvent:
+    Guid:
+      Data1: -2125841795
+      Data2: 1313905659
+      Data3: 1837730733
+      Data4: 97966857
+    Path: event:/Tools/Laser/Laser_Off
 --- !u!1 &986694629
 GameObject:
   m_ObjectHideFlags: 0
@@ -25336,6 +25356,13 @@ MonoBehaviour:
   - {fileID: 1293167554}
   ammoBar: {fileID: 1179216095}
   particleHitNotifier: {fileID: 1293167555}
+  gooShootEvent:
+    Guid:
+      Data1: 1015815709
+      Data2: 1148453677
+      Data3: -103361904
+      Data4: 37006690
+    Path: event:/Tools/GooGun/Goo_Shoot
 --- !u!1 &1038738507
 GameObject:
   m_ObjectHideFlags: 0
@@ -35990,6 +36017,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 831dc83c4dd7f7946b40badb21a6ef9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GooParticleNotifier
+  gooPopEvent:
+    Guid:
+      Data1: 1469976792
+      Data2: 1198802094
+      Data3: 428191917
+      Data4: 497874614
+    Path: event:/Tools/GooGun/Goo_Pop
 --- !u!1 &1315449377
 GameObject:
   m_ObjectHideFlags: 0
@@ -37115,6 +37149,13 @@ MonoBehaviour:
   - {fileID: 1799463851385510715}
   - {fileID: 957881529}
   - {fileID: 1171152370}
+  toolSwitchEvent:
+    Guid:
+      Data1: -1327034376
+      Data2: 1075971167
+      Data3: -1584757116
+      Data4: 87753381
+    Path: event:/Tools/Tool_Switch
   nextToolAction: {fileID: -8878704847213959957, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   prevToolAction: {fileID: 5766316853376839344, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
   tool1Action: {fileID: 2411907206095950430, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}

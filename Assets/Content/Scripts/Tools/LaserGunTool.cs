@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using FMOD.Studio;
+using FMODUnity;
 using UnityEngine;
 
 public class LaserGunTool : Tool
@@ -12,9 +14,14 @@ public class LaserGunTool : Tool
     [SerializeField] ProgressBar ammoBar;
     [SerializeField] LayerMask hitMask;
 
+    [Header("Audio")]
+    [SerializeField] EventReference laserLoopEvent;
+    [SerializeField] EventReference laserOffEvent;
+
     float currentAmmo;
     bool isActive;
     Camera cam;
+    EventInstance laserLoopInstance;
 
     public override void Initialize()
     {
@@ -31,14 +38,57 @@ public class LaserGunTool : Tool
 
         foreach (ParticleSystem effect in sprayEffects)
             effect.Play();
+
+        StartLaserLoop();
     }
 
     protected override void OnShootStop()
     {
+        bool wasActive = isActive;
         isActive = false;
 
         foreach (ParticleSystem effect in sprayEffects)
             effect.Stop();
+
+        StopLaserLoop();
+
+        if (wasActive)
+            PlayLaserOff();
+    }
+
+    void StartLaserLoop()
+    {
+        if (laserLoopEvent.IsNull)
+            throw new System.InvalidOperationException("Laser loop FMOD event is not assigned on LaserGunTool.");
+
+        StopLaserLoop();
+
+        laserLoopInstance = RuntimeManager.CreateInstance(laserLoopEvent);
+        RuntimeManager.AttachInstanceToGameObject(laserLoopInstance, GetAudioAttachTarget().transform);
+        laserLoopInstance.start();
+    }
+
+    void StopLaserLoop()
+    {
+        if (!laserLoopInstance.isValid())
+            return;
+
+        laserLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        laserLoopInstance.release();
+        laserLoopInstance.clearHandle();
+    }
+
+    void PlayLaserOff()
+    {
+        if (laserOffEvent.IsNull)
+            throw new System.InvalidOperationException("Laser off FMOD event is not assigned on LaserGunTool.");
+
+        RuntimeManager.PlayOneShotAttached(laserOffEvent, GetAudioAttachTarget());
+    }
+
+    GameObject GetAudioAttachTarget()
+    {
+        return Tip != null ? Tip.gameObject : gameObject;
     }
 
     void Update()

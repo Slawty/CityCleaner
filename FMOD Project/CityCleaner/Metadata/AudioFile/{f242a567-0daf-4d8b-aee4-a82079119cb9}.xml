@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{f242a567-0daf-4d8b-aee4-a82079119cb9}">
+		<property name="assetPath">
+			<value>zapsplat_multimedia_game_designed_bubble_pop_007_26273.mp3</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.35999999999999999</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{ca4bafdd-1d06-4e3f-ac47-db09b9971158}</destination>
+		</relationship>
+	</object>
+</objects>

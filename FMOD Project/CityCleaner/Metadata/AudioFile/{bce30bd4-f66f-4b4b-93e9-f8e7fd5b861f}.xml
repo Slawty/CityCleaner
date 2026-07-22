@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{bce30bd4-f66f-4b4b-93e9-f8e7fd5b861f}">
+		<property name="assetPath">
+			<value>zapsplat_foley_clothing_towel_soaking_wet_squeeze_rinse_squish_squelch_002_98850.mp3</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.64800000000000002</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{ca4bafdd-1d06-4e3f-ac47-db09b9971158}</destination>
+		</relationship>
+	</object>
+</objects>

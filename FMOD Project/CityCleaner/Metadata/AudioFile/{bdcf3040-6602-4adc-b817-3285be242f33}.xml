@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{bdcf3040-6602-4adc-b817-3285be242f33}">
+		<property name="assetPath">
+			<value>esm_game_boot_stomp_zombie_head_impact_stab_knife_spill_drip_weapon_wet_juicy_horror.mp3</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>1.008</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{ca4bafdd-1d06-4e3f-ac47-db09b9971158}</destination>
+		</relationship>
+	</object>
+</objects>

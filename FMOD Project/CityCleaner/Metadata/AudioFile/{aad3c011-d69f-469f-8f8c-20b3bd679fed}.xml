@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{aad3c011-d69f-469f-8f8c-20b3bd679fed}">
+		<property name="assetPath">
+			<value>Success_02.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>96</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>1.5514270833333332</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{ca4bafdd-1d06-4e3f-ac47-db09b9971158}</destination>
+		</relationship>
+	</object>
+</objects>

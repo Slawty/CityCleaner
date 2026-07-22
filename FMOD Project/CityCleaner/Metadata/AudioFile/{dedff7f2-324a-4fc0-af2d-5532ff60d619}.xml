@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{dedff7f2-324a-4fc0-af2d-5532ff60d619}">
+		<property name="assetPath">
+			<value>zapsplat_cartoon_bubble_pop_003_40275.mp3</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>0.16800000000000001</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{ca4bafdd-1d06-4e3f-ac47-db09b9971158}</destination>
+		</relationship>
+	</object>
+</objects>

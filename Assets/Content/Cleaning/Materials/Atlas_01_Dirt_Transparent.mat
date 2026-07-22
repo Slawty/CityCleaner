@@ -167,7 +167,7 @@ Material:
     - _DebugView: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DirtAmount: 0
+    - _DirtAmount: 1
     - _DirtMetallic: 0
     - _DirtMetallicStrength: 0
     - _DirtNoiseOffset: 1.995

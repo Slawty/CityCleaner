@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FMODUnity;
 using UnityEngine;
 
 public class GooGunTool : Tool
@@ -11,8 +12,13 @@ public class GooGunTool : Tool
     [SerializeField] List<ParticleSystem> sprayEffects;
     [SerializeField] ProgressBar ammoBar;
     [SerializeField] GooParticleNotifier particleHitNotifier;
+
+    [Header("Audio")]
+    [SerializeField] EventReference gooShootEvent;
+
     float currentAmmo;
     bool isActive;
+    float shootSoundTimer;
 
     public override void Initialize()
     {
@@ -35,14 +41,18 @@ public class GooGunTool : Tool
             return;
 
         isActive = true;
+        shootSoundTimer = 0f;
 
         foreach (ParticleSystem effect in sprayEffects)
             effect.Play();
+
+        PlayGooShoot();
     }
 
     protected override void OnShootStop()
     {
         isActive = false;
+        shootSoundTimer = 0f;
 
         foreach (ParticleSystem effect in sprayEffects)
             effect.Stop();
@@ -57,8 +67,32 @@ public class GooGunTool : Tool
         currentAmmo = Mathf.Clamp(currentAmmo, 0f, MaxAmmo);
         ammoBar.SetPercent((currentAmmo / MaxAmmo) * 100f);
 
+        UpdateShootSound();
+
         if (currentAmmo <= 0f)
             OnShootStop();
+    }
+
+    void UpdateShootSound()
+    {
+        float emissionRate = Mathf.Max(particleHitNotifier.EmissionRateOverTime, 0.001f);
+        float interval = 1f / emissionRate;
+
+        shootSoundTimer += Time.deltaTime;
+        while (shootSoundTimer >= interval)
+        {
+            shootSoundTimer -= interval;
+            PlayGooShoot();
+        }
+    }
+
+    void PlayGooShoot()
+    {
+        if (gooShootEvent.IsNull)
+            throw new System.InvalidOperationException("Goo shoot FMOD event is not assigned on GooGunTool.");
+
+        GameObject attachTarget = Tip != null ? Tip.gameObject : gameObject;
+        RuntimeManager.PlayOneShotAttached(gooShootEvent, attachTarget);
     }
 
     protected override void OnEnable()
@@ -89,7 +123,6 @@ public class GooGunTool : Tool
 
     void OnParticleHit(Vector3 hitPos, GameObject hitObject)
     {
-        // Debug.Log($"Goo hit {hitObject.name} at: {hitPos}");
         if (hitObject.GetComponentInParent<GPUPaintableObject>() is { AllowGooCleaning: true })
             painter.PaintAtPosition(hitPos, CleanStrength, gooOnly: true);
     }

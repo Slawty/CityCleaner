@@ -1,10 +1,15 @@
-using UnityEngine;
 using System.Collections.Generic;
+using FMODUnity;
+using UnityEngine;
 using UnityEngine.Events;
 
 public class GooParticleNotifier : MonoBehaviour
 {
     public UnityAction<Vector3, GameObject> OnGooHit;
+
+    [Header("Audio")]
+    [SerializeField] EventReference gooPopEvent;
+
     ParticleSystem ps;
     GooGunTool gooGun;
     List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
@@ -38,6 +43,8 @@ public class GooParticleNotifier : MonoBehaviour
                 nest.ApplyGooDamage(gooGun.GooDamagePerParticle * collisionCount);
         }
 
+        PlayGooPop(hitPoint);
+
         OnGooHit?.Invoke(hitPoint, other);
 
         IGooHitReceiver[] receivers = other.GetComponents<IGooHitReceiver>();
@@ -51,5 +58,13 @@ public class GooParticleNotifier : MonoBehaviour
             if (gooInParents != null)
                 gooInParents.OnGooHit(hitPoint, gameObject);
         }
+    }
+
+    void PlayGooPop(Vector3 hitPoint)
+    {
+        if (gooPopEvent.IsNull)
+            throw new System.InvalidOperationException("Goo pop FMOD event is not assigned on GooParticleNotifier.");
+
+        RuntimeManager.PlayOneShot(gooPopEvent, hitPoint);
     }
 }

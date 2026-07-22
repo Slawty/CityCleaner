@@ -1026,7 +1026,7 @@ MonoBehaviour:
     m_OverlaysVisible: 1
     m_DynamicPanelBehavior: 0
   m_WindowGUID: cc27987af1a868c49b0894db9c0f5429
-  m_Gizmos: 0
+  m_Gizmos: 1
   m_OverrideSceneCullingMask: 6917529027641081856
   m_SceneIsLit: 1
   m_SceneLighting: 1
@@ -1036,9 +1036,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 72.84043, y: 0.31376472, z: 238.56303}
+    m_Target: {x: 97.74578, y: 1.3484479, z: 223.66873}
     speed: 2
-    m_Value: {x: 72.84043, y: 0.31376472, z: 238.56303}
+    m_Value: {x: 97.74578, y: 1.3484479, z: 223.66873}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1084,13 +1084,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0
   m_Rotation:
-    m_Target: {x: -0.08228852, y: -0.9144434, z: 0.23092453, w: -0.32410738}
+    m_Target: {x: -0.29767022, y: -0.1988655, z: 0.06323577, w: -0.93230695}
     speed: 2
-    m_Value: {x: -0.082233034, y: -0.91382676, z: 0.23076883, w: -0.32388884}
+    m_Value: {x: -0.29746947, y: -0.1987314, z: 0.06319312, w: -0.93167824}
   m_Size:
-    m_Target: 6.9462585
+    m_Target: 0.25448805
     speed: 2
-    m_Value: 6.9462585
+    m_Value: 0.25448805
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -2384,7 +2384,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 112}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 26700
+  controlID: 36586
   draggingID: 0
 --- !u!114 &11
 MonoBehaviour:
@@ -2485,14 +2485,36 @@ MonoBehaviour:
       - m_Data: 499622
       - m_Data: 499986
       - m_Data: 665040
+      - m_Data: 665044
       - m_Data: 665252
+      - m_Data: 665428
+      - m_Data: 665532
+      - m_Data: 665634
       - m_Data: 665638
       - m_Data: 665806
       - m_Data: 666004
+      - m_Data: 1065670
+      - m_Data: 1065674
+      - m_Data: 1065882
+      - m_Data: 1066058
+      - m_Data: 1066162
+      - m_Data: 1066264
+      - m_Data: 1066268
+      - m_Data: 1066634
+      - m_Data: 1713474
+      - m_Data: 1713478
+      - m_Data: 1713686
+      - m_Data: 1713820
+      - m_Data: 1713862
+      - m_Data: 1713922
+      - m_Data: 1713966
+      - m_Data: 1714068
+      - m_Data: 1714072
+      - m_Data: 1714438
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
+        m_Name: Goo Muzzle Splats
+        m_OriginalName: Goo Muzzle Splats
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
@@ -2500,10 +2522,10 @@ MonoBehaviour:
           width: 0
           height: 0
         m_UserData:
-          m_Data: 0
+          m_Data: 1714198
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 11
+        m_OriginalEventType: 0
         m_IsRenamingFilename: 0
         m_TrimLeadingAndTrailingWhitespace: 0
         m_ClientGUIView: {fileID: 11}
@@ -3319,7 +3341,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 112}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 26911
+  controlID: 36711
   draggingID: 0
 --- !u!114 &17
 MonoBehaviour:
@@ -3388,7 +3410,7 @@ MonoBehaviour:
   m_ObjectsLockedBeforeSerialization: []
   m_InstanceIDsLockedBeforeSerialization: 
   m_PreviewResizer:
-    m_CachedPref: 286.33334
+    m_CachedPref: 382.33334
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
   m_LastInspectedObjectInstanceID: -1

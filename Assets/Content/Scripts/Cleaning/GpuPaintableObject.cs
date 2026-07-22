@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FMODUnity;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -64,6 +65,8 @@ public class GPUPaintableObject : MonoBehaviour
     Renderer[] flashRenderers;
     bool usesCleanMaterial;
     bool pendingMaterialFinalize;
+
+    const string CleanSuccessEventPath = "event:/UI/Clean_Success";
 
     MaterialPropertyBlock PropertyBlock => propertyBlock ??= new MaterialPropertyBlock();
 
@@ -353,7 +356,7 @@ public class GPUPaintableObject : MonoBehaviour
                 {
                     if (!obj.IsInitialized)
                         obj.Initialize(128);
-                    obj.SetClean();
+                    obj.SetClean(playSuccessSound: false);
                 }
             }
         }
@@ -364,6 +367,11 @@ public class GPUPaintableObject : MonoBehaviour
     }
 
     public void SetClean()
+    {
+        SetClean(playSuccessSound: true);
+    }
+
+    public void SetClean(bool playSuccessSound)
     {
         if (isClean)
             return;
@@ -377,7 +385,15 @@ public class GPUPaintableObject : MonoBehaviour
         if (!deferCleanMaterialSwapUntilGrowComplete)
             PlayCleanFlash();
 
+        if (playSuccessSound)
+            PlayCleanSuccessSound();
+
         OnCleaned?.Invoke();
+    }
+
+    void PlayCleanSuccessSound()
+    {
+        RuntimeManager.PlayOneShot(CleanSuccessEventPath, transform.position);
     }
 
     void PlayCleanFlash(bool finalizeAfterFlash = false)

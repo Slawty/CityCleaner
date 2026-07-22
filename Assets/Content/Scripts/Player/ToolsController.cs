@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using FMODUnity;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Interactions;
 
 public class ToolsController : MonoBehaviour
 {
@@ -14,6 +14,9 @@ public class ToolsController : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] ToolSlot[] toolSlots;
+
+    [Header("Audio")]
+    [SerializeField] EventReference toolSwitchEvent;
 
     [Header("Input")]
     [SerializeField] InputActionReference nextToolAction;
@@ -166,9 +169,6 @@ public class ToolsController : MonoBehaviour
         if (Managers.Input.InteractionBlocked())
             return;
 
-        if (ctx.interaction is not HoldInteraction)
-            return;
-
         BeginVacuumMode();
     }
 
@@ -277,8 +277,19 @@ public class ToolsController : MonoBehaviour
         CurrentTool = tools[currentToolIndex];
         CurrentTool.gameObject.SetActive(true);
 
+        if (!force)
+            PlayToolSwitch();
+
         Debug.Log($"Equipped tool: {tools[currentToolIndex].name}");
         RefreshToolSlotVisuals();
+    }
+
+    void PlayToolSwitch()
+    {
+        if (toolSwitchEvent.IsNull)
+            throw new System.InvalidOperationException("Tool switch FMOD event is not assigned on ToolsController.");
+
+        RuntimeManager.PlayOneShotAttached(toolSwitchEvent, gameObject);
     }
 
     void RefreshToolSlotVisuals()

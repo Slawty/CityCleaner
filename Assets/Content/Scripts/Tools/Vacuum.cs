@@ -1,3 +1,5 @@
+using FMOD.Studio;
+using FMODUnity;
 using UnityEngine;
 
 public class Vacuum : MonoBehaviour
@@ -9,10 +11,14 @@ public class Vacuum : MonoBehaviour
     [Tooltip("Dirtlings parent here while vacuumed.")]
     public Transform dirtlingAttachPoint;
 
+    [Header("Audio")]
+    [SerializeField] EventReference vacuumLoopEvent;
+
     IVacuumable currentVacuumable;
     Camera cam;
     bool suctionActive;
     bool carryMode;
+    EventInstance vacuumLoopInstance;
 
     public bool HasCarryTarget =>
         currentVacuumable is IVacuumCarryable carryable && carryable.IsAttached;
@@ -20,6 +26,11 @@ public class Vacuum : MonoBehaviour
     void Awake()
     {
         cam = Managers.MainCam;
+    }
+
+    void OnDisable()
+    {
+        StopVacuumLoop();
     }
 
     void Update()
@@ -36,6 +47,7 @@ public class Vacuum : MonoBehaviour
         carryMode = false;
         particleTriggerCollider.enabled = true;
         Managers.Input.BlockInteraction(this);
+        StartVacuumLoop();
     }
 
     public void EnterCarryMode()
@@ -83,6 +95,29 @@ public class Vacuum : MonoBehaviour
         carryMode = false;
         particleTriggerCollider.enabled = false;
         Managers.Input.UnblockInteraction(this);
+        StopVacuumLoop();
+    }
+
+    void StartVacuumLoop()
+    {
+        if (vacuumLoopEvent.IsNull)
+            throw new System.InvalidOperationException("Vacuum loop FMOD event is not assigned on Vacuum.");
+
+        StopVacuumLoop();
+
+        vacuumLoopInstance = RuntimeManager.CreateInstance(vacuumLoopEvent);
+        RuntimeManager.AttachInstanceToGameObject(vacuumLoopInstance, transform);
+        vacuumLoopInstance.start();
+    }
+
+    void StopVacuumLoop()
+    {
+        if (!vacuumLoopInstance.isValid())
+            return;
+
+        vacuumLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        vacuumLoopInstance.release();
+        vacuumLoopInstance.clearHandle();
     }
 
     void ClearTarget()
