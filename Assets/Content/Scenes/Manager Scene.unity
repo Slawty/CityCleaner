@@ -6515,7 +6515,7 @@ MonoBehaviour:
   materials:
   - {fileID: 2100000, guid: 945bfbb1de35f854eab5a26c7844fbc9, type: 2}
   - {fileID: 2100000, guid: dafa4dc716ce7aa42ad0ad427503dfde, type: 2}
-  previewDirty: 1
+  previewDirty: 0
 --- !u!1 &343724865
 GameObject:
   m_ObjectHideFlags: 0
