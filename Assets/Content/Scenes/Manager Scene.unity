@@ -6515,7 +6515,8 @@ MonoBehaviour:
   materials:
   - {fileID: 2100000, guid: 945bfbb1de35f854eab5a26c7844fbc9, type: 2}
   - {fileID: 2100000, guid: dafa4dc716ce7aa42ad0ad427503dfde, type: 2}
-  previewDirty: 0
+  - {fileID: 2100000, guid: aab778baaf8abd64e8180978f16be595, type: 2}
+  previewDirty: 1
 --- !u!1 &343724865
 GameObject:
   m_ObjectHideFlags: 0
@@ -12281,8 +12282,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Air Cleaned
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b0edfee1030636b4b93193e672bbf532, type: 2}
-  m_sharedMaterial: {fileID: -1396064852735971370, guid: b0edfee1030636b4b93193e672bbf532, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c9fdb342313826d45bdd5396b5b1d47f, type: 2}
+  m_sharedMaterial: {fileID: -8956243852291856807, guid: c9fdb342313826d45bdd5396b5b1d47f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -12306,7 +12307,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 119.7
+  m_fontSize: 104.4
   m_fontSizeBase: 65.71
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -36195,8 +36196,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -1.6500112, y: 0}
-  m_SizeDelta: {x: 3.2999775, y: 0}
+  m_AnchoredPosition: {x: 2.7000008, y: -1.9799998}
+  m_SizeDelta: {x: -5.399999, y: -3.9600005}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1319199154
 MonoBehaviour:
@@ -36220,8 +36221,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: E
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b0edfee1030636b4b93193e672bbf532, type: 2}
-  m_sharedMaterial: {fileID: -1396064852735971370, guid: b0edfee1030636b4b93193e672bbf532, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c9fdb342313826d45bdd5396b5b1d47f, type: 2}
+  m_sharedMaterial: {fileID: -8956243852291856807, guid: c9fdb342313826d45bdd5396b5b1d47f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -36245,12 +36246,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 42
+  m_fontSize: 31.3
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 42
+  m_fontSizeMax: 31.3
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -37602,8 +37603,8 @@ MonoBehaviour:
     I am Mayor Cleanus and will help you clean
     the city ...'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b0edfee1030636b4b93193e672bbf532, type: 2}
-  m_sharedMaterial: {fileID: -1396064852735971370, guid: b0edfee1030636b4b93193e672bbf532, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c9fdb342313826d45bdd5396b5b1d47f, type: 2}
+  m_sharedMaterial: {fileID: -8956243852291856807, guid: c9fdb342313826d45bdd5396b5b1d47f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -37627,7 +37628,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 65.4
+  m_fontSize: 41.85
   m_fontSizeBase: 65.71
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -44315,8 +44316,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Interact (E)
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b0edfee1030636b4b93193e672bbf532, type: 2}
-  m_sharedMaterial: {fileID: -1396064852735971370, guid: b0edfee1030636b4b93193e672bbf532, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c9fdb342313826d45bdd5396b5b1d47f, type: 2}
+  m_sharedMaterial: {fileID: -8956243852291856807, guid: c9fdb342313826d45bdd5396b5b1d47f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -44340,19 +44341,19 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 42
+  m_fontSize: 35.6
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 42
-  m_fontStyle: 1
+  m_fontSizeMax: 35.6
+  m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
-  m_wordSpacing: 0
+  m_wordSpacing: -62.2
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
