@@ -119,7 +119,6 @@ public class UpgradeMenuController : MonoBehaviour
         if (!purchased)
             return;
 
-        Managers.Tutorial.NotifyPowerWasherUpgraded();
         RefreshCoinDisplay();
         RefreshBoard();
         RefreshDetailPanel();

@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -26,16 +27,24 @@ public class JobClient : MonoBehaviour, IInteractable
     [Header("Reward")]
     [SerializeField] Transform coinSpawnPoint;
     [SerializeField] int rewardCoinCount = 20;
+    [Header("Return")]
+    [SerializeField] string returnDestinationName;
+    [Header("Waypoint")]
+    [SerializeField] Transform waypointTarget;
 
     JobClientState state = JobClientState.Available;
 
     public JobClientState State => state;
     public Job Job => job;
     public JobSequence Sequence => jobSequence;
+    public Transform WaypointTransform => waypointTarget != null ? waypointTarget : transform;
+    public string ReturnDestinationName => string.IsNullOrEmpty(returnDestinationName) ? name : returnDestinationName;
     public string OfferDialogue => string.IsNullOrEmpty(dialogue) ? DefaultOfferDialogue : dialogue;
     public string CompletionDialogue => string.IsNullOrEmpty(completionDialogue) ? DefaultCompletionDialogue : completionDialogue;
 
     public string Prompt => "Talk";
+
+    public event Action SpokenTo;
 
     void Awake()
     {
@@ -70,21 +79,25 @@ public class JobClient : MonoBehaviour, IInteractable
                 break;
             case JobClientState.Active:
                 Managers.Speech.Show(ActiveJobDialogue);
+                NotifySpokenTo();
                 break;
             default:
                 if (jobSequence != null)
                 {
                     jobSequence.StartSequence();
+                    NotifySpokenTo();
                     break;
                 }
 
                 if (job == null)
                 {
-                    Debug.LogError($"{nameof(JobClient)} on {name}: assign {nameof(job)} or {nameof(jobSequence)}.", this);
-                    return;
+                    Managers.Speech.Show(OfferDialogue);
+                    NotifySpokenTo();
+                    break;
                 }
 
                 Managers.Jobs.OfferJob(this);
+                NotifySpokenTo();
                 break;
         }
     }
@@ -97,6 +110,7 @@ public class JobClient : MonoBehaviour, IInteractable
     {
         state = newState;
         RefreshSymbols();
+        Managers.Jobs?.RefreshWaypoint();
     }
 
     public void PayReward()
@@ -138,5 +152,10 @@ public class JobClient : MonoBehaviour, IInteractable
     {
         if (symbol != null)
             symbol.SetActive(active);
+    }
+
+    void NotifySpokenTo()
+    {
+        SpokenTo?.Invoke();
     }
 }

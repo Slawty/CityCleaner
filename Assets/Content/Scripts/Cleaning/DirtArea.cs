@@ -47,6 +47,11 @@ public class DirtArea : MonoBehaviour
     public float JobCompletionFraction => jobCompletionFraction;
     public bool IsJobTargetActive => jobTargetActive;
 
+    public bool ShouldShowWaypoint()
+    {
+        return jobTargetActive && !playerInsideArea && !jobCompleted && NormalizedProgress < 1f;
+    }
+
     void Awake()
     {
         DiscoverTargets();
@@ -89,6 +94,7 @@ public class DirtArea : MonoBehaviour
             visualBorder.SetActive(true);
 
         RefreshJobIndicator();
+        Managers.Jobs?.RefreshWaypoint();
     }
 
     void OnPlayerExitedArea()
@@ -100,6 +106,7 @@ public class DirtArea : MonoBehaviour
             visualBorder.SetActive(false);
 
         RefreshJobIndicator();
+        Managers.Jobs?.RefreshWaypoint();
     }
 
     public void SetJobTargetActive(bool active)

@@ -56,4 +56,15 @@ public class DirtAreaJob : Job
     {
         targetArea?.CollectIncompletePaintables(results);
     }
+
+    protected override Transform GetWaypointTargetTransform()
+    {
+        if (waypointTarget != null)
+            return waypointTarget;
+
+        if (targetArea == null || !targetArea.ShouldShowWaypoint())
+            return null;
+
+        return targetArea.transform;
+    }
 }

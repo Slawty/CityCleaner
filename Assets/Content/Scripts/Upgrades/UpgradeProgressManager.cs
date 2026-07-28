@@ -41,7 +41,15 @@ public class UpgradeProgressManager : MonoBehaviour
         if (node?.Data == null)
             return 0;
 
-        return ranksById.TryGetValue(node.Data.id, out int rank) ? rank : 0;
+        return GetRankById(node.Data.id);
+    }
+
+    public int GetRankById(string upgradeId)
+    {
+        if (string.IsNullOrEmpty(upgradeId))
+            return 0;
+
+        return ranksById.TryGetValue(upgradeId, out int rank) ? rank : 0;
     }
 
     public UpgradeNodeState GetState(UpgradeNode node)

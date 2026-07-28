@@ -17,6 +17,7 @@ public class CleanTargetsJob : Job
             return;
 
         tracking = true;
+        ResetWaypointDismissal();
 
         foreach (GPUPaintableObject target in targets)
         {

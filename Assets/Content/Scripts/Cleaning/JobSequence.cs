@@ -4,6 +4,7 @@ public class JobSequence : MonoBehaviour
 {
     [SerializeField] JobStep[] steps;
     [SerializeField] bool autoStartOnLoad;
+    [SerializeField] Job postSequenceGuidanceJob;
     [SerializeField] bool triggerTutorialOnComplete;
 
     int currentStepIndex;
@@ -123,7 +124,9 @@ public class JobSequence : MonoBehaviour
 
         sequenceActive = false;
 
-        if (triggerTutorialOnComplete)
+        if (postSequenceGuidanceJob != null)
+            Managers.Jobs.StartGuidanceJob(postSequenceGuidanceJob);
+        else if (triggerTutorialOnComplete)
             Managers.Tutorial.NotifyJobSequenceCompleted();
     }
 

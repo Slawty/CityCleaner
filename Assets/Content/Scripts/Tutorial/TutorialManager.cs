@@ -7,21 +7,11 @@ public class TutorialManager : MonoBehaviour
 
     const string VacuumCoinInfo = "Use RMB to activate the Vacuum";
 
-    const string PowerWasherUpgradeInfo =
-        "Go to the work station and upgrade your power washer";
-
     bool waterRefillTutorialShown;
     bool waitingForWaterRefill;
 
     bool vacuumCoinTutorialShown;
     bool waitingForFirstCoinCollection;
-
-    bool powerWasherUpgradeTutorialShown;
-    bool waitingForPowerWasherUpgrade;
-
-    PowerWasherUpgradeStation powerWasherUpgradeStation;
-
-    public bool IsWaitingForPowerWasherUpgrade => waitingForPowerWasherUpgrade;
 
     void Start()
     {
@@ -45,33 +35,8 @@ public class TutorialManager : MonoBehaviour
         CoinParticleMover.OnCoinCollected -= HandleCoinCollected;
     }
 
-    public void RegisterPowerWasherUpgradeStation(PowerWasherUpgradeStation station)
-    {
-        powerWasherUpgradeStation = station;
-
-        if (waitingForPowerWasherUpgrade)
-            station.SetAvailable(true);
-    }
-
     public void NotifyJobSequenceCompleted()
     {
-        if (powerWasherUpgradeTutorialShown)
-            return;
-
-        powerWasherUpgradeTutorialShown = true;
-        waitingForPowerWasherUpgrade = true;
-        Managers.UI.ShowTutorialInfoText(PowerWasherUpgradeInfo, 0f);
-        powerWasherUpgradeStation?.SetAvailable(true);
-    }
-
-    public void NotifyPowerWasherUpgraded()
-    {
-        if (!waitingForPowerWasherUpgrade)
-            return;
-
-        waitingForPowerWasherUpgrade = false;
-        Managers.UI.HideTutorialInfoText();
-        powerWasherUpgradeStation?.SetAvailable(false);
     }
 
     void HandleCoinSpawned()

@@ -16,11 +16,6 @@ public class PowerWasherUpgradeStation : MonoBehaviour, IInteractable
         SetAvailable(false);
     }
 
-    void Start()
-    {
-        Managers.Tutorial.RegisterPowerWasherUpgradeStation(this);
-    }
-
     public void SetAvailable(bool available)
     {
         isAvailable = available;

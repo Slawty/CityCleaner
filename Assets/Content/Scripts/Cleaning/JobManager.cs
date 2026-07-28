@@ -46,6 +46,12 @@ public class JobManager : MonoBehaviour
 
     public bool HasActiveJob => activeJobs.Count > 0;
 
+    void Update()
+    {
+        foreach (TrackedJob tracked in activeJobs)
+            tracked.Job.UpdateWaypointDismissal();
+    }
+
     public void CompleteActiveJobDebug()
     {
         if (activeJobs.Count == 0)
@@ -132,6 +138,8 @@ public class JobManager : MonoBehaviour
 
                 if (targetHighlighter != null)
                     targetHighlighter.HighlightActiveJobTargets();
+
+                RefreshWaypoint();
                 return;
             }
         }
@@ -199,16 +207,48 @@ public class JobManager : MonoBehaviour
         if (pendingClient == null)
             return;
 
-        pendingClient.PayReward();
-        pendingClient.SetState(JobClientState.TurnedIn);
+        CompleteClientTurnIn(pendingClient);
+        RefreshWaypoint();
+    }
+
+    public void RefreshWaypoint()
+    {
+        RefreshReturnMessages();
+
+        JobClient turnInClient = FindTurnInClient();
+        if (turnInClient != null)
+        {
+            Managers.UI.SetWaypointTurnInTarget(turnInClient.WaypointTransform);
+            return;
+        }
+
+        for (int index = activeJobs.Count - 1; index >= 0; index--)
+        {
+            Job job = activeJobs[index].Job;
+            Transform target = job.GetWaypointTarget();
+            if (target == null)
+                continue;
+
+            Managers.UI.SetWaypointTarget(target, job.GetWaypointHideDistance());
+            return;
+        }
+
+        Managers.UI.ClearWaypointTarget();
+    }
+
+    void RefreshReturnMessages()
+    {
+        Managers.UI.RefreshReturnMessages();
     }
 
     void BeginTracking(TrackedJob tracked)
     {
         tracked.ProgressHandler = progress => OnJobProgressChanged(tracked, progress);
         tracked.Job.OnProgressChanged += tracked.ProgressHandler;
+        tracked.Job.ResetWaypointDismissal();
         tracked.Job.StartTracking();
         activeJobs.Add(tracked);
+        RefreshWaypoint();
     }
 
     void OnJobProgressChanged(TrackedJob tracked, float progress)
@@ -232,6 +272,7 @@ public class JobManager : MonoBehaviour
         Managers.UI.ShowInfoText("Job Completed");
         tracked.OnObjectivesCompleted?.Invoke();
         ClearTargetHighlightsIfNeeded();
+        RefreshWaypoint();
     }
 
     void FinishClientJobObjectives(TrackedJob tracked)
@@ -239,9 +280,21 @@ public class JobManager : MonoBehaviour
         StopTracking(tracked);
         tracked.Job.CompleteRemaining();
         tracked.Job.MarkCompleted();
-        tracked.Client.SetState(JobClientState.CompletedPendingTurnIn);
         Managers.UI.ShowInfoText("Job Completed");
+
+        if (tracked.Job.RequiresTurnIn)
+            tracked.Client.SetState(JobClientState.CompletedPendingTurnIn);
+        else
+            CompleteClientTurnIn(tracked.Client);
+
         ClearTargetHighlightsIfNeeded();
+        RefreshWaypoint();
+    }
+
+    void CompleteClientTurnIn(JobClient client)
+    {
+        client.PayReward();
+        client.SetState(JobClientState.TurnedIn);
     }
 
     void FinishGuidanceJob(TrackedJob tracked)
@@ -250,6 +303,7 @@ public class JobManager : MonoBehaviour
         tracked.Job.CompleteRemaining();
         tracked.Job.MarkCompleted();
         Managers.UI.ShowInfoText("Task Completed");
+        RefreshWaypoint();
     }
 
     void StopTracking(TrackedJob tracked)
@@ -257,6 +311,18 @@ public class JobManager : MonoBehaviour
         tracked.Job.OnProgressChanged -= tracked.ProgressHandler;
         tracked.Job.StopTracking();
         activeJobs.Remove(tracked);
+    }
+
+    JobClient FindTurnInClient()
+    {
+        JobClient[] clients = FindObjectsByType<JobClient>(FindObjectsSortMode.None);
+        foreach (JobClient client in clients)
+        {
+            if (client.State == JobClientState.CompletedPendingTurnIn)
+                return client;
+        }
+
+        return null;
     }
 
     bool IsTrackingJob(Job job)
