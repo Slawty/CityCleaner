@@ -12,12 +12,15 @@ public class NpcNavMovement : MonoBehaviour
     [Header("Animation")]
     public string speedParameter = "Speed";
     public float animationSmooth = 10f;
+    [Header("Arrival")]
+    [SerializeField] float arrivalRotationSpeed = 360f;
 
     float currentAnimSpeed;
 
     bool waitingForGround;
     bool wasThrown;
     PickupInteractable pickupInteractable;
+    Quaternion? pendingArrivalRotation;
 
     void Awake()
     {
@@ -30,6 +33,7 @@ public class NpcNavMovement : MonoBehaviour
         if (followPlayerOnStart)
             HandleFollow();
 
+        UpdateArrivalRotation();
         UpdateAnimation();
     }
 
@@ -50,8 +54,39 @@ public class NpcNavMovement : MonoBehaviour
 
     public void MoveTo(Vector3 position)
     {
+        MoveTo(position, null);
+    }
+
+    public void MoveTo(Vector3 position, Transform faceTarget)
+    {
         followTarget = null;
         agent.SetDestination(position);
+
+        if (faceTarget == null)
+        {
+            pendingArrivalRotation = null;
+            return;
+        }
+
+        pendingArrivalRotation = Quaternion.LookRotation(faceTarget.forward, Vector3.up);
+    }
+
+    void UpdateArrivalRotation()
+    {
+        if (!pendingArrivalRotation.HasValue)
+            return;
+
+        if (!HasReachedDestination())
+            return;
+
+        Quaternion targetRotation = pendingArrivalRotation.Value;
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, arrivalRotationSpeed * Time.deltaTime);
+
+        if (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
+            return;
+
+        transform.rotation = targetRotation;
+        pendingArrivalRotation = null;
     }
 
     public void Follow(Transform target)
@@ -95,6 +130,7 @@ public class NpcNavMovement : MonoBehaviour
     public void Stop()
     {
         followTarget = null;
+        pendingArrivalRotation = null;
         agent.ResetPath();
     }
 

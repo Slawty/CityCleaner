@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using FMODUnity;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,6 +10,7 @@ public class JobTargetHighlighter : MonoBehaviour
     [SerializeField] float highlightDuration = 4f;
     [SerializeField] float fadeInDuration = 0.35f;
     [SerializeField] float fadeOutDuration = 0.65f;
+    [SerializeField] EventReference highlightSoundEvent;
 
     readonly List<GPUPaintableObject> highlightedTargets = new();
     readonly List<GPUPaintableObject> scratchTargets = new();
@@ -83,9 +85,18 @@ public class JobTargetHighlighter : MonoBehaviour
         if (highlightedTargets.Count == 0)
             return;
 
+        PlayHighlightSound();
         float holdDuration = Mathf.Max(highlightDuration - fadeInDuration - fadeOutDuration, 0f);
         ApplyStrengthToAll(EvaluateHighlightStrength(Time.deltaTime, holdDuration));
         highlightRoutine = StartCoroutine(HighlightRoutine());
+    }
+
+    void PlayHighlightSound()
+    {
+        if (highlightSoundEvent.IsNull)
+            throw new System.InvalidOperationException("Highlight FMOD event is not assigned on JobTargetHighlighter.");
+
+        RuntimeManager.PlayOneShotAttached(highlightSoundEvent, gameObject);
     }
 
     IEnumerator HighlightRoutine()

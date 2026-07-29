@@ -16,17 +16,24 @@ public class JobManager : MonoBehaviour
         public Job Job;
         public JobClient Client;
         public Action<float> ProgressHandler;
-        public Action OnObjectivesCompleted;
-        public bool IsSequenceStep;
+        public bool IsChainJob;
     }
 
     [SerializeField] JobTargetHighlighter targetHighlighter;
+    [SerializeField] Job postChainGuidanceJob;
+    [SerializeField] bool triggerTutorialOnComplete;
 
     readonly List<TrackedJob> activeJobs = new();
     readonly List<Job> activeJobsScratch = new();
 
     JobClient pendingClient;
     JobSpeechAction pendingSpeechAction;
+
+    Job chainFirstJob;
+    Job currentChainJob;
+    bool chainActive;
+    bool waitingForChainOutro;
+    Job preIntroMovesRanForJob;
 
     public Job ActiveJob => activeJobs.Count > 0 ? activeJobs[activeJobs.Count - 1].Job : null;
     public IReadOnlyList<Job> ActiveJobs => GetActiveJobsSnapshot();
@@ -52,6 +59,11 @@ public class JobManager : MonoBehaviour
             tracked.Job.UpdateWaypointDismissal();
     }
 
+    public void MarkPreIntroMovesRan(Job job)
+    {
+        preIntroMovesRanForJob = job;
+    }
+
     public void CompleteActiveJobDebug()
     {
         if (activeJobs.Count == 0)
@@ -59,6 +71,40 @@ public class JobManager : MonoBehaviour
 
         TrackedJob tracked = activeJobs[activeJobs.Count - 1];
         OnJobProgressChanged(tracked, 1f);
+    }
+
+    public void StartJobChain(Job firstJob)
+    {
+        if (firstJob == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(StartJobChain)}: job is required.", this);
+            return;
+        }
+
+        if (chainActive)
+            return;
+
+        chainFirstJob = firstJob;
+        currentChainJob = firstJob;
+        chainActive = true;
+        BeginCurrentChainJob();
+    }
+
+    public bool OfferChainJobOutro(JobClient client)
+    {
+        if (!chainActive || !waitingForChainOutro || client == null || currentChainJob == null)
+            return false;
+
+        if (currentChainJob.Speaker != client)
+            return false;
+
+        JobPresentation presentation = currentChainJob.Presentation;
+        if (HasDialogues(presentation.outroDialogues))
+            Managers.Speech.ShowDialogueSequence(presentation.outroDialogues, OnChainOutroFinished);
+        else
+            OnChainOutroFinished();
+
+        return true;
     }
 
     public void OfferJob(JobClient client)
@@ -114,51 +160,6 @@ public class JobManager : MonoBehaviour
         BeginTracking(new TrackedJob { Job = job, Client = null });
     }
 
-    public void StartSequenceJob(Job job, JobClient client, Action onObjectivesCompleted)
-    {
-        if (job == null)
-        {
-            Debug.LogError($"{nameof(JobManager)}.{nameof(StartSequenceJob)}: job is required.", this);
-            return;
-        }
-
-        if (IsTrackingJob(job))
-        {
-            foreach (TrackedJob tracked in activeJobs)
-            {
-                if (tracked.Job != job)
-                    continue;
-
-                tracked.IsSequenceStep = true;
-                tracked.Client = client;
-                tracked.OnObjectivesCompleted = onObjectivesCompleted;
-
-                if (client != null)
-                    client.SetState(JobClientState.Active);
-
-                if (targetHighlighter != null)
-                    targetHighlighter.HighlightActiveJobTargets();
-
-                RefreshWaypoint();
-                return;
-            }
-        }
-
-        if (client != null)
-            client.SetState(JobClientState.Active);
-
-        BeginTracking(new TrackedJob
-        {
-            Job = job,
-            Client = client,
-            IsSequenceStep = true,
-            OnObjectivesCompleted = onObjectivesCompleted
-        });
-
-        if (targetHighlighter != null)
-            targetHighlighter.HighlightActiveJobTargets();
-    }
-
     public void ClearPendingOffer()
     {
         pendingClient = null;
@@ -179,6 +180,117 @@ public class JobManager : MonoBehaviour
 
         pendingClient = null;
         pendingSpeechAction = JobSpeechAction.None;
+    }
+
+    void BeginCurrentChainJob()
+    {
+        if (currentChainJob == null)
+        {
+            Debug.LogError($"{nameof(JobManager)} on {name}: current chain job is missing.", this);
+            return;
+        }
+
+        JobPresentation presentation = currentChainJob.Presentation;
+        bool skipPreIntroMoves = currentChainJob == preIntroMovesRanForJob;
+        if (!skipPreIntroMoves)
+            NpcMoveRunner.Run(presentation.movesBeforeIntro);
+
+        preIntroMovesRanForJob = null;
+
+        if (HasDialogues(presentation.introDialogues))
+            Managers.Speech.ShowDialogueSequence(presentation.introDialogues, OnChainIntroFinished);
+        else
+            OnChainIntroFinished();
+    }
+
+    void OnChainIntroFinished()
+    {
+        currentChainJob.Presentation.onJobStarted?.Invoke();
+        StartChainJobTracking(currentChainJob, currentChainJob.Speaker);
+    }
+
+    void StartChainJobTracking(Job job, JobClient client)
+    {
+        if (IsTrackingJob(job))
+        {
+            foreach (TrackedJob tracked in activeJobs)
+            {
+                if (tracked.Job != job)
+                    continue;
+
+                tracked.IsChainJob = true;
+                tracked.Client = client;
+
+                if (client != null)
+                    client.SetState(JobClientState.Active);
+
+                if (targetHighlighter != null)
+                    targetHighlighter.HighlightActiveJobTargets();
+
+                RefreshWaypoint();
+                return;
+            }
+        }
+
+        if (client != null)
+            client.SetState(JobClientState.Active);
+
+        BeginTracking(new TrackedJob
+        {
+            Job = job,
+            Client = client,
+            IsChainJob = true
+        });
+
+        if (targetHighlighter != null)
+            targetHighlighter.HighlightActiveJobTargets();
+    }
+
+    void OnChainJobObjectivesCompleted()
+    {
+        currentChainJob.Presentation.onJobCompleted?.Invoke();
+
+        if (currentChainJob.Speaker != null && currentChainJob.RequiresTurnIn)
+        {
+            waitingForChainOutro = true;
+            currentChainJob.Speaker.SetState(JobClientState.CompletedPendingTurnIn);
+        }
+        else
+            OnChainOutroFinished();
+    }
+
+    void OnChainOutroFinished()
+    {
+        waitingForChainOutro = false;
+        JobPresentation presentation = currentChainJob.Presentation;
+        NpcMoveRunner.Run(presentation.movesAfterOutro);
+
+        if (presentation.payRewardOnComplete && currentChainJob.Speaker != null)
+            currentChainJob.Speaker.PayReward();
+
+        Job nextJob = currentChainJob.FollowUpJob;
+        if (nextJob == null)
+        {
+            if (currentChainJob.Speaker != null)
+                currentChainJob.Speaker.SetState(JobClientState.TurnedIn);
+
+            chainActive = false;
+            chainFirstJob = null;
+            currentChainJob = null;
+
+            if (postChainGuidanceJob != null)
+                StartGuidanceJob(postChainGuidanceJob);
+            else if (triggerTutorialOnComplete)
+                Managers.Tutorial.NotifyJobChainCompleted();
+
+            return;
+        }
+
+        currentChainJob = nextJob;
+        if (currentChainJob.Speaker != null)
+            currentChainJob.Speaker.SetState(JobClientState.Available);
+
+        BeginCurrentChainJob();
     }
 
     void AcceptNewJob()
@@ -256,21 +368,21 @@ public class JobManager : MonoBehaviour
         if (progress < tracked.Job.CompletionFraction)
             return;
 
-        if (tracked.IsSequenceStep)
-            FinishSequenceJob(tracked);
+        if (tracked.IsChainJob)
+            FinishChainJob(tracked);
         else if (tracked.Client != null)
             FinishClientJobObjectives(tracked);
         else
             FinishGuidanceJob(tracked);
     }
 
-    void FinishSequenceJob(TrackedJob tracked)
+    void FinishChainJob(TrackedJob tracked)
     {
         StopTracking(tracked);
         tracked.Job.CompleteRemaining();
         tracked.Job.MarkCompleted();
         Managers.UI.ShowInfoText("Job Completed");
-        tracked.OnObjectivesCompleted?.Invoke();
+        OnChainJobObjectivesCompleted();
         ClearTargetHighlightsIfNeeded();
         RefreshWaypoint();
     }
@@ -351,5 +463,10 @@ public class JobManager : MonoBehaviour
 
         if (activeJobs.Count == 0)
             targetHighlighter.StopHighlight();
+    }
+
+    static bool HasDialogues(string[] dialogues)
+    {
+        return dialogues != null && dialogues.Length > 0;
     }
 }

@@ -201,6 +201,7 @@ MonoBehaviour:
   followPlayerOnStart: 0
   speedParameter: Speed
   animationSmooth: 10
+  arrivalRotationSpeed: 360
 --- !u!54 &6912682421103994261
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -394,10 +395,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7036213049465896255, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7014976580811933650}
+    - targetCorrespondingSourceObject: {fileID: 7036213049465896255, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7570458118807760732}
   m_SourcePrefab: {fileID: 100100000, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
 --- !u!4 &2301516416086478842 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
+  m_PrefabInstance: {fileID: 1763750250057426961}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4862943559627412078 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6559137607592213119, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
   m_PrefabInstance: {fileID: 1763750250057426961}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &8781948890775295278 stripped
@@ -427,3 +436,25 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7570458118807760732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8781948890775295278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4e9c2b1d8f4a3e9b6c5d4e3f2a1b0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimationSounds
+  sounds:
+  - name: Footstep
+    eventReference:
+      Guid:
+        Data1: -1571419135
+        Data2: 1336026592
+        Data3: 135941261
+        Data4: 930068125
+      Path: event:/NPCs/Cleanling_Footsteps
+  attachPoint: {fileID: 4862943559627412078}

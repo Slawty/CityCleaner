@@ -1,3 +1,4 @@
+using FMODUnity;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ public class CoinParticleMover : MonoBehaviour
     public RessourceType Type;
     public ParticleSystem ps;
     public Transform vacuumPoint;
+    [SerializeField] EventReference coinCollectEvent;
     public bool scaleSize = true;
     public float suctionStrength = 12f;
     public float hopForce = 4f;
@@ -68,8 +70,17 @@ public class CoinParticleMover : MonoBehaviour
         {
             Managers.Inventory.IncreaseCoins(amount);
             OnCoinCollected?.Invoke();
+            PlayCoinCollectSound();
         }
         else if (Type == RessourceType.Poop)
             Managers.Inventory.IncreasePoop(amount);
+    }
+
+    void PlayCoinCollectSound()
+    {
+        if (coinCollectEvent.IsNull)
+            throw new System.InvalidOperationException("Coin collect FMOD event is not assigned on CoinParticleMover.");
+
+        RuntimeManager.PlayOneShotAttached(coinCollectEvent, vacuumPoint.gameObject);
     }
 }

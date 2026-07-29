@@ -117,7 +117,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::JobClient
   job: {fileID: 0}
-  jobSequence: {fileID: 0}
   dialogue: Hey, can you please help me?
   completionDialogue: Thanks man!
   jobAvailableSymbol: {fileID: 9178566164299144942}
@@ -127,6 +126,7 @@ MonoBehaviour:
   rewardCoinCount: 20
   returnDestinationName: 
   waypointTarget: {fileID: 9025912406636663398}
+  animationSounds: {fileID: 0}
 --- !u!136 &8055453177405506620
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -166,6 +166,7 @@ MonoBehaviour:
   followPlayerOnStart: 0
   speedParameter: Speed
   animationSmooth: 10
+  arrivalRotationSpeed: 360
 --- !u!54 &1226433375803334992
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -207,9 +208,9 @@ NavMeshAgent:
   m_Acceleration: 30
   avoidancePriority: 50
   m_AngularSpeed: 400
-  m_StoppingDistance: 2
+  m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 0
@@ -956,6 +957,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7036213049465896255, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5605577285135313363}
+    - targetCorrespondingSourceObject: {fileID: 7036213049465896255, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8242611543606099326}
   m_SourcePrefab: {fileID: 100100000, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
 --- !u!1 &2059273550639101064 stripped
 GameObject:
@@ -984,6 +988,33 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8242611543606099326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2059273550639101064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4e9c2b1d8f4a3e9b6c5d4e3f2a1b0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcSounds
+  sounds:
+  - name: Footstep
+    eventReference:
+      Guid:
+        Data1: -1571419135
+        Data2: 1336026592
+        Data3: 135941261
+        Data4: 930068125
+      Path: event:/NPCs/Cleanling_Footsteps
+  attachPoint: {fileID: 5682997399063960849}
+--- !u!4 &5682997399063960849 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3742407835892290726, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
+  m_PrefabInstance: {fileID: 9021171983535212983}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8843694600266706524 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f8d7c365db0ca944780907e491e1429b, type: 3}

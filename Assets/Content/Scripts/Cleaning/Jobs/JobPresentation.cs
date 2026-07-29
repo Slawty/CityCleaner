@@ -1,12 +1,9 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-[Serializable]
-public class JobStep
+[System.Serializable]
+public class JobPresentation
 {
-    public Job job;
-    public JobClient speaker;
     [TextArea(2, 6)] public string[] introDialogues;
     [TextArea(2, 6)] public string[] outroDialogues;
     public NpcMoveInstruction[] movesBeforeIntro;

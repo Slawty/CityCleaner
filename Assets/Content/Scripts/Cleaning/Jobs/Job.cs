@@ -8,6 +8,12 @@ public abstract class Job : MonoBehaviour
     [SerializeField] string progressDescription;
     [Header("Completion")]
     [SerializeField] bool requiresTurnIn = true;
+    [Header("Presentation")]
+    [SerializeField] JobPresentation presentation = new();
+    [SerializeField] JobClient speaker;
+    [Header("Chain")]
+    [SerializeField] Job followUpJob;
+    [SerializeField] bool runPreIntroMovesOnLoad;
     [Header("Waypoint")]
     [SerializeField] bool useWaypoint;
     [SerializeField] protected Transform waypointTarget;
@@ -19,10 +25,33 @@ public abstract class Job : MonoBehaviour
     public virtual float CompletionFraction => completionFraction;
     public virtual bool UsesProgressBar => true;
     public bool RequiresTurnIn => requiresTurnIn;
+    public JobPresentation Presentation => presentation;
+    public JobClient Speaker => speaker;
+    public Job FollowUpJob => followUpJob;
     public string ProgressDescription => progressDescription;
     public abstract float NormalizedProgress { get; }
 
+    public bool UsesChainFlow =>
+        speaker != null ||
+        followUpJob != null ||
+        HasDialogues(presentation.introDialogues) ||
+        HasDialogues(presentation.outroDialogues) ||
+        presentation.movesBeforeIntro is { Length: > 0 } ||
+        presentation.movesAfterOutro is { Length: > 0 } ||
+        presentation.payRewardOnComplete;
+
     public event Action<float> OnProgressChanged;
+
+    void Start()
+    {
+        if (!runPreIntroMovesOnLoad)
+            return;
+
+        NpcMoveRunner.Run(presentation.movesBeforeIntro);
+        Managers.Jobs?.MarkPreIntroMovesRan(this);
+    }
+
+    static bool HasDialogues(string[] dialogues) => dialogues != null && dialogues.Length > 0;
 
     protected void BeginJobProgressUi()
     {

@@ -35,7 +35,7 @@ public class TutorialManager : MonoBehaviour
         CoinParticleMover.OnCoinCollected -= HandleCoinCollected;
     }
 
-    public void NotifyJobSequenceCompleted()
+    public void NotifyJobChainCompleted()
     {
     }
 

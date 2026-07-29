@@ -1,5 +1,8 @@
 using System;
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using FMOD.Studio;
+using FMODUnity;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -13,12 +16,18 @@ public class SpeechPanelController : MonoBehaviour
     [SerializeField] GameObject panelRoot;
     [SerializeField] TMP_Text dialogueText;
     [SerializeField] Button acceptButton;
+    [SerializeField] float typewriterCharsPerSecond = 45f;
+    [SerializeField] EventReference typewriterSoundEvent;
 
     bool isOpen;
+    bool lineFullyRevealed;
     Action pendingOnAccept;
     string[] pendingLines;
     int pendingLineIndex;
-    Coroutine enableGameplayInputRoutine;
+    string currentLineText;
+    CancellationTokenSource typewriterCts;
+    CancellationTokenSource enableGameplayInputCts;
+    EventInstance typewriterLoopInstance;
 
     void Awake()
     {
@@ -29,7 +38,9 @@ public class SpeechPanelController : MonoBehaviour
     void OnDestroy()
     {
         acceptButton.onClick.RemoveListener(OnAcceptClicked);
-        StopEnableGameplayInputRoutine();
+        CancelTypewriter();
+        StopTypewriterLoop();
+        CancelEnableGameplayInputTask();
     }
 
     public void Show(string text = null, Action onAccept = null)
@@ -57,8 +68,7 @@ public class SpeechPanelController : MonoBehaviour
 
         if (isOpen)
         {
-            dialogueText.text = lines[0];
-            ResetAcceptButtonState();
+            ShowLine(lines[0]);
             return;
         }
 
@@ -67,11 +77,11 @@ public class SpeechPanelController : MonoBehaviour
 
     void OpenPanel(string text)
     {
-        StopEnableGameplayInputRoutine();
+        CancelEnableGameplayInputTask();
         isOpen = true;
-        dialogueText.text = text;
-        ResetAcceptButtonState();
         panelRoot.SetActive(true);
+        ShowLine(text);
+        ResetAcceptButtonState();
 
         Managers.UI.HideInteractText();
         Managers.UI.SetHudVisible(false);
@@ -81,13 +91,108 @@ public class SpeechPanelController : MonoBehaviour
         Managers.Tools.StopActiveShooting();
     }
 
+    void ShowLine(string text)
+    {
+        currentLineText = text;
+        lineFullyRevealed = false;
+        CancelTypewriter();
+        typewriterCts = new CancellationTokenSource();
+        TypewriterAsync(text, typewriterCts.Token).Forget();
+    }
+
+    async UniTaskVoid TypewriterAsync(string text, CancellationToken cancellationToken)
+    {
+        try
+        {
+            StartTypewriterLoop();
+
+            dialogueText.text = text;
+            dialogueText.ForceMeshUpdate();
+            dialogueText.maxVisibleCharacters = 0;
+
+            float charDelay = typewriterCharsPerSecond > 0f ? 1f / typewriterCharsPerSecond : 0f;
+            int visibleCount = 0;
+
+            while (visibleCount < text.Length)
+            {
+                visibleCount++;
+                dialogueText.maxVisibleCharacters = visibleCount;
+
+                if (charDelay > 0f)
+                    await UniTask.Delay(TimeSpan.FromSeconds(charDelay), ignoreTimeScale: true, cancellationToken: cancellationToken);
+                else
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+
+            lineFullyRevealed = true;
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            StopTypewriterLoop();
+        }
+    }
+
+    void CompleteTypewriter()
+    {
+        CancelTypewriter();
+
+        if (string.IsNullOrEmpty(currentLineText))
+        {
+            lineFullyRevealed = true;
+            return;
+        }
+
+        dialogueText.text = currentLineText;
+        dialogueText.ForceMeshUpdate();
+        dialogueText.maxVisibleCharacters = currentLineText.Length;
+        lineFullyRevealed = true;
+    }
+
+    void StartTypewriterLoop()
+    {
+        if (typewriterSoundEvent.IsNull)
+            return;
+
+        StopTypewriterLoop();
+
+        typewriterLoopInstance = RuntimeManager.CreateInstance(typewriterSoundEvent);
+        RuntimeManager.AttachInstanceToGameObject(typewriterLoopInstance, gameObject);
+        typewriterLoopInstance.start();
+    }
+
+    void StopTypewriterLoop()
+    {
+        if (!typewriterLoopInstance.isValid())
+            return;
+
+        typewriterLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        typewriterLoopInstance.release();
+        typewriterLoopInstance.clearHandle();
+    }
+
+    void CancelTypewriter()
+    {
+        if (typewriterCts == null)
+            return;
+
+        typewriterCts.Cancel();
+        typewriterCts.Dispose();
+        typewriterCts = null;
+    }
+
     public void Close()
     {
         if (!isOpen)
             return;
 
+        CancelTypewriter();
         Managers.Jobs.ClearPendingOffer();
         isOpen = false;
+        lineFullyRevealed = false;
+        currentLineText = null;
         pendingOnAccept = null;
         pendingLines = null;
         pendingLineIndex = 0;
@@ -97,15 +202,23 @@ public class SpeechPanelController : MonoBehaviour
         Managers.UI.SetHudVisible(true);
         Managers.Player.SetMovementEnabled(true);
         Managers.Player.mouseLook.SetPointerMode(false);
-        enableGameplayInputRoutine = StartCoroutine(EnableGameplayInputAfterPointerReleased());
+        enableGameplayInputCts = new CancellationTokenSource();
+        EnableGameplayInputAfterPointerReleasedAsync(enableGameplayInputCts.Token).Forget();
     }
 
     void OnAcceptClicked()
     {
+        if (!lineFullyRevealed)
+        {
+            CompleteTypewriter();
+            ResetAcceptButtonState();
+            return;
+        }
+
         if (pendingLines != null && pendingLineIndex < pendingLines.Length - 1)
         {
             pendingLineIndex++;
-            dialogueText.text = pendingLines[pendingLineIndex];
+            ShowLine(pendingLines[pendingLineIndex]);
             ResetAcceptButtonState();
             return;
         }
@@ -126,28 +239,33 @@ public class SpeechPanelController : MonoBehaviour
         Close();
     }
 
-    IEnumerator EnableGameplayInputAfterPointerReleased()
+    async UniTaskVoid EnableGameplayInputAfterPointerReleasedAsync(CancellationToken cancellationToken)
     {
-        Mouse mouse = Mouse.current;
-        if (mouse != null)
+        try
         {
-            while (mouse.leftButton.isPressed)
-                yield return null;
+            Mouse mouse = Mouse.current;
+            if (mouse != null)
+            {
+                while (mouse.leftButton.isPressed)
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            Managers.Input.UnblockInteraction(this);
         }
-
-        yield return null;
-
-        enableGameplayInputRoutine = null;
-        Managers.Input.UnblockInteraction(this);
+        catch (OperationCanceledException)
+        {
+        }
     }
 
-    void StopEnableGameplayInputRoutine()
+    void CancelEnableGameplayInputTask()
     {
-        if (enableGameplayInputRoutine == null)
+        if (enableGameplayInputCts == null)
             return;
 
-        StopCoroutine(enableGameplayInputRoutine);
-        enableGameplayInputRoutine = null;
+        enableGameplayInputCts.Cancel();
+        enableGameplayInputCts.Dispose();
+        enableGameplayInputCts = null;
     }
 
     void ResetAcceptButtonState()

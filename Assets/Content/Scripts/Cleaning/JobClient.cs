@@ -17,7 +17,6 @@ public class JobClient : MonoBehaviour, IInteractable
     const string ActiveJobDialogue = "Keep cleaning — you're not done yet!";
 
     [SerializeField] Job job;
-    [SerializeField] JobSequence jobSequence;
     [SerializeField] string dialogue;
     [SerializeField] string completionDialogue;
     [Header("Symbols")]
@@ -31,12 +30,14 @@ public class JobClient : MonoBehaviour, IInteractable
     [SerializeField] string returnDestinationName;
     [Header("Waypoint")]
     [SerializeField] Transform waypointTarget;
+    [Header("Audio")]
+    [SerializeField] AnimationSounds animationSounds;
 
     JobClientState state = JobClientState.Available;
 
     public JobClientState State => state;
     public Job Job => job;
-    public JobSequence Sequence => jobSequence;
+    public AnimationSounds AnimationSounds => animationSounds;
     public Transform WaypointTransform => waypointTarget != null ? waypointTarget : transform;
     public string ReturnDestinationName => string.IsNullOrEmpty(returnDestinationName) ? name : returnDestinationName;
     public string OfferDialogue => string.IsNullOrEmpty(dialogue) ? DefaultOfferDialogue : dialogue;
@@ -49,6 +50,7 @@ public class JobClient : MonoBehaviour, IInteractable
     void Awake()
     {
         ResolveJobReference();
+        ResolveAnimationSounds();
     }
 
     void Start()
@@ -63,11 +65,8 @@ public class JobClient : MonoBehaviour, IInteractable
             case JobClientState.TurnedIn:
                 return;
             case JobClientState.CompletedPendingTurnIn:
-                if (jobSequence != null)
-                {
-                    jobSequence.OfferCurrentStepOutro(this);
+                if (Managers.Jobs.OfferChainJobOutro(this))
                     break;
-                }
 
                 if (job == null)
                 {
@@ -82,16 +81,16 @@ public class JobClient : MonoBehaviour, IInteractable
                 NotifySpokenTo();
                 break;
             default:
-                if (jobSequence != null)
+                if (job == null)
                 {
-                    jobSequence.StartSequence();
+                    Managers.Speech.Show(OfferDialogue);
                     NotifySpokenTo();
                     break;
                 }
 
-                if (job == null)
+                if (job.UsesChainFlow)
                 {
-                    Managers.Speech.Show(OfferDialogue);
+                    Managers.Jobs.StartJobChain(job);
                     NotifySpokenTo();
                     break;
                 }
@@ -128,6 +127,16 @@ public class JobClient : MonoBehaviour, IInteractable
         job = GetComponent<Job>();
         if (job == null)
             job = GetComponentInChildren<Job>();
+    }
+
+    void ResolveAnimationSounds()
+    {
+        if (animationSounds != null)
+            return;
+
+        animationSounds = GetComponent<AnimationSounds>();
+        if (animationSounds == null)
+            animationSounds = GetComponentInChildren<AnimationSounds>();
     }
 
     void RefreshSymbols()

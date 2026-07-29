@@ -15,7 +15,7 @@ public static class NpcMoveRunner
             if (move.stopWandering && move.npc.TryGetComponent(out NpcWander wander))
                 wander.StopWandering();
 
-            move.npc.MoveTo(move.destination.position);
+            move.npc.MoveTo(move.destination.position, move.destination);
         }
     }
 }
