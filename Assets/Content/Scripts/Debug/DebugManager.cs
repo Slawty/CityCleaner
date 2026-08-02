@@ -1,21 +1,30 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class DebugManager : MonoBehaviour
 {
     public bool InstantCleaning;
-    [SerializeField] InputActionReference interactAction;
+    [SerializeField] InputActionReference pauseAction;
 
-    void Start()
+    void OnEnable()
     {
-        if (interactAction != null)
-            interactAction.action.performed += OnDebugButton01Pressed;
+        if (pauseAction == null)
+            return;
+
+        pauseAction.action.Enable();
+        pauseAction.action.performed += OnPausePressed;
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
-        if (interactAction != null)
-            interactAction.action.performed -= OnDebugButton01Pressed;
+        if (pauseAction == null)
+            return;
+
+        pauseAction.action.performed -= OnPausePressed;
+        pauseAction.action.Disable();
     }
 
     void Update()
@@ -27,8 +36,17 @@ public class DebugManager : MonoBehaviour
             Managers.UpgradeMenu.Open();
     }
 
-    void OnDebugButton01Pressed(InputAction.CallbackContext context)
+    void OnPausePressed(InputAction.CallbackContext context)
     {
-        Debug.Log("Debug button pressed (hook tools here if needed).");
+        ToggleEditorPause();
+    }
+
+    void ToggleEditorPause()
+    {
+#if UNITY_EDITOR
+        EditorApplication.isPaused = !EditorApplication.isPaused;
+#else
+        Debug.LogWarning($"{nameof(DebugManager)} pause only works in the Unity Editor.");
+#endif
     }
 }

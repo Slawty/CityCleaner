@@ -74,6 +74,8 @@ public class CoinParticleMover : MonoBehaviour
         }
         else if (Type == RessourceType.Poop)
             Managers.Inventory.IncreasePoop(amount);
+        else if (Type == RessourceType.Dirt)
+            Managers.Inventory.IncreaseDirt(amount);
     }
 
     void PlayCoinCollectSound()

@@ -16,6 +16,9 @@ public class GPUPainterWorld : MonoBehaviour
     [SerializeField] Texture2D brushTexture;
     [SerializeField] float brushWorldSize = 0.5f;
     [SerializeField] float cleanSpeed = 4f;
+    [Header("Dirt")]
+    [SerializeField] bool spawnDirtChunksWhileCleaning;
+    [SerializeField] float dirtChunksPerSecond = 3f;
 
     public float BrushWorldSize
     {
@@ -37,6 +40,7 @@ public class GPUPainterWorld : MonoBehaviour
 
     Material localPaintMaterial;
     float nextUpdateTime;
+    float dirtSpawnAccumulator;
     bool isPainting;
     WaterSprayTool waterTool;
 
@@ -79,14 +83,26 @@ public class GPUPainterWorld : MonoBehaviour
 
         paintablesInBrush.Clear();
 
+        float dirtMultiplierSum = 0f;
+        int dirtyPaintableCount = 0;
+
         for (int i = 0; i < hitCount; i++)
         {
             GPUPaintableObject paintable = overlapColliders[i].GetComponentInParent<GPUPaintableObject>();
             if (paintable == null || !paintablesInBrush.Add(paintable))
                 continue;
 
+            if (!paintable.isClean)
+            {
+                dirtyPaintableCount++;
+                dirtMultiplierSum += paintable.DirtChunkMultiplier;
+            }
+
             ApplyBrushStroke(paintable, brushCenter, hitNormal, cleanStrength);
         }
+
+        if (dirtyPaintableCount > 0)
+            SpawnCleaningDirt(brushCenter, dirtMultiplierSum / dirtyPaintableCount);
 
         if (paintablesInBrush.Count == 0 || Time.time <= nextUpdateTime)
             return;
@@ -173,5 +189,32 @@ public class GPUPainterWorld : MonoBehaviour
         Vector3 coinSpawnPos = paintable.CoinSpawnPos == null ? brushCenter : paintable.CoinSpawnPos.position;
         coinSpawnPos += dirToPlayer * 0.25f;
         Managers.Spawning.SpawnCoins(paintable.winCoins, coinSpawnPos, dirToPlayer).Forget();
+    }
+
+    void SpawnCleaningDirt(Vector3 brushCenter, float dirtMultiplier)
+    {
+        if (!spawnDirtChunksWhileCleaning || dirtChunksPerSecond <= 0f || dirtMultiplier <= 0f)
+            return;
+
+        dirtSpawnAccumulator += dirtChunksPerSecond * dirtMultiplier * Time.deltaTime;
+        int chunkCount = Mathf.FloorToInt(dirtSpawnAccumulator);
+        if (chunkCount <= 0)
+            return;
+
+        dirtSpawnAccumulator -= chunkCount;
+
+        Vector3 dirFromPlayer = brushCenter - transform.position;
+        dirFromPlayer.y = 0f;
+        if (dirFromPlayer.sqrMagnitude < 0.01f)
+            dirFromPlayer = Vector3.forward;
+        else
+            dirFromPlayer.Normalize();
+
+        for (int i = 0; i < chunkCount; i++)
+        {
+            Vector3 spawnPos = brushCenter + Random.insideUnitSphere * 0.15f;
+            Vector3 spawnDirection = Quaternion.AngleAxis(Random.Range(-45f, 45f), Vector3.up) * dirFromPlayer;
+            Managers.Spawning.SpawnPickupChunk(spawnPos, spawnDirection);
+        }
     }
 }

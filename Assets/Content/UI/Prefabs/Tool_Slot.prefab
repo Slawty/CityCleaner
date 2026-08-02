@@ -129,7 +129,7 @@ MonoBehaviour:
   background: {fileID: 120296902200078726}
   icon: {fileID: 8706652344403467184}
   highlightColor: {r: 0.96862745, g: 0.76955587, b: 0.16078432, a: 1}
-  toolIndex: 0
+  toolType: 0
   selectedIconScale: 1.15
   tweenDuration: 0.15
 --- !u!1 &2019067251139113301

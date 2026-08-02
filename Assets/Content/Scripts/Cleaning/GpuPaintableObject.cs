@@ -34,6 +34,9 @@ public class GPUPaintableObject : MonoBehaviour
     [SerializeField] bool allowGooCleaning = false;
     [Header("Growable")]
     [SerializeField] bool deferCleanMaterialSwapUntilGrowComplete;
+    [Header("Dirt")]
+    [SerializeField] float dirtChunkMultiplier = 1f;
+    public float DirtChunkMultiplier => dirtChunkMultiplier;
 
     const string OutlineRenderingLayerName = "Outline";
     static uint outlineRenderingLayerMask;

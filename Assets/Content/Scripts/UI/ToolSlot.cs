@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class ToolSlot : MonoBehaviour
@@ -7,7 +8,8 @@ public class ToolSlot : MonoBehaviour
     [SerializeField] Image background;
     [SerializeField] RectTransform icon;
     [SerializeField] Color highlightColor;
-    [SerializeField] int toolIndex;
+    [FormerlySerializedAs("toolIndex")]
+    [SerializeField] PlayerToolType toolType;
     [SerializeField] float selectedIconScale = 1.15f;
     [SerializeField] float tweenDuration = 0.15f;
 
@@ -15,7 +17,12 @@ public class ToolSlot : MonoBehaviour
     float normalIconScale = 1f;
     bool isSelected;
 
-    public int ToolIndex => toolIndex;
+    public PlayerToolType ToolType => toolType;
+
+    public void SetUnlocked(bool unlocked)
+    {
+        gameObject.SetActive(unlocked);
+    }
 
     void Awake()
     {

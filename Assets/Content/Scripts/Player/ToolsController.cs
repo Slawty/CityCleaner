@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FMODUnity;
 using UnityEngine;
@@ -6,11 +7,8 @@ using UnityEngine.InputSystem;
 public class ToolsController : MonoBehaviour
 {
     [Header("Tools")]
-    [SerializeField] List<Tool> tools;
+    [SerializeField] ToolEntry[] toolEntries;
     [SerializeField] Vacuum vacuum;
-    public WaterSprayTool WaterSprayer;
-    public LaserGunTool Lasergun;
-    public GooGunTool GooGun;
 
     [Header("UI")]
     [SerializeField] ToolSlot[] toolSlots;
@@ -21,30 +19,50 @@ public class ToolsController : MonoBehaviour
     [Header("Input")]
     [SerializeField] InputActionReference nextToolAction;
     [SerializeField] InputActionReference prevToolAction;
-    [SerializeField] InputActionReference tool1Action;
-    [SerializeField] InputActionReference tool2Action;
-    [SerializeField] InputActionReference tool3Action;
     [SerializeField] InputActionReference vacuumInteractAction;
     [SerializeField] InputActionReference vacuumReleaseAction;
     [SerializeField] InputActionReference vacuumShootAction;
 
-    const int LaserToolIndex = 0;
-    const int PowerWasherToolIndex = 1;
-    const int GooGunToolIndex = 2;
+    readonly Dictionary<PlayerToolType, Tool> toolsByType = new();
+    readonly Dictionary<PlayerToolType, bool> toolUnlocked = new();
+    readonly List<EquipHotkeyBinding> equipHotkeyBindings = new();
 
-    int currentToolIndex = -1;
-    int savedToolIndex = -1;
+    PlayerToolType? currentToolType;
+    PlayerToolType? savedToolType;
     bool vacuumMode;
     bool vacuumCarryMode;
 
     public Tool CurrentTool { get; private set; }
-    public int CurrentToolIndex => currentToolIndex;
+    public PlayerToolType? CurrentToolType => currentToolType;
     public bool IsInVacuumMode => vacuumMode;
+
+    public WaterSprayTool WaterSprayer => GetTool<WaterSprayTool>(PlayerToolType.PowerWasher);
+    public LaserGunTool Lasergun => GetTool<LaserGunTool>(PlayerToolType.Laser);
+    public GooGunTool GooGun => GetTool<GooGunTool>(PlayerToolType.GooGun);
 
     void Awake()
     {
-        ResolveToolHotkeyActions();
+        BuildToolRegistry();
         ResolveToolSlots();
+    }
+
+    void BuildToolRegistry()
+    {
+        toolsByType.Clear();
+
+        if (toolEntries == null)
+            throw new System.InvalidOperationException($"{nameof(ToolsController)} on {name}: {nameof(toolEntries)} is not assigned.");
+
+        foreach (ToolEntry entry in toolEntries)
+        {
+            if (entry.tool == null)
+                throw new System.InvalidOperationException($"{nameof(ToolsController)} on {name}: {entry.type} is missing a tool reference.");
+
+            if (toolsByType.ContainsKey(entry.type))
+                throw new System.InvalidOperationException($"{nameof(ToolsController)} on {name}: duplicate entry for {entry.type}.");
+
+            toolsByType.Add(entry.type, entry.tool);
+        }
     }
 
     void ResolveToolSlots()
@@ -55,35 +73,44 @@ public class ToolsController : MonoBehaviour
         toolSlots = FindObjectsByType<ToolSlot>(FindObjectsSortMode.None);
     }
 
-    void ResolveToolHotkeyActions()
+    void BindEquipHotkeys()
     {
-        if (tool1Action != null && tool2Action != null && tool3Action != null)
-            return;
+        UnbindEquipHotkeys();
 
-        InputActionAsset asset = nextToolAction.action.actionMap.asset;
-        InputActionMap playerMap = asset.FindActionMap("Player");
+        foreach (ToolEntry entry in toolEntries)
+        {
+            if (entry.equipAction == null)
+                continue;
 
-        if (tool1Action == null)
-            tool1Action = InputActionReference.Create(playerMap.FindAction("Tool 1"));
-        if (tool2Action == null)
-            tool2Action = InputActionReference.Create(playerMap.FindAction("Tool 2"));
-        if (tool3Action == null)
-            tool3Action = InputActionReference.Create(playerMap.FindAction("Tool 3"));
+            PlayerToolType toolType = entry.type;
+            Action<InputAction.CallbackContext> handler = _ => EquipTool(toolType);
+            InputAction action = entry.equipAction.action;
+
+            action.Enable();
+            action.performed += handler;
+            equipHotkeyBindings.Add(new EquipHotkeyBinding(action, handler));
+        }
+    }
+
+    void UnbindEquipHotkeys()
+    {
+        foreach (EquipHotkeyBinding binding in equipHotkeyBindings)
+        {
+            binding.Action.performed -= binding.Handler;
+            binding.Action.Disable();
+        }
+
+        equipHotkeyBindings.Clear();
     }
 
     void OnEnable()
     {
         nextToolAction.action.Enable();
         prevToolAction.action.Enable();
-        tool1Action.action.Enable();
-        tool2Action.action.Enable();
-        tool3Action.action.Enable();
+        BindEquipHotkeys();
 
         nextToolAction.action.performed += OnNextTool;
         prevToolAction.action.performed += OnPrevTool;
-        tool1Action.action.performed += OnTool1;
-        tool2Action.action.performed += OnTool2;
-        tool3Action.action.performed += OnTool3;
 
         vacuumInteractAction.action.Enable();
         vacuumInteractAction.action.performed += OnVacuumInteractPerformed;
@@ -94,15 +121,10 @@ public class ToolsController : MonoBehaviour
     {
         nextToolAction.action.performed -= OnNextTool;
         prevToolAction.action.performed -= OnPrevTool;
-        tool1Action.action.performed -= OnTool1;
-        tool2Action.action.performed -= OnTool2;
-        tool3Action.action.performed -= OnTool3;
+        UnbindEquipHotkeys();
 
         nextToolAction.action.Disable();
         prevToolAction.action.Disable();
-        tool1Action.action.Disable();
-        tool2Action.action.Disable();
-        tool3Action.action.Disable();
 
         vacuumInteractAction.action.performed -= OnVacuumInteractPerformed;
         vacuumInteractAction.action.canceled -= OnVacuumInteractCanceled;
@@ -115,53 +137,103 @@ public class ToolsController : MonoBehaviour
 
     void Start()
     {
-        foreach (Tool tool in tools)
-            tool.Initialize();
+        foreach (ToolEntry entry in toolEntries)
+        {
+            toolUnlocked[entry.type] = false;
+            entry.tool.Initialize();
+            entry.tool.gameObject.SetActive(false);
+        }
+
+        currentToolType = null;
+        CurrentTool = null;
+        RefreshToolSlotUnlockStates();
 
         if (vacuum != null)
             vacuum.gameObject.SetActive(false);
+    }
 
-        int initialIndex = LaserToolIndex;
-        for (int i = 0; i < tools.Count; i++)
+    public T GetTool<T>(PlayerToolType type) where T : Tool
+    {
+        if (!toolsByType.TryGetValue(type, out Tool tool))
+            throw new System.InvalidOperationException($"{nameof(ToolsController)}.{nameof(GetTool)}: {type} is not registered.");
+
+        if (tool is not T typedTool)
+            throw new System.InvalidOperationException($"{nameof(ToolsController)}.{nameof(GetTool)}: {type} is not a {typeof(T).Name}.");
+
+        return typedTool;
+    }
+
+    public bool IsToolUnlocked(PlayerToolType type)
+    {
+        return toolUnlocked.TryGetValue(type, out bool unlocked) && unlocked;
+    }
+
+    public void UnlockTool(PlayerToolType type)
+    {
+        if (!toolsByType.ContainsKey(type))
+            throw new System.InvalidOperationException($"{nameof(ToolsController)}.{nameof(UnlockTool)}: {type} is not registered.");
+
+        if (IsToolUnlocked(type))
         {
-            if (tools[i].gameObject.activeSelf)
-            {
-                initialIndex = i;
-                break;
-            }
+            EquipTool(type);
+            return;
         }
 
-        EquipTool(initialIndex, force: true);
+        toolUnlocked[type] = true;
+        RefreshToolSlotUnlockStates();
+        EquipTool(type);
     }
 
     void OnNextTool(InputAction.CallbackContext ctx) => SelectNextTool();
 
     void OnPrevTool(InputAction.CallbackContext ctx) => SelectPrevTool();
 
-    void OnTool1(InputAction.CallbackContext ctx) => EquipTool(LaserToolIndex);
-
-    void OnTool2(InputAction.CallbackContext ctx) => EquipTool(PowerWasherToolIndex);
-
-    void OnTool3(InputAction.CallbackContext ctx) => EquipTool(GooGunToolIndex);
-
     public void SelectNextTool()
     {
-        if (vacuumMode || tools.Count == 0)
+        if (vacuumMode || toolEntries.Length == 0 || !currentToolType.HasValue)
             return;
 
-        int next = currentToolIndex < 0 ? 0 : (currentToolIndex + 1) % tools.Count;
-        EquipTool(next);
+        PlayerToolType? next = GetNextUnlockedTool(currentToolType.Value, 1);
+        if (next.HasValue)
+            EquipTool(next.Value);
     }
 
     public void SelectPrevTool()
     {
-        if (vacuumMode || tools.Count == 0)
+        if (vacuumMode || toolEntries.Length == 0 || !currentToolType.HasValue)
             return;
 
-        int prev = currentToolIndex - 1;
-        if (prev < 0)
-            prev = tools.Count - 1;
-        EquipTool(prev);
+        PlayerToolType? prev = GetNextUnlockedTool(currentToolType.Value, -1);
+        if (prev.HasValue)
+            EquipTool(prev.Value);
+    }
+
+    PlayerToolType? GetNextUnlockedTool(PlayerToolType fromType, int direction)
+    {
+        int fromIndex = GetEntryIndex(fromType);
+        if (fromIndex < 0)
+            return null;
+
+        for (int step = 0; step < toolEntries.Length; step++)
+        {
+            fromIndex = (fromIndex + direction + toolEntries.Length) % toolEntries.Length;
+            PlayerToolType candidate = toolEntries[fromIndex].type;
+            if (IsToolUnlocked(candidate))
+                return candidate;
+        }
+
+        return fromType;
+    }
+
+    int GetEntryIndex(PlayerToolType type)
+    {
+        for (int index = 0; index < toolEntries.Length; index++)
+        {
+            if (toolEntries[index].type == type)
+                return index;
+        }
+
+        return -1;
     }
 
     void OnVacuumInteractPerformed(InputAction.CallbackContext ctx)
@@ -230,15 +302,16 @@ public class ToolsController : MonoBehaviour
         if (vacuumMode || vacuum == null)
             return;
 
-        savedToolIndex = currentToolIndex;
+        savedToolType = currentToolType;
 
-        if (currentToolIndex >= 0)
-            tools[currentToolIndex].gameObject.SetActive(false);
+        if (currentToolType.HasValue)
+            toolsByType[currentToolType.Value].gameObject.SetActive(false);
 
         vacuum.gameObject.SetActive(true);
         vacuum.Begin();
         vacuumMode = true;
         CurrentTool = null;
+        currentToolType = null;
         RefreshToolSlotVisuals();
     }
 
@@ -252,35 +325,38 @@ public class ToolsController : MonoBehaviour
         vacuum.gameObject.SetActive(false);
         vacuumMode = false;
 
-        int restoreIndex = savedToolIndex;
-        savedToolIndex = -1;
+        PlayerToolType? restoreType = savedToolType;
+        savedToolType = null;
 
-        if (restoreIndex >= 0)
-            EquipTool(restoreIndex, force: true);
+        if (restoreType.HasValue)
+            EquipTool(restoreType.Value, force: true);
     }
 
-    public void EquipTool(int index, bool force = false)
+    public void EquipTool(PlayerToolType type, bool force = false)
     {
-        if (index < 0 || index >= tools.Count)
+        if (!toolsByType.TryGetValue(type, out Tool tool))
+            return;
+
+        if (!force && !IsToolUnlocked(type))
             return;
 
         if (vacuumMode && !force)
             return;
 
-        if (!force && currentToolIndex == index)
+        if (!force && currentToolType == type)
             return;
 
-        if (currentToolIndex >= 0)
-            tools[currentToolIndex].gameObject.SetActive(false);
+        if (currentToolType.HasValue)
+            toolsByType[currentToolType.Value].gameObject.SetActive(false);
 
-        currentToolIndex = index;
-        CurrentTool = tools[currentToolIndex];
-        CurrentTool.gameObject.SetActive(true);
+        currentToolType = type;
+        CurrentTool = tool;
+        tool.gameObject.SetActive(true);
 
         if (!force)
             PlayToolSwitch();
 
-        Debug.Log($"Equipped tool: {tools[currentToolIndex].name}");
+        Debug.Log($"Equipped tool: {tool.name}");
         RefreshToolSlotVisuals();
     }
 
@@ -297,22 +373,43 @@ public class ToolsController : MonoBehaviour
         if (toolSlots == null)
             return;
 
-        int activeIndex = vacuumMode ? -1 : currentToolIndex;
+        foreach (ToolSlot slot in toolSlots)
+        {
+            if (!IsToolUnlocked(slot.ToolType))
+                continue;
+
+            slot.SetSelected(currentToolType.HasValue && slot.ToolType == currentToolType.Value);
+        }
+    }
+
+    void RefreshToolSlotUnlockStates()
+    {
+        if (toolSlots == null)
+            return;
 
         foreach (ToolSlot slot in toolSlots)
-            slot.SetSelected(slot.ToolIndex == activeIndex);
+            slot.SetUnlocked(IsToolUnlocked(slot.ToolType));
     }
 
     public Tool GetCurrentTool()
     {
-        if (currentToolIndex < 0)
-            return null;
-        return tools[currentToolIndex];
+        return CurrentTool;
     }
 
     public void StopActiveShooting()
     {
-        if (currentToolIndex >= 0)
-            tools[currentToolIndex].StopShooting();
+        CurrentTool?.StopShooting();
+    }
+
+    sealed class EquipHotkeyBinding
+    {
+        public InputAction Action { get; }
+        public Action<InputAction.CallbackContext> Handler { get; }
+
+        public EquipHotkeyBinding(InputAction action, Action<InputAction.CallbackContext> handler)
+        {
+            Action = action;
+            Handler = handler;
+        }
     }
 }

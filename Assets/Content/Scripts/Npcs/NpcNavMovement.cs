@@ -1,3 +1,5 @@
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -141,5 +143,35 @@ public class NpcNavMovement : MonoBehaviour
         if (agent.hasPath && agent.velocity.sqrMagnitude > 0f) return false;
 
         return true;
+    }
+
+    public async UniTask FacePointAsync(Vector3 worldPoint, CancellationToken cancellationToken)
+    {
+        pendingArrivalRotation = null;
+
+        Vector3 direction = worldPoint - transform.position;
+        direction.y = 0f;
+        if (direction.sqrMagnitude < 0.0001f)
+            return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+        await RotateTowardsAsync(targetRotation, cancellationToken);
+    }
+
+    public async UniTask FaceRotationAsync(Quaternion targetRotation, CancellationToken cancellationToken)
+    {
+        pendingArrivalRotation = null;
+        await RotateTowardsAsync(targetRotation, cancellationToken);
+    }
+
+    async UniTask RotateTowardsAsync(Quaternion targetRotation, CancellationToken cancellationToken)
+    {
+        while (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, arrivalRotationSpeed * Time.deltaTime);
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+        }
+
+        transform.rotation = targetRotation;
     }
 }

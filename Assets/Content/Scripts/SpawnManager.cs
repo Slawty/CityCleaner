@@ -38,12 +38,13 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    void SpawnPickupChunk(Vector3 spawnPos, Vector3 spawnDirection)
+    public void SpawnPickupChunk(Vector3 spawnPos, Vector3 spawnDirection)
     {
         ParticleSystem.EmitParams emit = new ParticleSystem.EmitParams();
         emit.position = spawnPos;
         emit.velocity = spawnDirection * Random.Range(1f, 2f);
         pickupChunkParticles.Emit(emit, 1);
+        Debug.Log("Spawn chunk");
     }
 
     public async UniTask SpawnPickupChunks(int amount, Vector3 spawnPos, Vector3 spawnDirection, float spawnDelay = -1f)
@@ -56,7 +57,7 @@ public class SpawnManager : MonoBehaviour
             await UniTask.Delay(System.TimeSpan.FromSeconds(delay), cancellationToken: destroyCancellationToken);
         }
     }
-    
+
     void SpawnTempChunk(Vector3 spawnPos, Vector3 spawnDirection)
     {
         ParticleSystem.EmitParams emit = new ParticleSystem.EmitParams();

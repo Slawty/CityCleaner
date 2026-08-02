@@ -43,7 +43,7 @@ public class PlayerInteractor : MonoBehaviour
 
         if (hitSomething)
         {
-            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
+            IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
 
             if (interactable != null)
             {
@@ -51,7 +51,11 @@ public class PlayerInteractor : MonoBehaviour
                 {
                     currentInteractable = interactable;
                     Debug.Log($"Found interactable: {hit.collider.name}");
-                    Managers.UI.ShowInteractText(interactable.Prompt);
+
+                    if (string.IsNullOrEmpty(interactable.Prompt))
+                        Managers.UI.HideInteractText();
+                    else
+                        Managers.UI.ShowInteractText(interactable.Prompt);
                 }
 
                 return;

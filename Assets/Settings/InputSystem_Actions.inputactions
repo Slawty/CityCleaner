@@ -1210,7 +1210,7 @@
             "id": "4e2d4034-5bde-46dc-8f71-72ef6dfd7c54",
             "actions": [
                 {
-                    "name": "Debug_01",
+                    "name": "Debug_Pause",
                     "type": "Button",
                     "id": "846d511f-08a9-48c0-b5ac-c46699a3c0c4",
                     "expectedControlType": "",
@@ -1223,11 +1223,11 @@
                 {
                     "name": "",
                     "id": "b03ecd2a-d33c-4eaf-b252-09095a9b3252",
-                    "path": "<Keyboard>/f1",
+                    "path": "<Keyboard>/x",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Debug_01",
+                    "action": "Debug_Pause",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
