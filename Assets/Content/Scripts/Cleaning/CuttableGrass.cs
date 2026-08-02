@@ -25,7 +25,7 @@ public class CuttableGrass : MonoBehaviour
         if (progress >= 0.9f)
         {
             OnCut?.Invoke(this);
-            Managers.Spawning.SpawnCoin(transform.position, transform.up);
+            Managers.Spawning.SpawnCoin(transform.position);
         }
     }
 

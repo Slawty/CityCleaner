@@ -115,8 +115,7 @@ public class JobClient : MonoBehaviour, IInteractable
     public void PayReward()
     {
         Vector3 spawnPos = coinSpawnPoint != null ? coinSpawnPoint.position : transform.position + Vector3.up;
-        Vector3 spawnDirection = coinSpawnPoint != null ? coinSpawnPoint.forward : transform.forward;
-        Managers.Spawning.SpawnCoins(rewardCoinCount, spawnPos, spawnDirection).Forget();
+        Managers.Spawning.SpawnCoins(rewardCoinCount, spawnPos).Forget();
     }
 
     void ResolveJobReference()

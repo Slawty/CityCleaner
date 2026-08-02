@@ -25,8 +25,13 @@ public class IntroSequenceController : MonoBehaviour
     bool introFinished;
     bool playerDeactivatedForIntro;
 
+    public static IntroSequenceController Instance { get; private set; }
+    public bool UseIntro => useIntro;
+
     void Awake()
     {
+        Instance = this;
+
         if (!useIntro)
         {
             introFinished = true;
@@ -47,6 +52,9 @@ public class IntroSequenceController : MonoBehaviour
     void OnDestroy()
     {
         activeSequence?.Kill();
+
+        if (Instance == this)
+            Instance = null;
 
         if (!introFinished)
             ReleaseGameplay();

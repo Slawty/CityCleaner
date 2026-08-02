@@ -35,6 +35,7 @@ public class ToolsController : MonoBehaviour
     public Tool CurrentTool { get; private set; }
     public PlayerToolType? CurrentToolType => currentToolType;
     public bool IsInVacuumMode => vacuumMode;
+    public bool IsCoinSuctionActive => vacuumMode && !vacuumCarryMode;
 
     public WaterSprayTool WaterSprayer => GetTool<WaterSprayTool>(PlayerToolType.PowerWasher);
     public LaserGunTool Lasergun => GetTool<LaserGunTool>(PlayerToolType.Laser);
@@ -137,15 +138,21 @@ public class ToolsController : MonoBehaviour
 
     void Start()
     {
+        bool startWithNoTools = IntroSequenceController.Instance != null && IntroSequenceController.Instance.UseIntro;
+
         foreach (ToolEntry entry in toolEntries)
         {
-            toolUnlocked[entry.type] = false;
+            toolUnlocked[entry.type] = !startWithNoTools;
             entry.tool.Initialize();
             entry.tool.gameObject.SetActive(false);
         }
 
         currentToolType = null;
         CurrentTool = null;
+
+        if (!startWithNoTools)
+            EquipTool(toolEntries[0].type, force: true);
+
         RefreshToolSlotUnlockStates();
 
         if (vacuum != null)

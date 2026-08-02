@@ -147,11 +147,8 @@ public class GPUPainter : MonoBehaviour
         if (!paintable.isClean)
             return;
 
-        Vector3 dirToPlayer = (transform.position - brushCenter).normalized;
-        dirToPlayer.y = 1f;
         Vector3 coinSpawnPos = paintable.CoinSpawnPos == null ? brushCenter : paintable.CoinSpawnPos.position;
-        coinSpawnPos += dirToPlayer * 0.25f;
-        Managers.Spawning.SpawnCoins(paintable.winCoins, coinSpawnPos, dirToPlayer).Forget();
+        Managers.Spawning.SpawnCoins(paintable.winCoins, coinSpawnPos).Forget();
     }
 
 }

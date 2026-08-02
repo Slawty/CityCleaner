@@ -101,7 +101,7 @@ public class SplitableObject : MonoBehaviour
         Managers.Spawning.SpawnTempChunks(amount, transform.position, playerDir, spawnDelay: 0f).Forget();
 
         if (Random.value <= coinChance)
-            Managers.Spawning.SpawnCoins(1, transform.position, playerDir).Forget();
+            Managers.Spawning.SpawnCoins(1, transform.position).Forget();
 
         OnDestroyed?.Invoke();
         Destroy(gameObject);

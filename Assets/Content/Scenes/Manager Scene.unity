@@ -12495,10 +12495,7 @@ MonoBehaviour:
   coinParticles: {fileID: 1942164584}
   pickupChunkParticles: {fileID: 1896933774}
   tempChunkParticles: {fileID: 626271372}
-  spawnForceMinMax: {x: 2, y: 5}
-  directionRandomness: 0.3
   multipleSpawnDelay: 0.2
-  spinForceMinMax: {x: 1, y: 3}
 --- !u!4 &519344375
 Transform:
   m_ObjectHideFlags: 0
@@ -60265,8 +60262,12 @@ MonoBehaviour:
     Path: 
   scaleSize: 1
   suctionStrength: 10
-  hopForce: 5
+  minSuctionStrengthMultiplier: 0.25
+  suctionFalloffDistance: 3
+  commitHorizontalDistance: 0.5
   collectDistance: 0.1
+  hopForce: 4
+  hopFrequency: 8
 --- !u!4 &1896933776
 Transform:
   m_ObjectHideFlags: 0
@@ -60532,6 +60533,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1942164586}
   - component: {fileID: 1942164585}
+  - component: {fileID: 1942164587}
   - component: {fileID: 1942164584}
   - component: {fileID: 1942164583}
   m_Layer: 0
@@ -64207,7 +64209,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
     range: {x: 0, y: 1}
   CollisionModule:
-    enabled: 1
+    enabled: 0
     serializedVersion: 4
     type: 1
     collisionMode: 0
@@ -65369,8 +65371,12 @@ MonoBehaviour:
     Path: event:/UI/Coin_Collect
   scaleSize: 1
   suctionStrength: 10
-  hopForce: 5
-  collectDistance: 0.1
+  minSuctionStrengthMultiplier: 0.25
+  suctionFalloffDistance: 3
+  commitHorizontalDistance: 0.5
+  collectDistance: 0.5
+  hopForce: 4
+  hopFrequency: 8
 --- !u!4 &1942164586
 Transform:
   m_ObjectHideFlags: 0
@@ -65386,6 +65392,36 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!114 &1942164587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942164582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7b8c9d0e1f2345678901234abcdef01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CoinParticleFlight
+  ps: {fileID: 1942164584}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 1
+  landingDistanceMin: 0.4
+  landingDistanceMax: 1.2
+  landingSpreadRadius: 0.5
+  flightDuration: 0.75
+  arcHeight: 1
+  verticalDeltaThreshold: 0.5
+  wallArcHeightMultiplier: 0.3
+  skipWallLandings: 1
+  minGroundNormalY: 0.7
+  groundRaycastStartOffset: 0.5
+  groundRaycastDownDistance: 10
+  groundRaycastStepUp: 5
+  groundRaycastUpSteps: 2
+  landingHeightOffset: 0.35
 --- !u!1 &1947674996
 GameObject:
   m_ObjectHideFlags: 0
@@ -70521,8 +70557,12 @@ MonoBehaviour:
     Path: 
   scaleSize: 1
   suctionStrength: 10
-  hopForce: 5
+  minSuctionStrengthMultiplier: 0.25
+  suctionFalloffDistance: 3
+  commitHorizontalDistance: 0.5
   collectDistance: 0.3
+  hopForce: 4
+  hopFrequency: 8
 --- !u!1 &1990418678
 GameObject:
   m_ObjectHideFlags: 0

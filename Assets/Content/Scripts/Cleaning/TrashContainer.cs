@@ -54,7 +54,7 @@ public class TrashContainer : MonoBehaviour
         // if (pickup.StaticPickup != null)
         OnTrashCollected?.Invoke(pickup);
 
-        Managers.Spawning.SpawnCoins(3, coinSpawnPoint.position, coinSpawnPoint.forward).Forget();
+        Managers.Spawning.SpawnCoins(3, coinSpawnPoint.position).Forget();
         Destroy(pickup.gameObject);
     }
 }

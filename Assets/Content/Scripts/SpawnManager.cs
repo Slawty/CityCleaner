@@ -1,39 +1,38 @@
 using UnityEngine;
 using UnityEngine.Events;
 using Cysharp.Threading.Tasks;
-using System.Threading;
 
 public class SpawnManager : MonoBehaviour
 {
-    [SerializeField] private GameObject coinPrefab;
-    [SerializeField] private ParticleSystem coinParticles;
-    [SerializeField] private ParticleSystem pickupChunkParticles;
-    [SerializeField] private ParticleSystem tempChunkParticles;
+    [SerializeField] GameObject coinPrefab;
+    [SerializeField] ParticleSystem coinParticles;
+    [SerializeField] ParticleSystem pickupChunkParticles;
+    [SerializeField] ParticleSystem tempChunkParticles;
+    [SerializeField] float multipleSpawnDelay = 0.2f;
 
-    [SerializeField] private Vector2 spawnForceMinMax = new Vector2(2f, 5f);
-    [SerializeField] private float directionRandomness = 0.3f;
-    [SerializeField] private float multipleSpawnDelay = 0.2f;
-    [SerializeField] private Vector2 spinForceMinMax = new Vector2(1f, 3f);
+    CoinParticleFlight coinFlight;
 
     public UnityAction OnCoinSpawned;
 
-    public void SpawnCoin(Vector3 spawnPos, Vector3 spawnDirection)
+    void Awake()
     {
-        ParticleSystem.EmitParams emit = new ParticleSystem.EmitParams();
+        coinFlight = coinParticles.GetComponent<CoinParticleFlight>();
+        if (coinFlight == null)
+            throw new System.InvalidOperationException($"{nameof(SpawnManager)} on {name}: {nameof(CoinParticleFlight)} is missing on {coinParticles.name}.");
+    }
 
-        emit.position = spawnPos;
-        emit.velocity = spawnDirection * Random.Range(1.5f, 3f);
-
-        coinParticles.Emit(emit, 1);
+    public void SpawnCoin(Vector3 spawnPos)
+    {
+        Vector3 landingPos = coinFlight.FindLandingSpot(spawnPos);
+        coinFlight.EmitFlight(spawnPos, landingPos);
         OnCoinSpawned?.Invoke();
     }
 
-    public async UniTask SpawnCoins(int amount, Vector3 spawnPos, Vector3 spawnDirection)
+    public async UniTask SpawnCoins(int amount, Vector3 spawnPos)
     {
-        for (int i = 0; i < amount; i++)
+        for (int index = 0; index < amount; index++)
         {
-            Vector3 rngDir = Quaternion.AngleAxis(Random.Range(-25f, 25f), Random.onUnitSphere) * spawnDirection;
-            SpawnCoin(spawnPos, rngDir);
+            SpawnCoin(spawnPos);
             await UniTask.Delay(System.TimeSpan.FromSeconds(multipleSpawnDelay), cancellationToken: destroyCancellationToken);
         }
     }
@@ -49,7 +48,7 @@ public class SpawnManager : MonoBehaviour
 
     public async UniTask SpawnPickupChunks(int amount, Vector3 spawnPos, Vector3 spawnDirection, float spawnDelay = -1f)
     {
-        for (int i = 0; i < amount; i++)
+        for (int index = 0; index < amount; index++)
         {
             Vector3 rngDir = Quaternion.AngleAxis(Random.Range(-90f, 90f), Random.onUnitSphere) * spawnDirection * Random.Range(1f, 1.5f);
             SpawnPickupChunk(spawnPos, rngDir);
@@ -68,7 +67,7 @@ public class SpawnManager : MonoBehaviour
 
     public async UniTask SpawnTempChunks(int amount, Vector3 spawnPos, Vector3 spawnDirection, float spawnDelay = -1f)
     {
-        for (int i = 0; i < amount; i++)
+        for (int index = 0; index < amount; index++)
         {
             Vector3 rngDir = Quaternion.AngleAxis(Random.Range(-90f, 90f), Random.onUnitSphere) * spawnDirection * Random.Range(1f, 1.5f);
             SpawnTempChunk(spawnPos, rngDir);
