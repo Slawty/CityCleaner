@@ -7,6 +7,7 @@ public class SplitMeshGridEditor : EditorWindow
 {
     const float ClipEpsilon = 0.0001f;
     const float MinTileSizeMeters = 0.1f;
+    const int DirtUvChannel = 3;
 
     enum GridSplitMode
     {
@@ -54,6 +55,7 @@ public class SplitMeshGridEditor : EditorWindow
         public Vector3 localPosition;
         public Vector3 localNormal;
         public Vector2 uv;
+        public Vector2 dirtUv;
         public bool valid;
     }
 
@@ -62,9 +64,11 @@ public class SplitMeshGridEditor : EditorWindow
         public Vector3[] localVertices;
         public Vector3[] localNormals;
         public Vector2[] uvs;
+        public Vector2[] dirtUvs;
         public int[] triangles;
         public bool hasNormals;
         public bool hasUvs;
+        public bool hasDirtUvs;
         public GridPlane gridPlane;
         public Transform sourceTransform;
         public bool useWorldPlaneCoords;
@@ -76,6 +80,7 @@ public class SplitMeshGridEditor : EditorWindow
         public Vector3 position;
         public Vector3 normal;
         public Vector2 uv;
+        public Vector2 dirtUv;
         public float planeA;
         public float planeB;
     }
@@ -127,14 +132,17 @@ public class SplitMeshGridEditor : EditorWindow
         readonly List<Vector3> positions = new();
         readonly List<Vector3> normals = new();
         readonly List<Vector2> uvs = new();
+        readonly List<Vector2> dirtUvs = new();
         readonly List<int> triangles = new();
         readonly bool hasNormals;
         readonly bool hasUvs;
+        readonly bool hasDirtUvs;
 
-        public TileMeshBuilder(bool hasNormals, bool hasUvs)
+        public TileMeshBuilder(bool hasNormals, bool hasUvs, bool hasDirtUvs)
         {
             this.hasNormals = hasNormals;
             this.hasUvs = hasUvs;
+            this.hasDirtUvs = hasDirtUvs;
         }
 
         public bool HasGeometry => triangles.Count > 0;
@@ -153,6 +161,8 @@ public class SplitMeshGridEditor : EditorWindow
                     normals.Add(vertex.normal);
                 if (hasUvs)
                     uvs.Add(vertex.uv);
+                if (hasDirtUvs)
+                    dirtUvs.Add(vertex.dirtUv);
             }
 
             for (int vertexIndex = 1; vertexIndex < polygon.Count - 1; vertexIndex++)
@@ -176,6 +186,9 @@ public class SplitMeshGridEditor : EditorWindow
 
             if (hasUvs)
                 pieceMesh.SetUVs(0, uvs);
+
+            if (hasDirtUvs)
+                pieceMesh.SetUVs(DirtUvChannel, dirtUvs);
 
             pieceMesh.RecalculateBounds();
             return pieceMesh;
@@ -319,9 +332,13 @@ public class SplitMeshGridEditor : EditorWindow
         Vector3[] vertices = sourceMesh.vertices;
         Vector3[] normals = sourceMesh.normals;
         Vector2[] uvs = sourceMesh.uv;
+        List<Vector2> dirtUvList = new List<Vector2>();
+        sourceMesh.GetUVs(DirtUvChannel, dirtUvList);
+        Vector2[] dirtUvs = dirtUvList.Count == vertices.Length ? dirtUvList.ToArray() : null;
         int[] triangles = sourceMesh.triangles;
         bool hasNormals = normals != null && normals.Length == vertices.Length;
         bool hasUvs = uvs != null && uvs.Length == vertices.Length;
+        bool hasDirtUvs = dirtUvs != null && dirtUvs.Length == vertices.Length;
 
         Transform sourceTransform = sourceObject.transform;
         bool useWorldPlaneCoords = splitMode == GridSplitMode.FixedTileSize;
@@ -357,9 +374,11 @@ public class SplitMeshGridEditor : EditorWindow
                 vertices,
                 normals,
                 uvs,
+                dirtUvs,
                 triangles,
                 hasNormals,
                 hasUvs,
+                hasDirtUvs,
                 gridPlane,
                 sourceTransform,
                 gridLayout.useWorldPlaneCoords);
@@ -397,9 +416,11 @@ public class SplitMeshGridEditor : EditorWindow
                 vertices,
                 normals,
                 uvs,
+                dirtUvs,
                 triangles,
                 hasNormals,
                 hasUvs,
+                hasDirtUvs,
                 gridPlane,
                 sourceTransform,
                 gridLayout);
@@ -518,9 +539,11 @@ public class SplitMeshGridEditor : EditorWindow
         Vector3[] localVertices,
         Vector3[] localNormals,
         Vector2[] uvs,
+        Vector2[] dirtUvs,
         int[] triangles,
         bool hasNormals,
         bool hasUvs,
+        bool hasDirtUvs,
         GridPlane gridPlane,
         Transform sourceTransform,
         bool useWorldPlaneCoords)
@@ -539,9 +562,11 @@ public class SplitMeshGridEditor : EditorWindow
             localVertices = localVertices,
             localNormals = localNormals,
             uvs = uvs,
+            dirtUvs = dirtUvs,
             triangles = triangles,
             hasNormals = hasNormals,
             hasUvs = hasUvs,
+            hasDirtUvs = hasDirtUvs,
             gridPlane = gridPlane,
             sourceTransform = sourceTransform,
             useWorldPlaneCoords = useWorldPlaneCoords,
@@ -591,6 +616,7 @@ public class SplitMeshGridEditor : EditorWindow
         List<Vector3> positions = new List<Vector3>();
         List<Vector3> meshNormals = sampleContext.hasNormals ? new List<Vector3>() : null;
         List<Vector2> meshUvs = sampleContext.hasUvs ? new List<Vector2>() : null;
+        List<Vector2> meshDirtUvs = sampleContext.hasDirtUvs ? new List<Vector2>() : null;
         List<int> meshTriangles = new List<int>();
         int[] vertexRemap = new int[gridVertices.Length];
 
@@ -611,10 +637,10 @@ public class SplitMeshGridEditor : EditorWindow
                 if (!v00.valid || !v10.valid || !v01.valid || !v11.valid)
                     continue;
 
-                int index00 = AddResampledVertex(v00, positions, meshNormals, meshUvs, vertexRemap, corner00);
-                int index10 = AddResampledVertex(v10, positions, meshNormals, meshUvs, vertexRemap, corner10);
-                int index11 = AddResampledVertex(v11, positions, meshNormals, meshUvs, vertexRemap, corner11);
-                int index01 = AddResampledVertex(v01, positions, meshNormals, meshUvs, vertexRemap, corner01);
+                int index00 = AddResampledVertex(v00, positions, meshNormals, meshUvs, meshDirtUvs, vertexRemap, corner00);
+                int index10 = AddResampledVertex(v10, positions, meshNormals, meshUvs, meshDirtUvs, vertexRemap, corner10);
+                int index11 = AddResampledVertex(v11, positions, meshNormals, meshUvs, meshDirtUvs, vertexRemap, corner11);
+                int index01 = AddResampledVertex(v01, positions, meshNormals, meshUvs, meshDirtUvs, vertexRemap, corner01);
 
                 meshTriangles.Add(index00);
                 meshTriangles.Add(index01);
@@ -644,6 +670,9 @@ public class SplitMeshGridEditor : EditorWindow
         if (meshUvs != null)
             pieceMesh.SetUVs(0, meshUvs);
 
+        if (meshDirtUvs != null)
+            pieceMesh.SetUVs(DirtUvChannel, meshDirtUvs);
+
         pieceMesh.RecalculateBounds();
         return true;
     }
@@ -653,6 +682,7 @@ public class SplitMeshGridEditor : EditorWindow
         List<Vector3> positions,
         List<Vector3> meshNormals,
         List<Vector2> meshUvs,
+        List<Vector2> meshDirtUvs,
         int[] vertexRemap,
         int gridVertexIndex)
     {
@@ -665,6 +695,8 @@ public class SplitMeshGridEditor : EditorWindow
             meshNormals.Add(vertex.localNormal);
         if (meshUvs != null)
             meshUvs.Add(vertex.uv);
+        if (meshDirtUvs != null)
+            meshDirtUvs.Add(vertex.dirtUv);
 
         vertexRemap[gridVertexIndex] = meshVertexIndex + 1;
         return meshVertexIndex;
@@ -727,6 +759,14 @@ public class SplitMeshGridEditor : EditorWindow
                 Vector2 uv2 = context.uvs[index2];
                 sampledVertex.uv = uv0 * barycentric.x + uv1 * barycentric.y + uv2 * barycentric.z;
             }
+
+            if (context.hasDirtUvs)
+            {
+                Vector2 dirtUv0 = context.dirtUvs[index0];
+                Vector2 dirtUv1 = context.dirtUvs[index1];
+                Vector2 dirtUv2 = context.dirtUvs[index2];
+                sampledVertex.dirtUv = dirtUv0 * barycentric.x + dirtUv1 * barycentric.y + dirtUv2 * barycentric.z;
+            }
         }
 
         return found;
@@ -786,6 +826,14 @@ public class SplitMeshGridEditor : EditorWindow
                 Vector2 uv1 = context.uvs[index1];
                 Vector2 uv2 = context.uvs[index2];
                 sampledVertex.uv = uv0 * barycentric.x + uv1 * barycentric.y + uv2 * barycentric.z;
+            }
+
+            if (context.hasDirtUvs)
+            {
+                Vector2 dirtUv0 = context.dirtUvs[index0];
+                Vector2 dirtUv1 = context.dirtUvs[index1];
+                Vector2 dirtUv2 = context.dirtUvs[index2];
+                sampledVertex.dirtUv = dirtUv0 * barycentric.x + dirtUv1 * barycentric.y + dirtUv2 * barycentric.z;
             }
         }
 
@@ -967,9 +1015,11 @@ public class SplitMeshGridEditor : EditorWindow
         Vector3[] vertices,
         Vector3[] normals,
         Vector2[] uvs,
+        Vector2[] dirtUvs,
         int[] triangles,
         bool hasNormals,
         bool hasUvs,
+        bool hasDirtUvs,
         GridPlane gridPlane,
         Transform sourceTransform,
         GridLayout gridLayout)
@@ -978,7 +1028,7 @@ public class SplitMeshGridEditor : EditorWindow
         for (int row = 0; row < gridLayout.rows; row++)
         {
             for (int column = 0; column < gridLayout.columns; column++)
-                tileBuilders[column, row] = new TileMeshBuilder(hasNormals, hasUvs);
+                tileBuilders[column, row] = new TileMeshBuilder(hasNormals, hasUvs, hasDirtUvs);
         }
 
         List<ClipVertex> clippedPolygon = new();
@@ -990,9 +1040,9 @@ public class SplitMeshGridEditor : EditorWindow
             int index1 = triangles[triangleIndex + 1];
             int index2 = triangles[triangleIndex + 2];
 
-            triangleVertices[0] = CreateClipVertex(index0, vertices, normals, uvs, hasNormals, hasUvs, gridPlane, sourceTransform, gridLayout.useWorldPlaneCoords);
-            triangleVertices[1] = CreateClipVertex(index1, vertices, normals, uvs, hasNormals, hasUvs, gridPlane, sourceTransform, gridLayout.useWorldPlaneCoords);
-            triangleVertices[2] = CreateClipVertex(index2, vertices, normals, uvs, hasNormals, hasUvs, gridPlane, sourceTransform, gridLayout.useWorldPlaneCoords);
+            triangleVertices[0] = CreateClipVertex(index0, vertices, normals, uvs, dirtUvs, hasNormals, hasUvs, hasDirtUvs, gridPlane, sourceTransform, gridLayout.useWorldPlaneCoords);
+            triangleVertices[1] = CreateClipVertex(index1, vertices, normals, uvs, dirtUvs, hasNormals, hasUvs, hasDirtUvs, gridPlane, sourceTransform, gridLayout.useWorldPlaneCoords);
+            triangleVertices[2] = CreateClipVertex(index2, vertices, normals, uvs, dirtUvs, hasNormals, hasUvs, hasDirtUvs, gridPlane, sourceTransform, gridLayout.useWorldPlaneCoords);
 
             GetTriangleCellRange(
                 triangleVertices,
@@ -1037,8 +1087,10 @@ public class SplitMeshGridEditor : EditorWindow
         Vector3[] vertices,
         Vector3[] normals,
         Vector2[] uvs,
+        Vector2[] dirtUvs,
         bool hasNormals,
         bool hasUvs,
+        bool hasDirtUvs,
         GridPlane gridPlane,
         Transform sourceTransform,
         bool useWorldPlaneCoords)
@@ -1052,13 +1104,16 @@ public class SplitMeshGridEditor : EditorWindow
             planeA = GetAxis(planePosition, gridPlane.axisA),
             planeB = GetAxis(planePosition, gridPlane.axisB),
             normal = Vector3.up,
-            uv = Vector2.zero
+            uv = Vector2.zero,
+            dirtUv = Vector2.zero
         };
 
         if (hasNormals)
             vertex.normal = normals[vertexIndex];
         if (hasUvs)
             vertex.uv = uvs[vertexIndex];
+        if (hasDirtUvs)
+            vertex.dirtUv = dirtUvs[vertexIndex];
 
         return vertex;
     }
@@ -1201,6 +1256,7 @@ public class SplitMeshGridEditor : EditorWindow
             position = Vector3.Lerp(start.position, end.position, t),
             normal = Vector3.Lerp(start.normal, end.normal, t).normalized,
             uv = Vector2.Lerp(start.uv, end.uv, t),
+            dirtUv = Vector2.Lerp(start.dirtUv, end.dirtUv, t),
             planeA = Mathf.Lerp(start.planeA, end.planeA, t),
             planeB = Mathf.Lerp(start.planeB, end.planeB, t)
         };
@@ -1242,6 +1298,7 @@ public class SplitMeshGridEditor : EditorWindow
             position = Vector3.Lerp(start.position, end.position, t),
             normal = Vector3.Lerp(start.normal, end.normal, t).normalized,
             uv = Vector2.Lerp(start.uv, end.uv, t),
+            dirtUv = Vector2.Lerp(start.dirtUv, end.dirtUv, t),
             planeA = Mathf.Lerp(start.planeA, end.planeA, t),
             planeB = Mathf.Lerp(start.planeB, end.planeB, t)
         };

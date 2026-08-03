@@ -48,7 +48,7 @@ Shader "Custom/URP_ObjectDirt"
                 float4 positionOS : POSITION;
                 float3 normalOS : NORMAL;
                 float2 uv : TEXCOORD0;
-                float2 uv1 : TEXCOORD1;
+                float2 dirtUv : TEXCOORD3;
             };
 
             struct Varyings
@@ -57,7 +57,7 @@ Shader "Custom/URP_ObjectDirt"
                 float3 positionWS : TEXCOORD0;
                 float3 normalWS : TEXCOORD1;
                 float2 uv : TEXCOORD2;
-                float2 uv1 : TEXCOORD3;
+                float2 dirtUv : TEXCOORD3;
             };
 
             Varyings vert(Attributes v)
@@ -75,23 +75,21 @@ Shader "Custom/URP_ObjectDirt"
                 o.normalWS = normalInputs.normalWS;
 
                 o.uv = v.uv;
-                o.uv1 = v.uv1;
+                o.dirtUv = v.dirtUv;
 
                 return o;
             }
 
             float4 frag(Varyings i) : SV_Target
             {
-                // Dirt mask from UV1
                 float dirt =
-                    tex2D(_DirtMask, i.uv1).r;
+                    tex2D(_DirtMask, i.dirtUv).r;
 
-                // Base textures from UV0
                 float3 clean =
                     tex2D(_BaseMap, i.uv).rgb;
 
                 float3 dirty =
-                    tex2D(_DirtMap, i.uv1).rgb;
+                    tex2D(_DirtMap, i.dirtUv).rgb;
 
                 float3 albedo =
                     lerp(clean, dirty, dirt);

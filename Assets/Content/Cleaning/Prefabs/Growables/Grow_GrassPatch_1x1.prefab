@@ -58,9 +58,9 @@ MonoBehaviour:
   bumpPeakAt: 0.35
   bumpUpEase: 27
   bumpDownEase: 6
-  linkedGrowables: []
   prerequisiteCleanables:
   - {fileID: 4182746193847291836}
+  linkedGrowables: []
   growableRenderers:
   - {fileID: 1853561475143949766}
   growableDirtRenderers: []
@@ -163,8 +163,10 @@ MonoBehaviour:
   cleanThreshold: 200
   cleanPercentage: 0.85
   countsTowardAreaProgress: 0
+  useContinuousProgress: 0
   allowGooCleaning: 0
   deferCleanMaterialSwapUntilGrowComplete: 1
+  dirtChunkMultiplier: 1
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -296,6 +298,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 6698b7d51b851dc408dd33d2877d0477, type: 3}
       propertyPath: m_Name
       value: GrassPatch_1x1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6698b7d51b851dc408dd33d2877d0477, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 6698b7d51b851dc408dd33d2877d0477, type: 3}
       propertyPath: m_StaticEditorFlags

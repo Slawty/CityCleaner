@@ -16,7 +16,7 @@ Shader "Hidden/CoverageMask"
             struct appdata
             {
                 float4 vertex : POSITION;
-                float2 uv1 : TEXCOORD1;
+                float2 dirtUv : TEXCOORD3;
             };
 
             struct v2f
@@ -28,7 +28,7 @@ Shader "Hidden/CoverageMask"
             {
                 v2f o;
 
-                float2 uv = v.uv1;
+                float2 uv = v.dirtUv;
                 uv.y = 1 - uv.y;
 
                 o.pos = float4(

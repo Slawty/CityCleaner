@@ -173,7 +173,7 @@ Material:
     - _DebugView: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DirtAmount: 0
+    - _DirtAmount: 1
     - _DirtMetallic: 0
     - _DirtMetallicStrength: 0.418
     - _DirtNoiseOffset: 1.995
@@ -218,7 +218,7 @@ Material:
     - _DirtAdditionalTint: {r: 0, g: 0, b: 0, a: 1}
     - _DirtDefaultTiling: {r: 1, g: 1, b: 0, a: 0}
     - _DirtTiling: {r: 5, g: 5, b: 0, a: 0}
-    - _DirtTint: {r: 0.38679248, g: 0.16939816, b: 0, a: 1}
+    - _DirtTint: {r: 0.3962264, g: 0.17209834, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MaskOffset: {r: 0, g: 0, b: 0, a: 0}
     - _PatternTiling: {r: 1, g: 1, b: 0, a: 0}

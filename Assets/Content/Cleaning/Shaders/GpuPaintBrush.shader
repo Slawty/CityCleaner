@@ -36,7 +36,7 @@ Shader "Hidden/GPUPaintBrush"
             struct appdata
             {
                 float4 vertex : POSITION;
-                float2 uv1 : TEXCOORD1;
+                float2 dirtUv : TEXCOORD3;
             };
 
             struct v2f
@@ -69,11 +69,11 @@ Shader "Hidden/GPUPaintBrush"
             {
                 v2f o;
 
-                float2 uv = v.uv1;
+                float2 uv = v.dirtUv;
                 uv.y = 1.0 - uv.y;
 
                 o.pos = float4(uv * 2 - 1, 0, 1);
-                o.uv = v.uv1;
+                o.uv = v.dirtUv;
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
 
                 return o;

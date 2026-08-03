@@ -9,6 +9,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 99c13ddce26ea544e95e471f5da55ccc, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 99c13ddce26ea544e95e471f5da55ccc, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 99c13ddce26ea544e95e471f5da55ccc, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 99c13ddce26ea544e95e471f5da55ccc, type: 3}
       propertyPath: m_LocalPosition.x
       value: 93
       objectReference: {fileID: 0}
@@ -95,8 +107,10 @@ MonoBehaviour:
   cleanThreshold: 200
   cleanPercentage: 0.85
   countsTowardAreaProgress: 1
+  useContinuousProgress: 0
   allowGooCleaning: 0
   deferCleanMaterialSwapUntilGrowComplete: 0
+  dirtChunkMultiplier: 1
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}

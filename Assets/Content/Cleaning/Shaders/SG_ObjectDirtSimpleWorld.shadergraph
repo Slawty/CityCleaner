@@ -8257,8 +8257,8 @@
     "m_ObjectId": "5a3fdfea3a3c486c88ea4989af839858",
     "m_Title": "Local object dirt mask",
     "m_Position": {
-        "x": -3236.000244140625,
-        "y": 1006.0000610351563
+        "x": -3236.0,
+        "y": 1006.0
     }
 }
 
@@ -8380,7 +8380,7 @@
     "m_ObjectId": "5c17545d985d4c50bc51a58dd322aedd",
     "m_Title": "YZ projection world UV",
     "m_Position": {
-        "x": -4584.00048828125,
+        "x": -4584.0,
         "y": -978.0
     }
 }
@@ -8858,7 +8858,7 @@
     "m_ObjectId": "67f33087420047059e7a581de237e1f4",
     "m_Title": "XZ (top down) projection world UV",
     "m_Position": {
-        "x": -4842.00048828125,
+        "x": -4842.0,
         "y": -1568.0
     }
 }
@@ -9603,7 +9603,7 @@
         "y": 0.0
     },
     "m_Labels": [],
-    "m_Channel": 1
+    "m_Channel": 3
 }
 
 {
@@ -10194,7 +10194,7 @@
     "m_ObjectId": "7db3f2d82b2043389962d709434dbce3",
     "m_Title": "XY projection world UV",
     "m_Position": {
-        "x": -4548.00048828125,
+        "x": -4548.0,
         "y": -482.0
     }
 }
@@ -11345,7 +11345,7 @@
     "m_ObjectId": "8fcdce619231446192f9420b7d2d5a27",
     "m_Title": "wX",
     "m_Position": {
-        "x": -3553.000244140625,
+        "x": -3553.0,
         "y": 284.0
     }
 }
@@ -13826,7 +13826,7 @@
         "y": 0.0
     },
     "m_Labels": [],
-    "m_Channel": 2
+    "m_Channel": 3
 }
 
 {
@@ -13933,7 +13933,7 @@
     "m_ObjectId": "c3b231aa0c584dea8649edd2bc60707d",
     "m_Title": "Debug View: 0 = Final, 1 = GlobalDirt, 2 = localDirt",
     "m_Position": {
-        "x": -2550.000244140625,
+        "x": -2550.0,
         "y": 935.0
     }
 }
@@ -14496,8 +14496,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -3117.0,
-            "y": -810.0,
+            "x": -3096.999755859375,
+            "y": -809.9999389648438,
             "width": 154.0,
             "height": 142.0
         }
@@ -15140,7 +15140,7 @@
         "y": 0.0
     },
     "m_Labels": [],
-    "m_Channel": 1
+    "m_Channel": 3
 }
 
 {
@@ -16317,8 +16317,8 @@
     "m_ObjectId": "ef85743905c2482791f1d1586d8081e0",
     "m_Title": "wZ",
     "m_Position": {
-        "x": -3539.000244140625,
-        "y": 684.0001220703125
+        "x": -3539.0,
+        "y": 684.0
     }
 }
 
@@ -17046,8 +17046,8 @@
     "m_ObjectId": "f88d2268bb304f118eca13a5300bf507",
     "m_Title": "wY",
     "m_Position": {
-        "x": -3553.000244140625,
-        "y": 486.99993896484377
+        "x": -3553.0,
+        "y": 487.0
     }
 }
 
