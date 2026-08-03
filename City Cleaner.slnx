@@ -13,4 +13,5 @@
   <Project Path="FMODUnityResonance.csproj" />
   <Project Path="Beans.Unity.Mathematics.csproj" />
   <Project Path="Beans.Unity.Collections.csproj" />
+  <Project Path="MeshyAssembly.csproj" />
 </Solution>

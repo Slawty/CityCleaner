@@ -101,7 +101,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: dafa4dc716ce7aa42ad0ad427503dfde, type: 2}
     - target: {fileID: 5769484663829117588, guid: fbb46eaf517958f47b4c94f4ce1d2280, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 126
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -149,13 +149,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
   winCoins: 1
-  winDirt: 3
   AdditionalObjectsToClean: []
   CoinSpawnPos: {fileID: 6172396371982844492}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.6
+  countsTowardAreaProgress: 1
+  useContinuousProgress: 0
   allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
+  dirtChunkMultiplier: 1
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -217,13 +220,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
   winCoins: 1
-  winDirt: 3
   AdditionalObjectsToClean: []
   CoinSpawnPos: {fileID: 6172396371982844492}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.85
+  countsTowardAreaProgress: 1
+  useContinuousProgress: 0
   allowGooCleaning: 0
+  deferCleanMaterialSwapUntilGrowComplete: 0
+  dirtChunkMultiplier: 1
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}

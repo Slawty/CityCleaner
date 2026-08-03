@@ -105,7 +105,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: dafa4dc716ce7aa42ad0ad427503dfde, type: 2}
     - target: {fileID: 5769484663829117588, guid: fbb46eaf517958f47b4c94f4ce1d2280, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 126
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -157,6 +157,7 @@ MonoBehaviour:
   useContinuousProgress: 0
   allowGooCleaning: 0
   deferCleanMaterialSwapUntilGrowComplete: 0
+  dirtChunkMultiplier: 1
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
@@ -216,6 +217,7 @@ MonoBehaviour:
   useContinuousProgress: 0
   allowGooCleaning: 0
   deferCleanMaterialSwapUntilGrowComplete: 0
+  dirtChunkMultiplier: 1
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
