@@ -34,6 +34,8 @@ public class GPUPaintableObject : MonoBehaviour
     [SerializeField] bool allowGooCleaning = false;
     [Header("Growable")]
     [SerializeField] bool deferCleanMaterialSwapUntilGrowComplete;
+    [Header("On Cleaned")]
+    [SerializeField] UnityEvent onCleaned;
     [Header("Dirt")]
     [SerializeField] float dirtChunkMultiplier = 1f;
     public float DirtChunkMultiplier => dirtChunkMultiplier;
@@ -392,6 +394,7 @@ public class GPUPaintableObject : MonoBehaviour
             PlayCleanSuccessSound();
 
         OnCleaned?.Invoke();
+        onCleaned?.Invoke();
     }
 
     void PlayCleanSuccessSound()

@@ -47,6 +47,9 @@ public class GooParticleNotifier : MonoBehaviour
 
         OnGooHit?.Invoke(hitPoint, other);
 
+        if (TryHandleGrowableHit(other, hitPoint))
+            return;
+
         IGooHitReceiver[] receivers = other.GetComponents<IGooHitReceiver>();
         foreach (IGooHitReceiver receiver in receivers)
             receiver.OnGooHit(hitPoint, gameObject);
@@ -66,5 +69,51 @@ public class GooParticleNotifier : MonoBehaviour
             throw new System.InvalidOperationException("Goo pop FMOD event is not assigned on GooParticleNotifier.");
 
         RuntimeManager.PlayOneShot(gooPopEvent, hitPoint);
+    }
+
+    bool TryHandleGrowableHit(GameObject other, Vector3 hitPoint)
+    {
+        GooHitGrowable growable = other.GetComponentInParent<GooHitGrowable>();
+        if (growable == null)
+            return false;
+
+        if (!growable.IsReadyForGoo || growable.IsFullyGrown)
+        {
+            growable.OnGooHit(hitPoint, gameObject);
+            return true;
+        }
+
+        HashSet<GooHitGrowable> group = new HashSet<GooHitGrowable>();
+        growable.CollectLinkedGroup(group);
+
+        Dictionary<GooHitGrowable, bool> wasFullyGrown = new Dictionary<GooHitGrowable, bool>();
+        foreach (GooHitGrowable member in group)
+            wasFullyGrown[member] = member.IsFullyGrown;
+
+        growable.OnGooHit(hitPoint, gameObject);
+
+        bool anyNewlyFullyGrown = false;
+        bool anyProgress = false;
+
+        foreach (GooHitGrowable member in group)
+        {
+            if (wasFullyGrown[member])
+                continue;
+
+            if (member.IsFullyGrown)
+                anyNewlyFullyGrown = true;
+            else if (member.IsReadyForGoo)
+                anyProgress = true;
+        }
+
+        if (gooGun != null)
+        {
+            if (anyNewlyFullyGrown)
+                gooGun.PlayFullyGrownSound(hitPoint);
+            else if (anyProgress)
+                gooGun.PlayGrowHitSound(hitPoint);
+        }
+
+        return true;
     }
 }

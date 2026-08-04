@@ -115,9 +115,15 @@ public class JobManager : MonoBehaviour
             return;
         }
 
+        if (client.Job == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(OfferJob)}: {nameof(JobClient.Job)} is not assigned on {client.name}.", client);
+            return;
+        }
+
         pendingClient = client;
         pendingSpeechAction = JobSpeechAction.AcceptJob;
-        Managers.Speech.Show(client.OfferDialogue);
+        ShowJobDialogues(client.Job.Presentation.introDialogues, OnSpeechAccepted);
     }
 
     public void OfferTurnIn(JobClient client)
@@ -128,9 +134,15 @@ public class JobManager : MonoBehaviour
             return;
         }
 
+        if (client.Job == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(OfferTurnIn)}: {nameof(JobClient.Job)} is not assigned on {client.name}.", client);
+            return;
+        }
+
         pendingClient = client;
         pendingSpeechAction = JobSpeechAction.TurnInJob;
-        Managers.Speech.Show(client.CompletionDialogue);
+        ShowJobDialogues(client.Job.Presentation.outroDialogues, OnSpeechAccepted);
     }
 
     public void StartJob(JobClient client)
@@ -468,5 +480,13 @@ public class JobManager : MonoBehaviour
     static bool HasDialogues(string[] dialogues)
     {
         return dialogues != null && dialogues.Length > 0;
+    }
+
+    static void ShowJobDialogues(string[] dialogues, Action onFinished)
+    {
+        if (HasDialogues(dialogues))
+            Managers.Speech.ShowDialogueSequence(dialogues, onFinished);
+        else
+            onFinished?.Invoke();
     }
 }

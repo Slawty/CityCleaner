@@ -117,8 +117,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::JobClient
   job: {fileID: 0}
-  dialogue: Hey, can you please help me?
-  completionDialogue: Thanks man!
   jobAvailableSymbol: {fileID: 9178566164299144942}
   jobPendingSymbol: {fileID: 8468525502947483979}
   jobCompletedSymbol: {fileID: 6599061272874176403}

@@ -15,6 +15,8 @@ public class GooGunTool : Tool
 
     [Header("Audio")]
     [SerializeField] EventReference gooShootEvent;
+    [SerializeField] EventReference gooGrowEvent;
+    [SerializeField] EventReference gooFullyGrownEvent;
 
     float currentAmmo;
     bool isActive;
@@ -93,6 +95,22 @@ public class GooGunTool : Tool
 
         GameObject attachTarget = Tip != null ? Tip.gameObject : gameObject;
         RuntimeManager.PlayOneShotAttached(gooShootEvent, attachTarget);
+    }
+
+    public void PlayGrowHitSound(Vector3 position)
+    {
+        if (gooGrowEvent.IsNull)
+            throw new System.InvalidOperationException("Goo grow FMOD event is not assigned on GooGunTool.");
+
+        RuntimeManager.PlayOneShot(gooGrowEvent, position);
+    }
+
+    public void PlayFullyGrownSound(Vector3 position)
+    {
+        if (gooFullyGrownEvent.IsNull)
+            throw new System.InvalidOperationException("Goo fully grown FMOD event is not assigned on GooGunTool.");
+
+        RuntimeManager.PlayOneShot(gooFullyGrownEvent, position);
     }
 
     protected override void OnEnable()

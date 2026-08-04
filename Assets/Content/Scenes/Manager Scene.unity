@@ -6331,7 +6331,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 945bfbb1de35f854eab5a26c7844fbc9, type: 2}
   - {fileID: 2100000, guid: dafa4dc716ce7aa42ad0ad427503dfde, type: 2}
   - {fileID: 2100000, guid: aab778baaf8abd64e8180978f16be595, type: 2}
-  previewDirty: 1
+  previewDirty: 0
 --- !u!1 &335207498
 GameObject:
   m_ObjectHideFlags: 0
@@ -26059,6 +26059,20 @@ MonoBehaviour:
       Data3: -103361904
       Data4: 37006690
     Path: event:/Tools/GooGun/Goo_Shoot
+  gooGrowEvent:
+    Guid:
+      Data1: 133906114
+      Data2: 1323703313
+      Data3: 1459001748
+      Data4: 1874589556
+    Path: event:/Tools/GooGun/Goo_Grow
+  gooFullyGrownEvent:
+    Guid:
+      Data1: 1361879045
+      Data2: 1198923301
+      Data3: 1820839822
+      Data4: -991253105
+    Path: event:/Tools/GooGun/Goo_FullyGrown
 --- !u!1 &1038738507
 GameObject:
   m_ObjectHideFlags: 0

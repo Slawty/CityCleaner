@@ -43,6 +43,19 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
     /// <summary>Fires once when growth reaches 100% (including linked propagation).</summary>
     public UnityAction OnFullyGrownCompleted;
 
+    public void CollectLinkedGroup(HashSet<GooHitGrowable> results)
+    {
+        if (results == null || !results.Add(this))
+            return;
+
+        for (int i = 0; i < linkedGrowables.Count; i++)
+        {
+            GooHitGrowable linkedGrowable = linkedGrowables[i];
+            if (linkedGrowable != null)
+                linkedGrowable.CollectLinkedGroup(results);
+        }
+    }
+
     protected void InitializeGrowable()
     {
         growthProgress = Mathf.Clamp01(startGrowthProgress);

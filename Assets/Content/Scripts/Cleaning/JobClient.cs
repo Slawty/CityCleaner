@@ -12,13 +12,9 @@ public enum JobClientState
 
 public class JobClient : MonoBehaviour, IInteractable
 {
-    const string DefaultOfferDialogue = "Please, can you help me clean up around here?";
-    const string DefaultCompletionDialogue = "Thanks for completing the job!";
     const string ActiveJobDialogue = "Keep cleaning — you're not done yet!";
 
     [SerializeField] Job job;
-    [SerializeField] string dialogue;
-    [SerializeField] string completionDialogue;
     [Header("Symbols")]
     [SerializeField] GameObject jobAvailableSymbol;
     [SerializeField] GameObject jobPendingSymbol;
@@ -40,8 +36,6 @@ public class JobClient : MonoBehaviour, IInteractable
     public AnimationSounds AnimationSounds => animationSounds;
     public Transform WaypointTransform => waypointTarget != null ? waypointTarget : transform;
     public string ReturnDestinationName => string.IsNullOrEmpty(returnDestinationName) ? name : returnDestinationName;
-    public string OfferDialogue => string.IsNullOrEmpty(dialogue) ? DefaultOfferDialogue : dialogue;
-    public string CompletionDialogue => string.IsNullOrEmpty(completionDialogue) ? DefaultCompletionDialogue : completionDialogue;
 
     public string Prompt => "Talk";
 
@@ -83,9 +77,8 @@ public class JobClient : MonoBehaviour, IInteractable
             default:
                 if (job == null)
                 {
-                    Managers.Speech.Show(OfferDialogue);
-                    NotifySpokenTo();
-                    break;
+                    Debug.LogError($"{nameof(JobClient)} on {name}: {nameof(job)} is not assigned.", this);
+                    return;
                 }
 
                 if (job.UsesChainFlow)
