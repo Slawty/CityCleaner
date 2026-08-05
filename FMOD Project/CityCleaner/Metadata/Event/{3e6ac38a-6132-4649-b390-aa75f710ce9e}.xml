@@ -5,7 +5,7 @@
 			<value>Laser_Pop</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{1f7b7904-915c-4e03-992a-9ac8da8bc973}</destination>
@@ -242,6 +242,7 @@
 	<object class="MixerBusEffectChain" id="{383e537e-d4bd-42f7-91df-23c8b325a496}">
 		<relationship name="effects">
 			<destination>{4de1259b-cdd3-4a35-907e-24511d06c4c8}</destination>
+			<destination>{e390e764-013a-40df-98cb-73b0c8063fe9}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{78e092be-e2e4-495d-8e4d-36578313bf97}" />
@@ -346,6 +347,7 @@
 	</object>
 	<object class="MixerBusPanner" id="{d9eda18e-c1e6-4214-8f66-5fc16cb7d482}" />
 	<object class="MixerBusFader" id="{4de1259b-cdd3-4a35-907e-24511d06c4c8}" />
+	<object class="SpatialiserEffect" id="{e390e764-013a-40df-98cb-73b0c8063fe9}" />
 	<object class="AutomationPoint" id="{cb7da240-fc40-4f12-baf4-aab7af60aa77}">
 		<property name="position">
 			<value>0.22000000000000008</value>

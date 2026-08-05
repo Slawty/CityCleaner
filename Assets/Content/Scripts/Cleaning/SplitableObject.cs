@@ -35,6 +35,9 @@ public class SplitableObject : MonoBehaviour
     [SerializeField] EventReference destroyEvent;
     [SerializeField] EventReference wobbleHitEvent;
 
+    [Header("Destroy VFX")]
+    [SerializeField] float destroyVfxScale = 1f;
+
     [SerializeField] MeshRenderer meshRenderer;
 
     MaterialPropertyBlock propertyBlock;
@@ -138,31 +141,36 @@ public class SplitableObject : MonoBehaviour
             return;
 
         isDestroyed = true;
-        PlayDestroySound();
+        Bounds destroyBounds = meshRenderer.bounds;
+        Vector3 destroyCenter = destroyBounds.center;
+
+        PlayDestroySound(destroyCenter);
+        Managers.Spawning.SpawnSplitableDestroyVfx(destroyBounds, destroyVfxScale);
+
         int amount = Random.Range(2, 5);
-        Vector3 playerDir = (Managers.Player.transform.position - transform.position).normalized;
+        Vector3 playerDir = (Managers.Player.transform.position - destroyCenter).normalized;
         playerDir.y = 1f;
         float velocity = Random.Range(1f, 1.5f);
         playerDir *= velocity;
-        Managers.Spawning.SpawnTempChunks(amount, transform.position, playerDir, spawnDelay: 0f).Forget();
+        Managers.Spawning.SpawnTempChunks(amount, destroyCenter, playerDir, spawnDelay: 0f).Forget();
 
         if (Random.value <= coinChance)
-            Managers.Spawning.SpawnCoins(1, transform.position).Forget();
+            Managers.Spawning.SpawnCoins(1, destroyCenter).Forget();
 
         meshRenderer.SetPropertyBlock(null);
         OnDestroyed?.Invoke();
         Destroy(gameObject);
     }
 
-    void PlayDestroySound()
+    void PlayDestroySound(Vector3 position)
     {
         if (!destroyEvent.IsNull)
         {
-            RuntimeManager.PlayOneShot(destroyEvent, transform.position);
+            RuntimeManager.PlayOneShot(destroyEvent, position);
             return;
         }
 
-        RuntimeManager.PlayOneShot(DefaultDestroyEventPath, transform.position);
+        RuntimeManager.PlayOneShot(DefaultDestroyEventPath, position);
     }
 
     void PlayWobbleHitSound()

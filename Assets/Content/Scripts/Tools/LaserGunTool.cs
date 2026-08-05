@@ -11,6 +11,7 @@ public class LaserGunTool : Tool
     public float DamagePerSecond = 10f;
 
     [SerializeField] List<ParticleSystem> sprayEffects;
+    [SerializeField] ParticleSystem laserHitEffects;
     [SerializeField] ProgressBar ammoBar;
     [SerializeField] LayerMask hitMask;
     [SerializeField] LineRenderer laserBeam;
@@ -22,6 +23,8 @@ public class LaserGunTool : Tool
 
     float currentAmmo;
     bool isActive;
+    bool laserHitEffectsPlaying;
+    Quaternion hitEffectsShapeOffset;
     Camera cam;
     EventInstance laserLoopInstance;
 
@@ -32,8 +35,20 @@ public class LaserGunTool : Tool
         if (laserBeam == null && Tip != null)
             laserBeam = Tip.GetComponentInChildren<LineRenderer>(true);
 
+        if (laserHitEffects == null && Tip != null)
+        {
+            Transform hitEffectsTransform = Tip.Find("Splitable Smoke PS");
+            if (hitEffectsTransform != null)
+                laserHitEffects = hitEffectsTransform.GetComponent<ParticleSystem>();
+        }
+
+        if (laserHitEffects != null)
+            hitEffectsShapeOffset = laserHitEffects.transform.localRotation;
+
         if (laserBeam != null)
             laserBeam.enabled = false;
+
+        StopLaserHitEffects();
 
         RefillAmmo();
     }
@@ -65,6 +80,7 @@ public class LaserGunTool : Tool
         foreach (ParticleSystem effect in sprayEffects)
             effect.Stop();
 
+        StopLaserHitEffects();
         StopLaserLoop();
 
         if (wasActive)
@@ -150,6 +166,7 @@ public class LaserGunTool : Tool
         bool hitSomething = Physics.Raycast(ray, out RaycastHit hit, maxLaserDistance, hitMask, QueryTriggerInteraction.Ignore);
 
         UpdateLaserBeam(hitSomething, hit);
+        UpdateLaserHitEffects(hitSomething, hit, ray);
 
         if (!hitSomething)
             return;
@@ -197,6 +214,45 @@ public class LaserGunTool : Tool
 
         laserBeam.SetPosition(0, Vector3.zero);
         laserBeam.SetPosition(1, new Vector3(0f, 0f, beamLength));
+    }
+
+    void UpdateLaserHitEffects(bool hitSomething, RaycastHit hit, Ray ray)
+    {
+        if (laserHitEffects == null)
+            return;
+
+        if (!hitSomething)
+        {
+            StopLaserHitEffects();
+            return;
+        }
+
+        Vector3 cameraDirection = ray.direction;
+
+        if (cameraDirection.sqrMagnitude > 0.0001f)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(cameraDirection.normalized, hit.normal);
+            laserHitEffects.transform.SetPositionAndRotation(hit.point, lookRotation * hitEffectsShapeOffset);
+        }
+        else
+        {
+            laserHitEffects.transform.position = hit.point;
+        }
+
+        if (laserHitEffectsPlaying)
+            return;
+
+        laserHitEffects.Play(true);
+        laserHitEffectsPlaying = true;
+    }
+
+    void StopLaserHitEffects()
+    {
+        if (laserHitEffects == null || !laserHitEffectsPlaying)
+            return;
+
+        laserHitEffects.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        laserHitEffectsPlaying = false;
     }
 
     protected override void OnDisable()

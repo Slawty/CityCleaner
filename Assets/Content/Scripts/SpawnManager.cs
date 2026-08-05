@@ -8,9 +8,15 @@ public class SpawnManager : MonoBehaviour
     [SerializeField] ParticleSystem coinParticles;
     [SerializeField] ParticleSystem pickupChunkParticles;
     [SerializeField] ParticleSystem tempChunkParticles;
+    [SerializeField] ParticleSystem splitableDestroyParticles;
+    [SerializeField] ParticleSystem splitableDestroySmokeParticles;
+    [SerializeField] float splitableDestroyBaseSize = 20f;
+    [SerializeField] float splitableDestroyReferenceExtent = 0.5f;
+    [SerializeField] int splitableDestroyBaseCount = 5;
     [SerializeField] float multipleSpawnDelay = 0.2f;
 
     CoinParticleFlight coinFlight;
+    Vector3 splitableSmokeDefaultScale;
 
     public UnityAction OnCoinSpawned;
 
@@ -19,6 +25,9 @@ public class SpawnManager : MonoBehaviour
         coinFlight = coinParticles.GetComponent<CoinParticleFlight>();
         if (coinFlight == null)
             throw new System.InvalidOperationException($"{nameof(SpawnManager)} on {name}: {nameof(CoinParticleFlight)} is missing on {coinParticles.name}.");
+
+        if (splitableDestroySmokeParticles != null)
+            splitableSmokeDefaultScale = splitableDestroySmokeParticles.transform.localScale;
     }
 
     public void SpawnCoin(Vector3 spawnPos)
@@ -74,5 +83,46 @@ public class SpawnManager : MonoBehaviour
             float delay = spawnDelay == -1f ? multipleSpawnDelay : spawnDelay;
             await UniTask.Delay(System.TimeSpan.FromSeconds(delay), cancellationToken: destroyCancellationToken);
         }
+    }
+
+    public void SpawnSplitableDestroyVfx(Bounds bounds, float scaleMultiplier = 1f)
+    {
+        float sizeFactor = bounds.extents.magnitude / splitableDestroyReferenceExtent * scaleMultiplier;
+        Vector3 spawnPos = bounds.center;
+
+        EmitScaledParticles(splitableDestroyParticles, spawnPos, splitableDestroyBaseSize, splitableDestroyBaseCount, sizeFactor);
+        SpawnSplitableSmoke(splitableDestroySmokeParticles, spawnPos, sizeFactor);
+    }
+
+    void SpawnSplitableSmoke(ParticleSystem smoke, Vector3 spawnPos, float sizeFactor)
+    {
+        if (smoke == null)
+            return;
+
+        Transform smokeTransform = smoke.transform;
+        smokeTransform.position = spawnPos;
+        smokeTransform.localScale = splitableSmokeDefaultScale * sizeFactor;
+
+        if (smoke.isPlaying)
+            smoke.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+
+        smoke.Play();
+    }
+
+    void EmitScaledParticles(ParticleSystem particles, Vector3 position, float baseSize, int baseCount, float sizeFactor)
+    {
+        if (particles == null)
+            return;
+
+        float particleSize = baseSize * sizeFactor;
+        int particleCount = Mathf.Max(1, Mathf.RoundToInt(baseCount * sizeFactor));
+
+        ParticleSystem.EmitParams emit = new ParticleSystem.EmitParams
+        {
+            position = position,
+            applyShapeToPosition = false,
+            startSize = particleSize,
+        };
+        particles.Emit(emit, particleCount);
     }
 }

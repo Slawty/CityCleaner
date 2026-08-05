@@ -5,7 +5,7 @@
 			<value>Laser_Hit</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{1f7b7904-915c-4e03-992a-9ac8da8bc973}</destination>
@@ -59,7 +59,7 @@
 	</object>
 	<object class="EventAutomatableProperties" id="{e7c8278a-7584-4e3f-8148-7217621aa639}">
 		<property name="maxVoices">
-			<value>4</value>
+			<value>3</value>
 		</property>
 	</object>
 	<object class="MarkerTrack" id="{ab9dd254-d053-46f6-8735-87915a9988fd}" />
@@ -115,7 +115,7 @@
 	</object>
 	<object class="EventMixerGroup" id="{d7c411e4-ed77-40de-8c0c-fe044ca9d295}">
 		<property name="volume">
-			<value>2.5</value>
+			<value>-80</value>
 		</property>
 		<property name="name">
 			<value>Audio 9</value>
@@ -160,6 +160,7 @@
 	<object class="MixerBusEffectChain" id="{22035d8d-b081-4ee5-bd90-9949104cb8b5}">
 		<relationship name="effects">
 			<destination>{c6dfa74b-4035-4b04-b90d-33338c2eb99b}</destination>
+			<destination>{de713cc2-a416-4ff0-a95d-facad153d39b}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{756043af-a38d-4dfc-9d4f-51645bd5e9df}" />
@@ -208,6 +209,7 @@
 	</object>
 	<object class="MixerBusPanner" id="{9b4edcc0-4e50-4fb7-88a9-57a3da12e83c}" />
 	<object class="MixerBusFader" id="{c6dfa74b-4035-4b04-b90d-33338c2eb99b}" />
+	<object class="SpatialiserEffect" id="{de713cc2-a416-4ff0-a95d-facad153d39b}" />
 	<object class="MixerBusFader" id="{bea23e1a-bcf9-42cd-8d7f-2f2aa752507f}" />
 	<object class="AutomationPoint" id="{93cf194f-ac70-4dfb-94b8-f2851561d728}">
 		<property name="position">
