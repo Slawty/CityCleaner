@@ -13,6 +13,8 @@ public class LaserGunTool : Tool
     [SerializeField] List<ParticleSystem> sprayEffects;
     [SerializeField] ProgressBar ammoBar;
     [SerializeField] LayerMask hitMask;
+    [SerializeField] LineRenderer laserBeam;
+    [SerializeField] float maxLaserDistance = 10f;
 
     [Header("Audio")]
     [SerializeField] EventReference laserLoopEvent;
@@ -26,6 +28,13 @@ public class LaserGunTool : Tool
     public override void Initialize()
     {
         cam = Managers.MainCam;
+
+        if (laserBeam == null && Tip != null)
+            laserBeam = Tip.GetComponentInChildren<LineRenderer>(true);
+
+        if (laserBeam != null)
+            laserBeam.enabled = false;
+
         RefillAmmo();
     }
 
@@ -35,6 +44,9 @@ public class LaserGunTool : Tool
             return;
 
         isActive = true;
+
+        if (laserBeam != null)
+            laserBeam.enabled = true;
 
         foreach (ParticleSystem effect in sprayEffects)
             effect.Play();
@@ -46,6 +58,9 @@ public class LaserGunTool : Tool
     {
         bool wasActive = isActive;
         isActive = false;
+
+        if (laserBeam != null)
+            laserBeam.enabled = false;
 
         foreach (ParticleSystem effect in sprayEffects)
             effect.Stop();
@@ -132,8 +147,11 @@ public class LaserGunTool : Tool
     void HandleLaser()
     {
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+        bool hitSomething = Physics.Raycast(ray, out RaycastHit hit, maxLaserDistance, hitMask, QueryTriggerInteraction.Ignore);
 
-        if (!Physics.Raycast(ray, out RaycastHit hit, 10f, hitMask, QueryTriggerInteraction.Ignore))
+        UpdateLaserBeam(hitSomething, hit);
+
+        if (!hitSomething)
             return;
 
         Dirtling dirtling = hit.collider.GetComponentInParent<Dirtling>();
@@ -162,6 +180,23 @@ public class LaserGunTool : Tool
 
         if (dirtNest != null)
             dirtNest.ApplyDamageOverTime(DamagePerSecond);
+    }
+
+    void UpdateLaserBeam(bool hitSomething, RaycastHit hit)
+    {
+        if (laserBeam == null)
+            return;
+
+        float beamLength = maxLaserDistance;
+
+        if (hitSomething)
+        {
+            Vector3 localHit = laserBeam.transform.InverseTransformPoint(hit.point);
+            beamLength = Mathf.Clamp(localHit.z, 0f, maxLaserDistance);
+        }
+
+        laserBeam.SetPosition(0, Vector3.zero);
+        laserBeam.SetPosition(1, new Vector3(0f, 0f, beamLength));
     }
 
     protected override void OnDisable()

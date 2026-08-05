@@ -18,6 +18,10 @@ Shader "Cleaning/Lit Hit Flash"
         _FlashStrength ("Flash Strength", Range(0, 1)) = 1
         _FlashFlickerHz ("Flash Flicker Hz", Float) = 0
         _FlashFlickerBlend ("Flash Flicker Blend", Range(0, 1)) = 0
+
+        [Header(Heat)]
+        [HDR] _EmissionColor ("Emission Color", Color) = (0, 0, 0, 0)
+        _EmissionStrength ("Emission Strength", Range(0, 1)) = 0
     }
 
     SubShader
@@ -61,6 +65,8 @@ Shader "Cleaning/Lit Hit Flash"
                 half _FlashStrength;
                 half _FlashFlickerHz;
                 half _FlashFlickerBlend;
+                half3 _EmissionColor;
+                half _EmissionStrength;
             CBUFFER_END
 
             struct Attributes
@@ -166,6 +172,7 @@ Shader "Cleaning/Lit Hit Flash"
 
                 half3 rgb =
                     SimpleLighting(normalWS, albedo, i.positionWS, i.shadowCoord);
+                rgb += _EmissionColor * _EmissionStrength;
                 return half4(rgb, 1);
             }
 

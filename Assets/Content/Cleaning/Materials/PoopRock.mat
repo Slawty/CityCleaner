@@ -137,6 +137,7 @@ Material:
     - _FlashFlickerHz: 0
     - _FlashStartTime: -999999
     - _FlashStrength: 1
+    - _EmissionStrength: 0
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
