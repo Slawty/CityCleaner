@@ -7,4 +7,5 @@ public class NpcMoveInstruction
     public NpcNavMovement npc;
     public Transform destination;
     public bool stopWandering = true;
+    public JobClientState returnState = JobClientState.Available;
 }

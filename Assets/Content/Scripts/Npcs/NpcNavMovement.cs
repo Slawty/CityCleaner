@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -20,14 +21,19 @@ public class NpcNavMovement : MonoBehaviour
     float currentAnimSpeed;
 
     bool waitingForGround;
-    bool wasThrown;
     PickupInteractable pickupInteractable;
     Quaternion? pendingArrivalRotation;
+    CancellationTokenSource facingCts;
 
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         pickupInteractable = GetComponent<PickupInteractable>();
+    }
+
+    void OnDestroy()
+    {
+        CancelFacing();
     }
 
     void Update()
@@ -62,6 +68,7 @@ public class NpcNavMovement : MonoBehaviour
     public void MoveTo(Vector3 position, Transform faceTarget)
     {
         followTarget = null;
+        CancelFacing();
         agent.SetDestination(position);
 
         if (faceTarget == null)
@@ -80,6 +87,8 @@ public class NpcNavMovement : MonoBehaviour
 
         if (!HasReachedDestination())
             return;
+
+        CancelFacing();
 
         Quaternion targetRotation = pendingArrivalRotation.Value;
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, arrivalRotationSpeed * Time.deltaTime);
@@ -103,14 +112,12 @@ public class NpcNavMovement : MonoBehaviour
 
     public void MarkThrown()
     {
-        wasThrown = true;
         waitingForGround = true;
     }
 
     public void CancelWaitingForCollision()
     {
         waitingForGround = false;
-        wasThrown = false;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -133,6 +140,7 @@ public class NpcNavMovement : MonoBehaviour
     {
         followTarget = null;
         pendingArrivalRotation = null;
+        CancelFacing();
         agent.ResetPath();
     }
 
@@ -145,7 +153,30 @@ public class NpcNavMovement : MonoBehaviour
         return true;
     }
 
-    public async UniTask FacePointAsync(Vector3 worldPoint, CancellationToken cancellationToken)
+    public UniTask WaitUntilArrivedAsync(CancellationToken cancellationToken = default)
+    {
+        return UniTask.WaitUntil(HasFullyArrived, cancellationToken: cancellationToken);
+    }
+
+    bool HasFullyArrived()
+    {
+        if (!agent.enabled || !agent.isOnNavMesh)
+            return true;
+
+        return HasReachedDestination() && !pendingArrivalRotation.HasValue;
+    }
+
+    public void CancelFacing()
+    {
+        if (facingCts == null)
+            return;
+
+        facingCts.Cancel();
+        facingCts.Dispose();
+        facingCts = null;
+    }
+
+    public async UniTask FacePointAsync(Vector3 worldPoint, CancellationToken cancellationToken = default)
     {
         pendingArrivalRotation = null;
 
@@ -155,13 +186,35 @@ public class NpcNavMovement : MonoBehaviour
             return;
 
         Quaternion targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
-        await RotateTowardsAsync(targetRotation, cancellationToken);
+        await FaceRotationAsync(targetRotation, cancellationToken);
     }
 
-    public async UniTask FaceRotationAsync(Quaternion targetRotation, CancellationToken cancellationToken)
+    public async UniTask FaceRotationAsync(Quaternion targetRotation, CancellationToken cancellationToken = default)
     {
         pendingArrivalRotation = null;
-        await RotateTowardsAsync(targetRotation, cancellationToken);
+
+        CancellationTokenSource rotationCts = CreateFacingCts(cancellationToken);
+        try
+        {
+            await RotateTowardsAsync(targetRotation, rotationCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            if (facingCts == rotationCts)
+            {
+                facingCts.Dispose();
+                facingCts = null;
+            }
+        }
+    }
+
+    CancellationTokenSource CreateFacingCts(CancellationToken externalToken)
+    {
+        CancelFacing();
+        return facingCts = CancellationTokenSource.CreateLinkedTokenSource(externalToken, destroyCancellationToken);
     }
 
     async UniTask RotateTowardsAsync(Quaternion targetRotation, CancellationToken cancellationToken)

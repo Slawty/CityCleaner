@@ -36,16 +36,24 @@ public class PlayerInteractor : MonoBehaviour
 
     void CheckForInteractable()
     {
-        bool hitSomething = Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, interactDistance, ~0, QueryTriggerInteraction.Ignore);
-
         if (Managers.Input.InteractionBlocked())
-            hitSomething = false;
+        {
+            if (currentInteractable != null)
+            {
+                currentInteractable = null;
+                Managers.UI.HideInteractText();
+            }
+
+            return;
+        }
+
+        bool hitSomething = Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, interactDistance, ~0, QueryTriggerInteraction.Ignore);
 
         if (hitSomething)
         {
             IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
 
-            if (interactable != null)
+            if (interactable != null && !string.IsNullOrEmpty(interactable.Prompt))
             {
                 if (interactable != currentInteractable)
                 {
@@ -72,6 +80,9 @@ public class PlayerInteractor : MonoBehaviour
 
     void InteractButtonPressed(InputAction.CallbackContext ctx)
     {
+        if (Managers.Input.InteractionBlocked())
+            return;
+
         Debug.Log($"Interact button pressed. Has inetractable: {currentInteractable != null}");
         if (currentInteractable == null)
             return;
@@ -81,6 +92,9 @@ public class PlayerInteractor : MonoBehaviour
 
     void InteractButtonReleased(InputAction.CallbackContext ctx)
     {
+        if (Managers.Input.InteractionBlocked())
+            return;
+
         Debug.Log($"Interact button released. Has inetractable: {currentInteractable != null}");
         if (currentInteractable == null)
             return;

@@ -8,6 +8,7 @@ public abstract class Job : MonoBehaviour
     [SerializeField] string progressDescription;
     [Header("Completion")]
     [SerializeField] bool requiresTurnIn = true;
+    [SerializeField] bool showCompletionPopup = true;
     [Header("Presentation")]
     [SerializeField] JobPresentation presentation = new();
     [SerializeField] JobClient speaker;
@@ -25,6 +26,7 @@ public abstract class Job : MonoBehaviour
     public virtual float CompletionFraction => completionFraction;
     public virtual bool UsesProgressBar => true;
     public bool RequiresTurnIn => requiresTurnIn;
+    public bool ShowCompletionPopup => showCompletionPopup;
     public JobPresentation Presentation => presentation;
     public JobClient Speaker => speaker;
     public Job FollowUpJob => followUpJob;

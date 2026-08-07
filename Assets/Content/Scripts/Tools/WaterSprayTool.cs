@@ -76,7 +76,7 @@ public class WaterSprayTool : Tool
         StopWasherLoop();
 
         washerLoopInstance = RuntimeManager.CreateInstance(washerLoopEvent);
-        RuntimeManager.AttachInstanceToGameObject(washerLoopInstance, GetAudioAttachTarget().transform);
+        RuntimeManager.AttachInstanceToGameObject(washerLoopInstance, GetAudioAttachTarget());
         washerLoopInstance.start();
     }
 

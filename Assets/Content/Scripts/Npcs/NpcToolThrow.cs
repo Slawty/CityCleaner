@@ -33,22 +33,35 @@ public class NpcToolThrow : MonoBehaviour
         if (pickupPrefab == null)
             throw new InvalidOperationException($"{nameof(NpcToolThrow)} on {name}: {nameof(pickupPrefab)} is not assigned.");
 
-        hasThrown = true;
         Transform npcTransform = npc.transform;
-        Quaternion originalRotation = npcTransform.rotation;
+        JobClient jobClient = npc.GetComponent<JobClient>();
+        if (jobClient == null)
+            jobClient = npc.GetComponentInParent<JobClient>();
 
-        await npc.FacePointAsync(dropPosition.position, destroyCancellationToken);
+        Quaternion returnRotation = npcTransform.rotation;
+        if (jobClient != null && jobClient.TryGetDialogueReturnRotation(out Quaternion savedRotation))
+            returnRotation = savedRotation;
 
-        if (turnPauseSeconds > 0f)
-            await UniTask.Delay(TimeSpan.FromSeconds(turnPauseSeconds), cancellationToken: destroyCancellationToken);
+        try
+        {
+            await npc.FacePointAsync(dropPosition.position, destroyCancellationToken);
 
-        Vector3 spawnPosition = npcTransform.position + npcTransform.TransformDirection(throwOriginOffset);
-        ToolPickup pickup = Instantiate(pickupPrefab, spawnPosition, Quaternion.identity);
-        pickup.ThrowTo(dropPosition.position, throwArcHeight, throwDuration);
+            if (turnPauseSeconds > 0f)
+                await UniTask.Delay(TimeSpan.FromSeconds(turnPauseSeconds), cancellationToken: destroyCancellationToken);
 
-        if (turnPauseSeconds > 0f)
-            await UniTask.Delay(TimeSpan.FromSeconds(turnPauseSeconds * 0.5f), cancellationToken: destroyCancellationToken);
+            Vector3 spawnPosition = npcTransform.position + npcTransform.TransformDirection(throwOriginOffset);
+            ToolPickup pickup = Instantiate(pickupPrefab, spawnPosition, Quaternion.identity);
+            pickup.ThrowTo(dropPosition.position, throwArcHeight, throwDuration);
+            hasThrown = true;
 
-        await npc.FaceRotationAsync(originalRotation, destroyCancellationToken);
+            if (turnPauseSeconds > 0f)
+                await UniTask.Delay(TimeSpan.FromSeconds(turnPauseSeconds * 0.5f), cancellationToken: destroyCancellationToken);
+
+            await npc.FaceRotationAsync(returnRotation, destroyCancellationToken);
+            jobClient?.ReleaseDialogueReturnRotation();
+        }
+        catch (OperationCanceledException)
+        {
+        }
     }
 }

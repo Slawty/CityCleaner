@@ -95,7 +95,7 @@ public class LaserGunTool : Tool
         StopLaserLoop();
 
         laserLoopInstance = RuntimeManager.CreateInstance(laserLoopEvent);
-        RuntimeManager.AttachInstanceToGameObject(laserLoopInstance, GetAudioAttachTarget().transform);
+        RuntimeManager.AttachInstanceToGameObject(laserLoopInstance, GetAudioAttachTarget());
         laserLoopInstance.start();
     }
 

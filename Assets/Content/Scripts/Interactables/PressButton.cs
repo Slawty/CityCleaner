@@ -13,7 +13,6 @@ public class PressButton : MonoBehaviour, IInteractable
     public Color InUseColor = Color.yellow;
 
     public event UnityAction OnButtonPressed;
-    public event UnityAction OnButtonReleased;
     public Renderer buttonRenderer;
 
     private ButtonState currentState = ButtonState.Unavailable;

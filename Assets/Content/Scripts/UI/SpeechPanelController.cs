@@ -21,6 +21,8 @@ public class SpeechPanelController : MonoBehaviour
 
     bool isOpen;
     bool lineFullyRevealed;
+    bool suppressDialogueFacingRestore;
+    JobClient dialogueClient;
     Action pendingOnAccept;
     string[] pendingLines;
     int pendingLineIndex;
@@ -41,6 +43,16 @@ public class SpeechPanelController : MonoBehaviour
         CancelTypewriter();
         StopTypewriterLoop();
         CancelEnableGameplayInputTask();
+    }
+
+    public void SetDialogueClient(JobClient client)
+    {
+        dialogueClient = client;
+    }
+
+    public void SuppressDialogueFacingRestore()
+    {
+        suppressDialogueFacingRestore = true;
     }
 
     public void Show(string text = null, Action onAccept = null)
@@ -190,6 +202,14 @@ public class SpeechPanelController : MonoBehaviour
 
         CancelTypewriter();
         Managers.Jobs.ClearPendingOffer();
+
+        if (dialogueClient != null)
+        {
+            dialogueClient.EndDialogueFacing(restoreRotation: !suppressDialogueFacingRestore);
+            dialogueClient = null;
+        }
+
+        suppressDialogueFacingRestore = false;
         isOpen = false;
         lineFullyRevealed = false;
         currentLineText = null;

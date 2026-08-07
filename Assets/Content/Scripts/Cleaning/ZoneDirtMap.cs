@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 [DisallowMultipleComponent]
 public class ZoneDirtMap : MonoBehaviour
@@ -311,7 +312,17 @@ public class ZoneDirtMap : MonoBehaviour
 
     RenderTexture CreateZoneTexture(string suffix)
     {
-        RenderTexture zoneTexture = new RenderTexture(textureResolution, textureResolution, 0, RenderTextureFormat.R8)
+        RenderTextureDescriptor descriptor = new RenderTextureDescriptor(textureResolution, textureResolution)
+        {
+            depthBufferBits = 0,
+            msaaSamples = 1,
+            sRGB = false,
+            useMipMap = false,
+            autoGenerateMips = false,
+            graphicsFormat = GetZoneDirtGraphicsFormat(),
+        };
+
+        RenderTexture zoneTexture = new RenderTexture(descriptor)
         {
             name = $"{name}_ZoneDirtRT_{suffix}",
             filterMode = FilterMode.Point,
@@ -350,5 +361,13 @@ public class ZoneDirtMap : MonoBehaviour
     {
         if (zoneTexture != null)
             zoneTexture.Release();
+    }
+
+    static GraphicsFormat GetZoneDirtGraphicsFormat()
+    {
+        if (SystemInfo.IsFormatSupported(GraphicsFormat.R8_UNorm, GraphicsFormatUsage.Render))
+            return GraphicsFormat.R8_UNorm;
+
+        return GraphicsFormat.R8G8B8A8_UNorm;
     }
 }

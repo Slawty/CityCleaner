@@ -106,7 +106,7 @@ public class Vacuum : MonoBehaviour
         StopVacuumLoop();
 
         vacuumLoopInstance = RuntimeManager.CreateInstance(vacuumLoopEvent);
-        RuntimeManager.AttachInstanceToGameObject(vacuumLoopInstance, transform);
+        RuntimeManager.AttachInstanceToGameObject(vacuumLoopInstance, gameObject);
         vacuumLoopInstance.start();
     }
 

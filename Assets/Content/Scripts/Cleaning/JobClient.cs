@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -7,7 +8,8 @@ public enum JobClientState
     Available,
     Active,
     CompletedPendingTurnIn,
-    TurnedIn
+    TurnedIn,
+    Transitioning
 }
 
 public class JobClient : MonoBehaviour, IInteractable
@@ -29,7 +31,15 @@ public class JobClient : MonoBehaviour, IInteractable
     [Header("Audio")]
     [SerializeField] AnimationSounds animationSounds;
 
+    NpcNavMovement navMovement;
+
     JobClientState state = JobClientState.Available;
+    JobClientState transitionReturnState = JobClientState.Available;
+    Quaternion dialogueReturnRotation;
+    bool isInDialogueFacing;
+    bool hasPendingReturnRotation;
+    bool hasSavedDialogueReturnRotation;
+    CancellationTokenSource dialogueFacingCts;
 
     public JobClientState State => state;
     public Job Job => job;
@@ -37,14 +47,17 @@ public class JobClient : MonoBehaviour, IInteractable
     public Transform WaypointTransform => waypointTarget != null ? waypointTarget : transform;
     public string ReturnDestinationName => string.IsNullOrEmpty(returnDestinationName) ? name : returnDestinationName;
 
-    public string Prompt => "Talk";
+    public string Prompt => CanTalk ? "Talk" : "";
 
     public event Action SpokenTo;
+
+    bool CanTalk => state != JobClientState.Transitioning && state != JobClientState.TurnedIn;
 
     void Awake()
     {
         ResolveJobReference();
         ResolveAnimationSounds();
+        ResolveNavMovement();
     }
 
     void Start()
@@ -52,19 +65,35 @@ public class JobClient : MonoBehaviour, IInteractable
         RefreshSymbols();
     }
 
+    void OnDestroy()
+    {
+        CancelDialogueFacingFlow(releaseSavedRotation: true);
+    }
+
     public void Interact(GameObject interactor)
     {
         switch (state)
         {
             case JobClientState.TurnedIn:
+            case JobClientState.Transitioning:
                 return;
+        }
+
+        BeginDialogueFacing(interactor.transform.position);
+        Managers.Speech.SetDialogueClient(this);
+
+        switch (state)
+        {
             case JobClientState.CompletedPendingTurnIn:
+                Managers.UI.UnregisterReturnMessage(this);
+
                 if (Managers.Jobs.OfferChainJobOutro(this))
                     break;
 
                 if (job == null)
                 {
                     Debug.LogError($"{nameof(JobClient)} on {name}: {nameof(job)} is not assigned.", this);
+                    CancelDialogueFacingSetup();
                     return;
                 }
 
@@ -78,7 +107,14 @@ public class JobClient : MonoBehaviour, IInteractable
                 if (job == null)
                 {
                     Debug.LogError($"{nameof(JobClient)} on {name}: {nameof(job)} is not assigned.", this);
+                    CancelDialogueFacingSetup();
                     return;
+                }
+
+                if (Managers.Jobs.TryStartPendingChainJobFromTalk(this))
+                {
+                    NotifySpokenTo();
+                    break;
                 }
 
                 if (job.UsesChainFlow)
@@ -105,6 +141,22 @@ public class JobClient : MonoBehaviour, IInteractable
         Managers.Jobs?.RefreshWaypoint();
     }
 
+    public void BeginTransition(JobClientState returnState)
+    {
+        PrepareForScriptedMove();
+        transitionReturnState = returnState;
+        state = JobClientState.Transitioning;
+        RefreshSymbols();
+    }
+
+    public void EndTransition()
+    {
+        if (state != JobClientState.Transitioning)
+            return;
+
+        SetState(transitionReturnState);
+    }
+
     public void PayReward()
     {
         Vector3 spawnPos = coinSpawnPoint != null ? coinSpawnPoint.position : transform.position + Vector3.up;
@@ -129,6 +181,123 @@ public class JobClient : MonoBehaviour, IInteractable
         animationSounds = GetComponent<AnimationSounds>();
         if (animationSounds == null)
             animationSounds = GetComponentInChildren<AnimationSounds>();
+    }
+
+    void ResolveNavMovement()
+    {
+        if (navMovement != null)
+            return;
+
+        navMovement = GetComponent<NpcNavMovement>();
+    }
+
+    public void BeginDialogueFacing(Vector3 lookAtWorldPoint)
+    {
+        if (navMovement == null)
+            throw new InvalidOperationException($"{nameof(JobClient)} on {name}: {nameof(NpcNavMovement)} is not assigned.");
+
+        navMovement.Stop();
+
+        if (!hasPendingReturnRotation)
+            dialogueReturnRotation = transform.rotation;
+
+        hasSavedDialogueReturnRotation = true;
+        isInDialogueFacing = true;
+
+        CancellationToken cancellationToken = StartDialogueFacingFlow();
+        FaceTowardPlayerAsync(lookAtWorldPoint, cancellationToken).Forget();
+    }
+
+    public void PrepareForScriptedMove()
+    {
+        CancelDialogueFacingFlow(releaseSavedRotation: true);
+        isInDialogueFacing = false;
+    }
+
+    public bool TryGetDialogueReturnRotation(out Quaternion rotation)
+    {
+        if (!hasSavedDialogueReturnRotation)
+        {
+            rotation = default;
+            return false;
+        }
+
+        rotation = dialogueReturnRotation;
+        return true;
+    }
+
+    public void ReleaseDialogueReturnRotation()
+    {
+        hasSavedDialogueReturnRotation = false;
+        hasPendingReturnRotation = false;
+    }
+
+    public void EndDialogueFacing(bool restoreRotation = true)
+    {
+        if (!isInDialogueFacing)
+            return;
+
+        isInDialogueFacing = false;
+
+        if (!restoreRotation)
+            return;
+
+        hasPendingReturnRotation = true;
+        CancellationToken cancellationToken = StartDialogueFacingFlow();
+        RestoreDialogueRotationAsync(cancellationToken).Forget();
+    }
+
+    CancellationToken StartDialogueFacingFlow()
+    {
+        CancelDialogueFacingFlow(releaseSavedRotation: false);
+        dialogueFacingCts = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
+        return dialogueFacingCts.Token;
+    }
+
+    void CancelDialogueFacingFlow(bool releaseSavedRotation)
+    {
+        if (dialogueFacingCts != null)
+        {
+            dialogueFacingCts.Cancel();
+            dialogueFacingCts.Dispose();
+            dialogueFacingCts = null;
+        }
+
+        navMovement?.CancelFacing();
+
+        if (releaseSavedRotation)
+            ReleaseDialogueReturnRotation();
+    }
+
+    async UniTaskVoid FaceTowardPlayerAsync(Vector3 lookAtWorldPoint, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await navMovement.FacePointAsync(lookAtWorldPoint, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    async UniTaskVoid RestoreDialogueRotationAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await navMovement.FaceRotationAsync(dialogueReturnRotation, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        ReleaseDialogueReturnRotation();
+    }
+
+    void CancelDialogueFacingSetup()
+    {
+        EndDialogueFacing();
+        Managers.Speech.SetDialogueClient(null);
     }
 
     void RefreshSymbols()

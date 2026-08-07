@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public enum JobSpeechAction
@@ -34,6 +36,7 @@ public class JobManager : MonoBehaviour
     bool chainActive;
     bool waitingForChainOutro;
     Job preIntroMovesRanForJob;
+    CancellationTokenSource chainFlowCts;
 
     public Job ActiveJob => activeJobs.Count > 0 ? activeJobs[activeJobs.Count - 1].Job : null;
     public IReadOnlyList<Job> ActiveJobs => GetActiveJobsSnapshot();
@@ -57,6 +60,11 @@ public class JobManager : MonoBehaviour
     {
         foreach (TrackedJob tracked in activeJobs)
             tracked.Job.UpdateWaypointDismissal();
+    }
+
+    void OnDestroy()
+    {
+        CancelChainFlow();
     }
 
     public void MarkPreIntroMovesRan(Job job)
@@ -87,7 +95,27 @@ public class JobManager : MonoBehaviour
         chainFirstJob = firstJob;
         currentChainJob = firstJob;
         chainActive = true;
-        BeginCurrentChainJob();
+        RunBeginCurrentChainJobAsync(BeginChainFlow());
+    }
+
+    void RunBeginCurrentChainJobAsync(CancellationToken cancellationToken)
+    {
+        BeginCurrentChainJobAsync(cancellationToken).Forget();
+    }
+
+    public bool TryStartPendingChainJobFromTalk(JobClient client)
+    {
+        if (!chainActive || currentChainJob == null || client == null)
+            return false;
+
+        if (currentChainJob.Speaker != client)
+            return false;
+
+        if (IsTrackingJob(currentChainJob))
+            return false;
+
+        RunBeginCurrentChainJobAsync(BeginChainFlow());
+        return true;
     }
 
     public bool OfferChainJobOutro(JobClient client)
@@ -99,6 +127,9 @@ public class JobManager : MonoBehaviour
             return false;
 
         JobPresentation presentation = currentChainJob.Presentation;
+        if (presentation.movesAfterOutro is { Length: > 0 })
+            Managers.Speech.SuppressDialogueFacingRestore();
+
         if (HasDialogues(presentation.outroDialogues))
             Managers.Speech.ShowDialogueSequence(presentation.outroDialogues, OnChainOutroFinished);
         else
@@ -196,29 +227,70 @@ public class JobManager : MonoBehaviour
 
     void BeginCurrentChainJob()
     {
-        if (currentChainJob == null)
-        {
-            Debug.LogError($"{nameof(JobManager)} on {name}: current chain job is missing.", this);
+        RunBeginCurrentChainJobAsync(BeginChainFlow());
+    }
+
+    CancellationToken BeginChainFlow()
+    {
+        CancelChainFlow();
+        chainFlowCts = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
+        return chainFlowCts.Token;
+    }
+
+    void CancelChainFlow()
+    {
+        if (chainFlowCts == null)
             return;
+
+        chainFlowCts.Cancel();
+        chainFlowCts.Dispose();
+        chainFlowCts = null;
+    }
+
+    async UniTask BeginCurrentChainJobAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (currentChainJob == null)
+            {
+                Debug.LogError($"{nameof(JobManager)} on {name}: current chain job is missing.", this);
+                return;
+            }
+
+            JobPresentation presentation = currentChainJob.Presentation;
+            bool skipPreIntroMoves = currentChainJob == preIntroMovesRanForJob;
+            if (!skipPreIntroMoves)
+                await NpcMoveRunner.RunAsync(presentation.movesBeforeIntro);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            preIntroMovesRanForJob = null;
+
+            if (HasDialogues(presentation.introDialogues))
+                Managers.Speech.ShowDialogueSequence(presentation.introDialogues, OnChainIntroFinished);
+            else
+                OnChainIntroFinished();
         }
-
-        JobPresentation presentation = currentChainJob.Presentation;
-        bool skipPreIntroMoves = currentChainJob == preIntroMovesRanForJob;
-        if (!skipPreIntroMoves)
-            NpcMoveRunner.Run(presentation.movesBeforeIntro);
-
-        preIntroMovesRanForJob = null;
-
-        if (HasDialogues(presentation.introDialogues))
-            Managers.Speech.ShowDialogueSequence(presentation.introDialogues, OnChainIntroFinished);
-        else
-            OnChainIntroFinished();
+        catch (OperationCanceledException)
+        {
+        }
     }
 
     void OnChainIntroFinished()
     {
-        currentChainJob.Presentation.onJobStarted?.Invoke();
+        JobPresentation presentation = currentChainJob.Presentation;
+
+        if (HasOnJobStartedListeners(presentation))
+            Managers.Speech.SuppressDialogueFacingRestore();
+
+        presentation.onJobStarted?.Invoke();
         StartChainJobTracking(currentChainJob, currentChainJob.Speaker);
+    }
+
+    static bool HasOnJobStartedListeners(JobPresentation presentation)
+    {
+        return presentation.onJobStarted != null
+            && presentation.onJobStarted.GetPersistentEventCount() > 0;
     }
 
     void StartChainJobTracking(Job job, JobClient client)
@@ -268,41 +340,65 @@ public class JobManager : MonoBehaviour
             currentChainJob.Speaker.SetState(JobClientState.CompletedPendingTurnIn);
         }
         else
-            OnChainOutroFinished();
+            RunOnChainOutroFinishedAsync(BeginChainFlow());
     }
 
     void OnChainOutroFinished()
     {
-        waitingForChainOutro = false;
-        JobPresentation presentation = currentChainJob.Presentation;
-        NpcMoveRunner.Run(presentation.movesAfterOutro);
+        RunOnChainOutroFinishedAsync(BeginChainFlow());
+    }
 
-        if (presentation.payRewardOnComplete && currentChainJob.Speaker != null)
-            currentChainJob.Speaker.PayReward();
+    void RunOnChainOutroFinishedAsync(CancellationToken cancellationToken)
+    {
+        OnChainOutroFinishedAsync(cancellationToken).Forget();
+    }
 
-        Job nextJob = currentChainJob.FollowUpJob;
-        if (nextJob == null)
+    async UniTaskVoid OnChainOutroFinishedAsync(CancellationToken cancellationToken)
+    {
+        try
         {
+            waitingForChainOutro = false;
+            JobPresentation presentation = currentChainJob.Presentation;
+            await NpcMoveRunner.RunAsync(presentation.movesAfterOutro);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (presentation.payRewardOnComplete && currentChainJob.Speaker != null)
+                currentChainJob.Speaker.PayReward();
+
+            Job nextJob = currentChainJob.FollowUpJob;
+            if (nextJob == null)
+            {
+                if (currentChainJob.Speaker != null)
+                    currentChainJob.Speaker.SetState(JobClientState.TurnedIn);
+
+                chainActive = false;
+                chainFirstJob = null;
+                currentChainJob = null;
+
+                if (postChainGuidanceJob != null)
+                    StartGuidanceJob(postChainGuidanceJob);
+                else if (triggerTutorialOnComplete)
+                    Managers.Tutorial.NotifyJobChainCompleted();
+
+                return;
+            }
+
+            currentChainJob = nextJob;
             if (currentChainJob.Speaker != null)
-                currentChainJob.Speaker.SetState(JobClientState.TurnedIn);
+                currentChainJob.Speaker.SetState(JobClientState.Available);
 
-            chainActive = false;
-            chainFirstJob = null;
-            currentChainJob = null;
+            if (presentation.movesAfterOutro is { Length: > 0 })
+            {
+                RefreshWaypoint();
+                return;
+            }
 
-            if (postChainGuidanceJob != null)
-                StartGuidanceJob(postChainGuidanceJob);
-            else if (triggerTutorialOnComplete)
-                Managers.Tutorial.NotifyJobChainCompleted();
-
-            return;
+            await BeginCurrentChainJobAsync(cancellationToken);
         }
-
-        currentChainJob = nextJob;
-        if (currentChainJob.Speaker != null)
-            currentChainJob.Speaker.SetState(JobClientState.Available);
-
-        BeginCurrentChainJob();
+        catch (OperationCanceledException)
+        {
+        }
     }
 
     void AcceptNewJob()
@@ -393,7 +489,7 @@ public class JobManager : MonoBehaviour
         StopTracking(tracked);
         tracked.Job.CompleteRemaining();
         tracked.Job.MarkCompleted();
-        Managers.UI.ShowInfoText("Job Completed");
+        ShowJobCompletedPopup(tracked.Job, "Job Completed");
         OnChainJobObjectivesCompleted();
         ClearTargetHighlightsIfNeeded();
         RefreshWaypoint();
@@ -404,7 +500,7 @@ public class JobManager : MonoBehaviour
         StopTracking(tracked);
         tracked.Job.CompleteRemaining();
         tracked.Job.MarkCompleted();
-        Managers.UI.ShowInfoText("Job Completed");
+        ShowJobCompletedPopup(tracked.Job, "Job Completed");
 
         if (tracked.Job.RequiresTurnIn)
             tracked.Client.SetState(JobClientState.CompletedPendingTurnIn);
@@ -426,8 +522,14 @@ public class JobManager : MonoBehaviour
         StopTracking(tracked);
         tracked.Job.CompleteRemaining();
         tracked.Job.MarkCompleted();
-        Managers.UI.ShowInfoText("Task Completed");
+        ShowJobCompletedPopup(tracked.Job, "Task Completed");
         RefreshWaypoint();
+    }
+
+    void ShowJobCompletedPopup(Job job, string message)
+    {
+        if (job.ShowCompletionPopup)
+            Managers.UI.ShowInfoText(message);
     }
 
     void StopTracking(TrackedJob tracked)

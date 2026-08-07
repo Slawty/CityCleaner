@@ -10,7 +10,6 @@ public class HitFlashObject : MonoBehaviour
     public string Prompt => "Mine Chunk";
     private Vector3 baseScale;
     private float hitTimer;
-    private float coinChance = 0.25f;
     Material flashMaterial;
     float flashTimeCounter;
 

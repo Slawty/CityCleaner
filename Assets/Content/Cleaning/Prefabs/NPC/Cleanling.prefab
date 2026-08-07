@@ -111,7 +111,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3848204775670957694}
-  - component: {fileID: 1919283467771478247}
   - component: {fileID: 3363111975109093528}
   - component: {fileID: 2304605779416928869}
   - component: {fileID: 6912682421103994261}
@@ -142,26 +141,6 @@ Transform:
   - {fileID: 2876215151350421865}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 116.117, z: 0}
---- !u!114 &1919283467771478247
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3390144607806561004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44c480d0167951c4090bfd53b64b345e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Dripling
-  Type: 0
-  prompt: Refill Water
-  totalAmmo: 100
-  shrinkDuration: 3
-  minScale: 0.2
-  startScale: 1
-  chunkConverter: {fileID: 1097574521667153878}
-  goolingPrefab: {fileID: 3034630154146569044, guid: d85c722ceccdfe847872df249fd2460a, type: 3}
 --- !u!136 &3363111975109093528
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -243,9 +222,9 @@ NavMeshAgent:
   m_Acceleration: 30
   avoidancePriority: 50
   m_AngularSpeed: 400
-  m_StoppingDistance: 2
+  m_StoppingDistance: 0.1
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 0
