@@ -5,21 +5,47 @@ using UnityEngine;
 
 public static class PaintableMeshUvMigrationEditor
 {
+    const string DialogTitle = "Migrate Paintable UVs";
+
     [MenuItem("City Cleaner/Mesh/Migrate Paintable UVs (UV1 to UV3)")]
     static void MigratePaintableUvs()
     {
-        bool generateMissingLightmapUvs = EditorUtility.DisplayDialog(
-            "Migrate Paintable UVs",
-            "Copy lightmap UVs (channel 1) to dirt UVs (channel 3) on paintable meshes.\n\nGenerate lightmap UVs first when channel 1 is missing?",
-            "Generate If Missing",
-            "Skip Missing");
-
         HashSet<Mesh> meshes = PaintableMeshUvUtility.CollectPaintableMeshes(includeCleaningMeshAssets: true);
         if (meshes.Count == 0)
         {
-            EditorUtility.DisplayDialog("Migrate Paintable UVs", "No paintable meshes were found.", "OK");
+            EditorUtility.DisplayDialog(DialogTitle, "No paintable meshes were found.", "OK");
             return;
         }
+
+        RunMigration(meshes, "all paintable meshes");
+    }
+
+    [MenuItem("City Cleaner/Mesh/Migrate Paintable UVs (Selection)")]
+    static void MigrateSelectedPaintableUvs()
+    {
+        HashSet<Mesh> meshes = PaintableMeshUvUtility.CollectMeshesFromSelection();
+        if (meshes.Count == 0)
+        {
+            EditorUtility.DisplayDialog(DialogTitle, "No meshes were found in the current selection.", "OK");
+            return;
+        }
+
+        RunMigration(meshes, "selection");
+    }
+
+    [MenuItem("City Cleaner/Mesh/Migrate Paintable UVs (Selection)", validate = true)]
+    static bool ValidateMigrateSelectedPaintableUvs()
+    {
+        return PaintableMeshUvUtility.SelectionHasMigratableMeshes();
+    }
+
+    static void RunMigration(HashSet<Mesh> meshes, string scopeLabel)
+    {
+        bool generateMissingLightmapUvs = EditorUtility.DisplayDialog(
+            DialogTitle,
+            $"Copy lightmap UVs (channel 1) to dirt UVs (channel 3) on {scopeLabel} ({meshes.Count} mesh{(meshes.Count == 1 ? "" : "es")}).\n\nGenerate lightmap UVs first when channel 1 is missing?",
+            "Generate If Missing",
+            "Skip Missing");
 
         UnwrapParam unwrapParam = PaintableMeshUvUtility.CreateDefaultUnwrapParam();
         int migratedCount = 0;
@@ -35,7 +61,7 @@ public static class PaintableMeshUvMigrationEditor
             {
                 processedCount++;
                 EditorUtility.DisplayProgressBar(
-                    "Migrate Paintable UVs",
+                    DialogTitle,
                     mesh.name,
                     (float)processedCount / meshes.Count);
 
@@ -92,6 +118,6 @@ public static class PaintableMeshUvMigrationEditor
         if (skippedNames.Length > 0)
             summary += $"\n\nSkipped meshes:\n{skippedNames}";
 
-        EditorUtility.DisplayDialog("Migrate Paintable UVs", summary, "OK");
+        EditorUtility.DisplayDialog(DialogTitle, summary, "OK");
     }
 }

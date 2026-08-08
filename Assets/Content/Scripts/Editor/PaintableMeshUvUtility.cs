@@ -117,4 +117,43 @@ public static class PaintableMeshUvUtility
 
         return meshes;
     }
+
+    public static HashSet<Mesh> CollectMeshesFromSelection()
+    {
+        HashSet<Mesh> meshes = new HashSet<Mesh>();
+
+        foreach (Object selectedObject in Selection.objects)
+        {
+            if (selectedObject is Mesh mesh)
+            {
+                meshes.Add(mesh);
+                continue;
+            }
+
+            if (selectedObject is GameObject gameObject)
+                CollectMeshesFromHierarchy(gameObject, meshes);
+        }
+
+        return meshes;
+    }
+
+    public static bool SelectionHasMigratableMeshes()
+    {
+        foreach (Object selectedObject in Selection.objects)
+        {
+            if (selectedObject is Mesh)
+                return true;
+
+            if (selectedObject is not GameObject gameObject)
+                continue;
+
+            if (gameObject.GetComponentInChildren<MeshFilter>(true) != null)
+                return true;
+
+            if (gameObject.GetComponentInChildren<SkinnedMeshRenderer>(true) != null)
+                return true;
+        }
+
+        return false;
+    }
 }
