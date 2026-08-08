@@ -111,21 +111,18 @@ public class JobClient : MonoBehaviour, IInteractable
                     return;
                 }
 
+                NotifySpokenTo();
+
                 if (Managers.Jobs.TryStartPendingChainJobFromTalk(this))
-                {
-                    NotifySpokenTo();
                     break;
-                }
 
                 if (job.UsesChainFlow)
                 {
                     Managers.Jobs.StartJobChain(job);
-                    NotifySpokenTo();
                     break;
                 }
 
                 Managers.Jobs.OfferJob(this);
-                NotifySpokenTo();
                 break;
         }
     }

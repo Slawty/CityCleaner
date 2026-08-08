@@ -11,6 +11,7 @@ public class WaterSprayTool : Tool
     [SerializeField] GPUPainterWorld painter;
     public GPUPainterWorld Painter => painter;
     [SerializeField] List<ParticleSystem> sprayEffects;
+    [SerializeField] GameObject sprayEffectsObject;
     [SerializeField] List<ParticleSystem> impactEffects;
     [SerializeField] float impactSurfaceOffset = 0.02f;
     [SerializeField] float impactRayDistance = 10f;
@@ -27,6 +28,8 @@ public class WaterSprayTool : Tool
     float currentAmmo;
     bool isActive;
     bool ammoDepletedFired;
+    bool impactEffectsPlaying;
+    Quaternion hitEffectsShapeOffset;
     Camera cam;
     EventInstance washerLoopInstance;
     EventInstance washerHitLoopInstance;
@@ -41,8 +44,53 @@ public class WaterSprayTool : Tool
     {
         cam = Managers.MainCam;
         painter.Bind(this);
+        ResolveImpactEffects();
+        ResolveSprayEffectsObject();
         RefillWater();
         StopImpactEffects();
+        SetSprayEffectsObjectActive(false);
+    }
+
+    void ResolveImpactEffects()
+    {
+        if (impactEffects != null && impactEffects.Count > 0 && impactEffects[0] != null)
+        {
+            hitEffectsShapeOffset = impactEffects[0].transform.localRotation;
+            return;
+        }
+
+        Transform searchRoot = Tip != null ? Tip : transform;
+        Transform hitEffectsTransform = searchRoot.Find("WaterSpray Hit Effect");
+        if (hitEffectsTransform == null)
+            return;
+
+        ParticleSystem hitEffect = hitEffectsTransform.GetComponent<ParticleSystem>();
+        if (hitEffect == null)
+            return;
+
+        impactEffects = new List<ParticleSystem> { hitEffect };
+        hitEffectsShapeOffset = hitEffect.transform.localRotation;
+    }
+
+    void ResolveSprayEffectsObject()
+    {
+        if (sprayEffectsObject != null)
+            return;
+
+        Transform searchRoot = Tip != null ? Tip : transform;
+        Transform effectsTransform = searchRoot.Find("SprayEffectsObject");
+        if (effectsTransform == null)
+            return;
+
+        sprayEffectsObject = effectsTransform.gameObject;
+    }
+
+    void SetSprayEffectsObjectActive(bool active)
+    {
+        if (sprayEffectsObject == null)
+            return;
+
+        sprayEffectsObject.SetActive(active);
     }
 
     protected override void OnShootStart()
@@ -55,6 +103,7 @@ public class WaterSprayTool : Tool
         foreach (ParticleSystem effect in sprayEffects)
             effect.Play();
 
+        SetSprayEffectsObjectActive(true);
         painter.StartPainting();
         PlayWasherStart();
         StartWasherLoop();
@@ -132,6 +181,7 @@ public class WaterSprayTool : Tool
         foreach (ParticleSystem effect in sprayEffects)
             effect.Stop();
 
+        SetSprayEffectsObjectActive(false);
         painter.StopPainting();
         StopImpactEffects();
         StopWasherLoop();
@@ -164,49 +214,75 @@ public class WaterSprayTool : Tool
 
     void HandleImpactEffects()
     {
-        Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+        Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        bool hitSomething = Physics.Raycast(ray, out RaycastHit hit, impactRayDistance, painter.PaintMask, QueryTriggerInteraction.Ignore);
 
-        if (!Physics.Raycast(ray, out RaycastHit hit, impactRayDistance, painter.PaintMask, QueryTriggerInteraction.Ignore))
+        UpdateImpactEffects(hitSomething, hit, ray);
+
+        if (!hitSomething)
         {
-            StopImpactEffects();
             StopWasherHitLoop();
             return;
-        }
-
-        Vector3 normal = hit.normal.sqrMagnitude > 0.0001f ? hit.normal.normalized : Vector3.up;
-        Vector3 position = hit.point + normal * impactSurfaceOffset;
-        Quaternion rotation = Quaternion.LookRotation(normal);
-
-        if (impactEffects != null)
-        {
-            foreach (ParticleSystem impactEffect in impactEffects)
-            {
-                if (impactEffect == null)
-                    continue;
-
-                impactEffect.transform.SetPositionAndRotation(position, rotation);
-
-                if (!impactEffect.isPlaying)
-                    impactEffect.Play();
-            }
         }
 
         StartWasherHitLoop();
         UpdateWasherHitLoopPosition(hit.point);
     }
 
-    void StopImpactEffects()
+    void UpdateImpactEffects(bool hitSomething, RaycastHit hit, Ray ray)
     {
-        if (impactEffects == null)
+        if (impactEffects == null || impactEffects.Count == 0)
+            return;
+
+        if (!hitSomething)
+        {
+            StopImpactEffects();
+            return;
+        }
+
+        Vector3 normal = hit.normal.sqrMagnitude > 0.0001f ? hit.normal.normalized : Vector3.up;
+        Vector3 position = hit.point + normal * impactSurfaceOffset;
+        Vector3 cameraDirection = ray.direction;
+        Quaternion rotation = cameraDirection.sqrMagnitude > 0.0001f
+            ? Quaternion.LookRotation(cameraDirection.normalized, normal) * hitEffectsShapeOffset
+            : Quaternion.LookRotation(normal);
+
+        foreach (ParticleSystem impactEffect in impactEffects)
+        {
+            if (impactEffect == null)
+                continue;
+
+            impactEffect.transform.SetPositionAndRotation(position, rotation);
+        }
+
+        if (impactEffectsPlaying)
             return;
 
         foreach (ParticleSystem impactEffect in impactEffects)
         {
-            if (impactEffect == null || !impactEffect.isPlaying)
+            if (impactEffect == null)
+                continue;
+
+            impactEffect.Play(true);
+        }
+
+        impactEffectsPlaying = true;
+    }
+
+    void StopImpactEffects()
+    {
+        if (impactEffects == null || !impactEffectsPlaying)
+            return;
+
+        foreach (ParticleSystem impactEffect in impactEffects)
+        {
+            if (impactEffect == null)
                 continue;
 
             impactEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         }
+
+        impactEffectsPlaying = false;
     }
 
     void HandleWaterRay()

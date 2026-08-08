@@ -49,6 +49,9 @@ public class SplitableObject : MonoBehaviour
     int lastLaserHitFrame = -1;
     bool isDestroyed;
 
+    public bool IsDestroyed => isDestroyed;
+    public event System.Action Destroyed;
+
     MaterialPropertyBlock PropertyBlock => propertyBlock ??= new MaterialPropertyBlock();
 
     void Awake()
@@ -158,6 +161,7 @@ public class SplitableObject : MonoBehaviour
             Managers.Spawning.SpawnCoins(1, destroyCenter).Forget();
 
         meshRenderer.SetPropertyBlock(null);
+        Destroyed?.Invoke();
         OnDestroyed?.Invoke();
         Destroy(gameObject);
     }

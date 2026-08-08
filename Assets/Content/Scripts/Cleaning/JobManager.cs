@@ -108,14 +108,39 @@ public class JobManager : MonoBehaviour
         if (!chainActive || currentChainJob == null || client == null)
             return false;
 
-        if (currentChainJob.Speaker != client)
-            return false;
-
         if (IsTrackingJob(currentChainJob))
             return false;
 
+        if (currentChainJob.Speaker == client)
+        {
+            RunBeginCurrentChainJobAsync(BeginChainFlow());
+            return true;
+        }
+
+        Job followUpJob = currentChainJob.FollowUpJob;
+        JobPresentation presentation = currentChainJob.Presentation;
+        if (followUpJob == null || followUpJob.Speaker != client)
+            return false;
+
+        if (presentation.movesAfterOutro is { Length: > 0 })
+            return false;
+
+        AdvanceChainToFollowUpJob();
         RunBeginCurrentChainJobAsync(BeginChainFlow());
         return true;
+    }
+
+    void AdvanceChainToFollowUpJob()
+    {
+        Job nextJob = currentChainJob.FollowUpJob;
+        if (nextJob == null)
+            return;
+
+        waitingForChainOutro = false;
+        currentChainJob = nextJob;
+
+        if (currentChainJob.Speaker != null)
+            currentChainJob.Speaker.SetState(JobClientState.Available);
     }
 
     public bool OfferChainJobOutro(JobClient client)
@@ -340,20 +365,20 @@ public class JobManager : MonoBehaviour
             currentChainJob.Speaker.SetState(JobClientState.CompletedPendingTurnIn);
         }
         else
-            RunOnChainOutroFinishedAsync(BeginChainFlow());
+            RunOnChainOutroFinishedAsync(BeginChainFlow(), startFollowUpIntro: false);
     }
 
     void OnChainOutroFinished()
     {
-        RunOnChainOutroFinishedAsync(BeginChainFlow());
+        RunOnChainOutroFinishedAsync(BeginChainFlow(), startFollowUpIntro: true);
     }
 
-    void RunOnChainOutroFinishedAsync(CancellationToken cancellationToken)
+    void RunOnChainOutroFinishedAsync(CancellationToken cancellationToken, bool startFollowUpIntro)
     {
-        OnChainOutroFinishedAsync(cancellationToken).Forget();
+        OnChainOutroFinishedAsync(cancellationToken, startFollowUpIntro).Forget();
     }
 
-    async UniTaskVoid OnChainOutroFinishedAsync(CancellationToken cancellationToken)
+    async UniTaskVoid OnChainOutroFinishedAsync(CancellationToken cancellationToken, bool startFollowUpIntro)
     {
         try
         {
@@ -388,7 +413,7 @@ public class JobManager : MonoBehaviour
             if (currentChainJob.Speaker != null)
                 currentChainJob.Speaker.SetState(JobClientState.Available);
 
-            if (presentation.movesAfterOutro is { Length: > 0 })
+            if (!startFollowUpIntro || presentation.movesAfterOutro is { Length: > 0 })
             {
                 RefreshWaypoint();
                 return;

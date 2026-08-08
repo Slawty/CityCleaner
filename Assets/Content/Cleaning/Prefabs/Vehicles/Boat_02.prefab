@@ -127,11 +127,15 @@ MonoBehaviour:
   CoinSpawnPos: {fileID: 6410136172233661985}
   trackingResolution: 128
   cleanThreshold: 200
-  cleanPercentage: 0.85
+  cleanPercentage: 0.7
   countsTowardAreaProgress: 1
   useContinuousProgress: 0
   allowGooCleaning: 0
   deferCleanMaterialSwapUntilGrowComplete: 0
+  onCleaned:
+    m_PersistentCalls:
+      m_Calls: []
+  dirtChunkMultiplier: 1
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}

@@ -18,6 +18,7 @@ public class Managers : MonoBehaviour
     [SerializeField] TutorialManager tutorialManager;
     [SerializeField] UpgradeProgressManager upgradeProgressManager;
     [SerializeField] UpgradeMenuController upgradeMenuController;
+    [SerializeField] SettingsMenuController settingsMenuController;
 
     private void Awake()
     {
@@ -38,4 +39,5 @@ public class Managers : MonoBehaviour
     public static TutorialManager Tutorial => Instance.tutorialManager;
     public static UpgradeProgressManager Upgrades => Instance.upgradeProgressManager;
     public static UpgradeMenuController UpgradeMenu => Instance.upgradeMenuController;
+    public static SettingsMenuController SettingsMenu => Instance.settingsMenuController;
 }
