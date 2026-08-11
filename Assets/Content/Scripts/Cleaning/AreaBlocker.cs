@@ -6,6 +6,7 @@ public class AreaBlocker : MonoBehaviour, IInteractable
 {
     [SerializeField] DirtArea targetArea;
     [SerializeField, Range(0.01f, 1f)] float requiredCleanFraction = 0.5f;
+    [SerializeField] bool allowManualOpen = true;
     [SerializeField] GameObject progressScreen;
     [SerializeField] GameObject cleanedScreen;
     [SerializeField] Image progressFill;
@@ -16,7 +17,11 @@ public class AreaBlocker : MonoBehaviour, IInteractable
     bool requirementMet;
     bool isOpen;
 
-    public string Prompt => requirementMet && !isOpen ? openPrompt : string.Empty;
+    public float RequiredCleanFraction => requiredCleanFraction;
+    public bool RequirementMet => requirementMet;
+    public bool IsOpen => isOpen;
+
+    public string Prompt => allowManualOpen && requirementMet && !isOpen ? openPrompt : string.Empty;
 
     void Awake()
     {
@@ -83,7 +88,7 @@ public class AreaBlocker : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
-        if (!requirementMet || isOpen)
+        if (!allowManualOpen || !requirementMet || isOpen)
             return;
 
         OpenBarrier();
@@ -93,7 +98,7 @@ public class AreaBlocker : MonoBehaviour, IInteractable
     {
     }
 
-    void OpenBarrier()
+    public void OpenBarrier()
     {
         isOpen = true;
 

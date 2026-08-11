@@ -51,7 +51,19 @@ public class JobClient : MonoBehaviour, IInteractable
 
     public event Action SpokenTo;
 
-    bool CanTalk => state != JobClientState.Transitioning && state != JobClientState.TurnedIn;
+    bool CanTalk
+    {
+        get
+        {
+            if (state == JobClientState.Transitioning)
+                return false;
+
+            if (state != JobClientState.TurnedIn)
+                return true;
+
+            return Managers.Jobs != null && Managers.Jobs.ShouldReopenClientForTalk(this);
+        }
+    }
 
     void Awake()
     {
@@ -72,12 +84,11 @@ public class JobClient : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
-        switch (state)
-        {
-            case JobClientState.TurnedIn:
-            case JobClientState.Transitioning:
-                return;
-        }
+        if (state == JobClientState.Transitioning)
+            return;
+
+        if (state == JobClientState.TurnedIn && !Managers.Jobs.TryReopenClientForTalk(this))
+            return;
 
         BeginDialogueFacing(interactor.transform.position);
         Managers.Speech.SetDialogueClient(this);
@@ -90,39 +101,22 @@ public class JobClient : MonoBehaviour, IInteractable
                 if (Managers.Jobs.OfferChainJobOutro(this))
                     break;
 
-                if (job == null)
-                {
-                    Debug.LogError($"{nameof(JobClient)} on {name}: {nameof(job)} is not assigned.", this);
-                    CancelDialogueFacingSetup();
-                    return;
-                }
-
-                Managers.Jobs.OfferTurnIn(this);
+                Managers.Jobs.OfferStandaloneTurnIn(this);
                 break;
             case JobClientState.Active:
                 Managers.Speech.Show(ActiveJobDialogue);
                 NotifySpokenTo();
                 break;
             default:
-                if (job == null)
-                {
-                    Debug.LogError($"{nameof(JobClient)} on {name}: {nameof(job)} is not assigned.", this);
-                    CancelDialogueFacingSetup();
-                    return;
-                }
-
                 NotifySpokenTo();
 
                 if (Managers.Jobs.TryStartPendingChainJobFromTalk(this))
                     break;
 
-                if (job.UsesChainFlow)
-                {
-                    Managers.Jobs.StartJobChain(job);
+                if (Managers.Jobs.TryOfferStandaloneJob(this))
                     break;
-                }
 
-                Managers.Jobs.OfferJob(this);
+                CancelDialogueFacingSetup();
                 break;
         }
     }

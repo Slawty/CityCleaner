@@ -11,6 +11,7 @@ public class JobsProgressUI : MonoBehaviour
     readonly Dictionary<Job, ProgressBar> barsByJob = new();
     readonly Dictionary<Job, JobReminderItem> remindersByJob = new();
     readonly Dictionary<JobClient, JobReminderItem> returnMessagesByClient = new();
+    readonly Dictionary<JobClient, JobReminderItem> talkMessagesByClient = new();
 
     void Awake()
     {
@@ -153,5 +154,49 @@ public class JobsProgressUI : MonoBehaviour
     static string GetReturnMessageText(JobClient client)
     {
         return $"Return to {client.ReturnDestinationName}";
+    }
+
+    public void RefreshTalkMessages(JobClient client)
+    {
+        if (client != null)
+        {
+            if (talkMessagesByClient.ContainsKey(client))
+            {
+                talkMessagesByClient[client].SetDescription(GetTalkMessageText(client));
+                return;
+            }
+
+            RegisterTalkMessage(client);
+            return;
+        }
+
+        List<JobClient> staleClients = new(talkMessagesByClient.Keys);
+        foreach (JobClient staleClient in staleClients)
+            UnregisterTalkMessage(staleClient);
+    }
+
+    public void RegisterTalkMessage(JobClient client)
+    {
+        if (client == null || returnMessageTemplate == null || talkMessagesByClient.ContainsKey(client))
+            return;
+
+        JobReminderItem message = Instantiate(returnMessageTemplate, listRoot);
+        message.gameObject.SetActive(true);
+        message.SetDescription(GetTalkMessageText(client));
+        talkMessagesByClient[client] = message;
+    }
+
+    public void UnregisterTalkMessage(JobClient client)
+    {
+        if (client == null || !talkMessagesByClient.TryGetValue(client, out JobReminderItem message))
+            return;
+
+        talkMessagesByClient.Remove(client);
+        Destroy(message.gameObject);
+    }
+
+    static string GetTalkMessageText(JobClient client)
+    {
+        return $"Talk to {client.ReturnDestinationName}";
     }
 }

@@ -1,18 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-6595901082244571171
-MonoBehaviour:
-  m_ObjectHideFlags: 11
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 10
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -20,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ShopStatue_Dirt
+  m_Name: Mansion_Door
   m_Shader: {fileID: -6465566751694194690, guid: fc004f396df8a0742a1bbb4035cc6773, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -38,18 +25,10 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: ddb9c4e420343bf4b965b87b3ee04f6b, type: 3}
+        m_Texture: {fileID: 2800000, guid: a8a157eaf9c27004ab29aaa7ecaf22ea, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _CleanMask:
-        m_Texture: {fileID: 2800000, guid: 6965c7323319f3640baf05d3ce5ed3e5, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _CleanPatternMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -69,22 +48,6 @@ Material:
         m_Texture: {fileID: 2800000, guid: 05d0156ae696bfb4191073f4a1cb7a25, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _DirtMask:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DirtMetallic:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DirtNormals:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DirtPatternMask:
-        m_Texture: {fileID: 2800000, guid: 2d73147aa21b6b544ba29230d6451cfb, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -102,11 +65,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Normals:
-        m_Texture: {fileID: 2800000, guid: 2c30882dd19aae44fa6673b751720d31, type: 3}
+        m_Texture: {fileID: 2800000, guid: cb07de49363281a4d806d82d9c14a732, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -122,11 +81,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _WindowMask:
-        m_Texture: {fileID: 2800000, guid: 7679cf19cdaa82c419066340b60f15e1, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _ZoneDirtTex:
-        m_Texture: {fileID: 2800000, guid: eb753f104a19c274abc98cfb98eb432a, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ZoneDirtTexXY:
@@ -155,11 +110,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AimOutline: 1
+    - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _BaseMetallic: 0
-    - _BaseSmoothness: 0
     - _Base_Metallic: 0
     - _Base_Smoothness: 0
     - _Blend: 0
@@ -174,17 +127,8 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DirtAmount: 0
-    - _DirtMetallic: 0
     - _DirtMetallicStrength: 0.418
-    - _DirtNoiseOffset: 1.995
-    - _DirtNoiseScale: 1.8
-    - _DirtNormalStrength: 1
     - _DirtSmoothStrength: 0.266
-    - _DirtSmoothness: 0
-    - _DirtStrength: 1
-    - _DirtTiling: 1
-    - _Dirt_Metallic: 0
-    - _Dirt_Smoothness: 0
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
@@ -193,7 +137,6 @@ Material:
     - _GlossyReflections: 0
     - _GooReadyGlow: 0
     - _JobHighlight: 0
-    - _MaskScale: 1
     - _Metallic: 0
     - _NormalStrength: 3
     - _OcclusionStrength: 1
@@ -210,24 +153,21 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _WorkflowMode: 1
+    - _XRMotionVectorsPass: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BaseTint: {r: 1, g: 0.9858491, b: 0.9858491, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DirtAdditionalTint: {r: 0, g: 0, b: 0, a: 1}
-    - _DirtDefaultTiling: {r: 1, g: 1, b: 0, a: 0}
     - _DirtTiling: {r: 5, g: 5, b: 0, a: 0}
     - _DirtTint: {r: 0.3962264, g: 0.17209834, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MaskOffset: {r: 0, g: 0, b: 0, a: 0}
     - _PatternTiling: {r: 1, g: 1, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Tiling: {r: 1, g: 1, b: 0, a: 0}
     - _TilingXY: {r: 1, g: 0.28, b: 0, a: 0}
     - _TilingXZ: {r: 1, g: 1, b: 0, a: 0}
     - _TilingYZ: {r: 0.28, g: 1, b: 0, a: 0}
-    - _UcleanTint: {r: 0, g: 0, b: 0, a: 1}
     - _ZoneMaxXY: {r: 0, g: 0, b: 0, a: 0}
     - _ZoneMaxXZ: {r: 0, g: 0, b: 0, a: 0}
     - _ZoneMaxYZ: {r: 0, g: 0, b: 0, a: 0}
@@ -236,3 +176,16 @@ Material:
     - _ZoneMinYZ: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!114 &5619966035856872947
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Editor::UnityEditor.Rendering.Universal.AssetVersion
+  version: 10

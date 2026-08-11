@@ -15,6 +15,10 @@ public class WaterSprayTool : Tool
     [SerializeField] List<ParticleSystem> impactEffects;
     [SerializeField] float impactSurfaceOffset = 0.02f;
     [SerializeField] float impactRayDistance = 10f;
+    [SerializeField] float minSprayLengthT = 0.08f;
+    [SerializeField] float sprayLengthInset = 0.02f;
+    [SerializeField] float sprayLengthSmoothSpeed = 20f;
+    [SerializeField] float fullSprayLocalLength;
     [SerializeField] ProgressBar ammoBar;
     [SerializeField] LayerMask dirtlingHitMask = ~0;
     [SerializeField] float dirtlingRayDistance = 12f;
@@ -33,6 +37,10 @@ public class WaterSprayTool : Tool
     Camera cam;
     EventInstance washerLoopInstance;
     EventInstance washerHitLoopInstance;
+    Vector3 sprayEffectsBaseLocalScale;
+    float currentSprayLengthT = 1f;
+
+    static readonly Vector3 SprayLocalLengthAxis = Vector3.forward;
 
     public float NormalizedAmmo => MaxAmmo > 0f ? currentAmmo / MaxAmmo : 0f;
     public bool IsEmpty => currentAmmo <= 0f;
@@ -46,9 +54,28 @@ public class WaterSprayTool : Tool
         painter.Bind(this);
         ResolveImpactEffects();
         ResolveSprayEffectsObject();
+        EnsureSprayConeCached();
         RefillWater();
         StopImpactEffects();
         SetSprayEffectsObjectActive(false);
+    }
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        EnsureSprayConeCached();
+    }
+
+    void EnsureSprayConeCached()
+    {
+        ResolveSprayEffectsObject();
+        if (sprayEffectsObject == null)
+            return;
+
+        if (fullSprayLocalLength > 0f)
+            return;
+
+        CacheSprayConeScaling();
     }
 
     void ResolveImpactEffects()
@@ -93,12 +120,101 @@ public class WaterSprayTool : Tool
         sprayEffectsObject.SetActive(active);
     }
 
+    void CacheSprayConeScaling()
+    {
+        if (sprayEffectsObject == null)
+            return;
+
+        bool restoreSprayEffectsActive = !sprayEffectsObject.activeSelf;
+        if (restoreSprayEffectsActive)
+            sprayEffectsObject.SetActive(true);
+
+        sprayEffectsBaseLocalScale = sprayEffectsObject.transform.localScale;
+
+        if (fullSprayLocalLength <= 0f)
+            fullSprayLocalLength = MeasureFullSprayLocalLength(sprayEffectsObject.transform);
+
+        if (restoreSprayEffectsActive)
+            sprayEffectsObject.SetActive(false);
+    }
+
+    static float MeasureFullSprayLocalLength(Transform sprayTransform)
+    {
+        float maxLength = 0f;
+        MeshFilter[] meshFilters = sprayTransform.GetComponentsInChildren<MeshFilter>(true);
+        foreach (MeshFilter meshFilter in meshFilters)
+        {
+            Mesh mesh = meshFilter.sharedMesh;
+            if (mesh == null)
+                continue;
+
+            Bounds meshBounds = mesh.bounds;
+            Vector3 center = meshBounds.center;
+            Vector3 extents = meshBounds.extents;
+            Transform meshTransform = meshFilter.transform;
+
+            for (int x = -1; x <= 1; x += 2)
+            {
+                for (int y = -1; y <= 1; y += 2)
+                {
+                    for (int z = -1; z <= 1; z += 2)
+                    {
+                        Vector3 meshCorner = center + Vector3.Scale(extents, new Vector3(x, y, z));
+                        Vector3 worldCorner = meshTransform.TransformPoint(meshCorner);
+                        Vector3 localCorner = sprayTransform.InverseTransformPoint(worldCorner);
+                        float projectedLength = Vector3.Dot(localCorner, SprayLocalLengthAxis);
+                        maxLength = Mathf.Max(maxLength, projectedLength);
+                    }
+                }
+            }
+        }
+
+        return maxLength;
+    }
+
+    void UpdateSprayConeLength(bool hitSomething, RaycastHit hit)
+    {
+        if (sprayEffectsObject == null || fullSprayLocalLength <= 0f)
+            return;
+
+        float targetLengthT = 1f;
+        if (hitSomething)
+        {
+            Vector3 localHit = sprayEffectsObject.transform.InverseTransformPoint(hit.point);
+            float traveled = Vector3.Dot(localHit, SprayLocalLengthAxis) - sprayLengthInset;
+            targetLengthT = Mathf.Clamp(traveled / fullSprayLocalLength, minSprayLengthT, 1f);
+        }
+
+        currentSprayLengthT = Mathf.Lerp(currentSprayLengthT, targetLengthT, Time.deltaTime * sprayLengthSmoothSpeed);
+        ApplySprayConeScale(currentSprayLengthT);
+    }
+
+    void ApplySprayConeScale(float lengthT)
+    {
+        Vector3 scale = sprayEffectsBaseLocalScale;
+        scale.y = sprayEffectsBaseLocalScale.y * lengthT;
+        scale.z = sprayEffectsBaseLocalScale.z * lengthT;
+        sprayEffectsObject.transform.localScale = scale;
+    }
+
+    void ResetSprayConeScale()
+    {
+        if (sprayEffectsObject == null)
+            return;
+
+        currentSprayLengthT = 1f;
+        sprayEffectsObject.transform.localScale = sprayEffectsBaseLocalScale;
+    }
+
     protected override void OnShootStart()
     {
         if (currentAmmo <= 0f)
             return;
 
+        EnsureSprayConeCached();
         isActive = true;
+        currentSprayLengthT = 1f;
+        ResetSprayConeScale();
 
         foreach (ParticleSystem effect in sprayEffects)
             effect.Play();
@@ -182,6 +298,7 @@ public class WaterSprayTool : Tool
             effect.Stop();
 
         SetSprayEffectsObjectActive(false);
+        ResetSprayConeScale();
         painter.StopPainting();
         StopImpactEffects();
         StopWasherLoop();
@@ -217,6 +334,7 @@ public class WaterSprayTool : Tool
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
         bool hitSomething = Physics.Raycast(ray, out RaycastHit hit, impactRayDistance, painter.PaintMask, QueryTriggerInteraction.Ignore);
 
+        UpdateSprayConeLength(hitSomething, hit);
         UpdateImpactEffects(hitSomething, hit, ray);
 
         if (!hitSomething)

@@ -149,6 +149,11 @@ public class UIManager : MonoBehaviour
         jobsProgressUI.UnregisterReturnMessage(client);
     }
 
+    public void RefreshTalkMessages(JobClient client)
+    {
+        jobsProgressUI.RefreshTalkMessages(client);
+    }
+
     public void SetJobProgress(Job job, float percent, string description = null)
     {
         jobsProgressUI.SetJobProgress(job, percent, description);

@@ -29,7 +29,9 @@ public class JobManager : MonoBehaviour
     readonly List<Job> activeJobsScratch = new();
 
     JobClient pendingClient;
+    Job pendingOfferJob;
     JobSpeechAction pendingSpeechAction;
+    readonly Dictionary<JobClient, Job> turnInJobs = new();
 
     Job chainFirstJob;
     Job currentChainJob;
@@ -37,6 +39,7 @@ public class JobManager : MonoBehaviour
     bool waitingForChainOutro;
     Job preIntroMovesRanForJob;
     CancellationTokenSource chainFlowCts;
+    JobClient pendingChainTalkClient;
 
     public Job ActiveJob => activeJobs.Count > 0 ? activeJobs[activeJobs.Count - 1].Job : null;
     public IReadOnlyList<Job> ActiveJobs => GetActiveJobsSnapshot();
@@ -55,6 +58,7 @@ public class JobManager : MonoBehaviour
     }
 
     public bool HasActiveJob => activeJobs.Count > 0;
+    public bool IsChainActive => chainActive;
 
     void Update()
     {
@@ -108,11 +112,13 @@ public class JobManager : MonoBehaviour
         if (!chainActive || currentChainJob == null || client == null)
             return false;
 
-        if (IsTrackingJob(currentChainJob))
-            return false;
-
         if (currentChainJob.Speaker == client)
         {
+            if (IsTrackingJob(currentChainJob))
+                return false;
+
+            ClearPendingChainTalkClient();
+            OpenClientForJob(client);
             RunBeginCurrentChainJobAsync(BeginChainFlow());
             return true;
         }
@@ -126,6 +132,8 @@ public class JobManager : MonoBehaviour
             return false;
 
         AdvanceChainToFollowUpJob();
+        ClearPendingChainTalkClient();
+        OpenClientForJob(client);
         RunBeginCurrentChainJobAsync(BeginChainFlow());
         return true;
     }
@@ -140,7 +148,134 @@ public class JobManager : MonoBehaviour
         currentChainJob = nextJob;
 
         if (currentChainJob.Speaker != null)
-            currentChainJob.Speaker.SetState(JobClientState.Available);
+            OpenClientForJob(currentChainJob.Speaker);
+    }
+
+    static void OpenClientForJob(JobClient client)
+    {
+        if (client == null || client.State == JobClientState.Available)
+            return;
+
+        client.SetState(JobClientState.Available);
+    }
+
+    public bool ShouldReopenClientForTalk(JobClient client)
+    {
+        if (client == null)
+            return false;
+
+        if (pendingChainTalkClient == client)
+            return true;
+
+        if (chainActive && currentChainJob != null)
+        {
+            if (currentChainJob.Speaker == client && !IsTrackingJob(currentChainJob))
+                return true;
+
+            Job followUpJob = currentChainJob.FollowUpJob;
+            if (followUpJob != null && followUpJob.Speaker == client)
+                return true;
+
+            if (IsSpokenConditionClient(currentChainJob, client))
+                return true;
+        }
+
+        foreach (TrackedJob tracked in activeJobs)
+        {
+            if (!tracked.IsChainJob || tracked.Job == null)
+                continue;
+
+            if (IsSpokenConditionClient(tracked.Job, client))
+                return true;
+        }
+
+        return false;
+    }
+
+    public bool TryReopenClientForTalk(JobClient client)
+    {
+        if (client == null)
+            return false;
+
+        if (client.State != JobClientState.TurnedIn)
+            return true;
+
+        if (!ShouldReopenClientForTalk(client))
+            return false;
+
+        OpenClientForJob(client);
+        return true;
+    }
+
+    static bool IsSpokenConditionClient(Job job, JobClient client)
+    {
+        if (job == null || client == null)
+            return false;
+
+        JobClientSpokenCondition spokenCondition = job.GetComponent<JobClientSpokenCondition>();
+        return spokenCondition != null && spokenCondition.Client == client;
+    }
+
+    static void OpenSpokenConditionClient(Job job)
+    {
+        if (job == null)
+            return;
+
+        JobClientSpokenCondition spokenCondition = job.GetComponent<JobClientSpokenCondition>();
+        if (spokenCondition != null && spokenCondition.Client != null)
+            OpenClientForJob(spokenCondition.Client);
+    }
+
+    public bool TryOfferStandaloneJob(JobClient client)
+    {
+        if (client == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(TryOfferStandaloneJob)}: client is required.", this);
+            return false;
+        }
+
+        if (chainActive)
+            return false;
+
+        Job job = client.Job;
+        if (job == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(TryOfferStandaloneJob)}: {nameof(JobClient.Job)} is not assigned on {client.name}.", client);
+            return false;
+        }
+
+        if (job.FollowUpJob != null)
+            StartJobChain(job);
+        else
+            OfferJob(client, job);
+
+        return true;
+    }
+
+    public void OfferStandaloneTurnIn(JobClient client)
+    {
+        if (client == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(OfferStandaloneTurnIn)}: client is required.", this);
+            return;
+        }
+
+        Job job = GetTurnInJob(client);
+        if (job == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(OfferStandaloneTurnIn)}: no turn-in job for {client.name}.", client);
+            return;
+        }
+
+        OfferTurnIn(client, job);
+    }
+
+    Job GetTurnInJob(JobClient client)
+    {
+        if (client != null && turnInJobs.TryGetValue(client, out Job job))
+            return job;
+
+        return client != null ? client.Job : null;
     }
 
     public bool OfferChainJobOutro(JobClient client)
@@ -163,7 +298,7 @@ public class JobManager : MonoBehaviour
         return true;
     }
 
-    public void OfferJob(JobClient client)
+    public void OfferJob(JobClient client, Job job)
     {
         if (client == null)
         {
@@ -171,18 +306,19 @@ public class JobManager : MonoBehaviour
             return;
         }
 
-        if (client.Job == null)
+        if (job == null)
         {
-            Debug.LogError($"{nameof(JobManager)}.{nameof(OfferJob)}: {nameof(JobClient.Job)} is not assigned on {client.name}.", client);
+            Debug.LogError($"{nameof(JobManager)}.{nameof(OfferJob)}: job is required.", this);
             return;
         }
 
         pendingClient = client;
+        pendingOfferJob = job;
         pendingSpeechAction = JobSpeechAction.AcceptJob;
-        ShowJobDialogues(client.Job.Presentation.introDialogues, OnSpeechAccepted);
+        ShowJobDialogues(job.Presentation.introDialogues, OnSpeechAccepted);
     }
 
-    public void OfferTurnIn(JobClient client)
+    public void OfferTurnIn(JobClient client, Job job)
     {
         if (client == null)
         {
@@ -190,15 +326,26 @@ public class JobManager : MonoBehaviour
             return;
         }
 
-        if (client.Job == null)
+        if (job == null)
         {
-            Debug.LogError($"{nameof(JobManager)}.{nameof(OfferTurnIn)}: {nameof(JobClient.Job)} is not assigned on {client.name}.", client);
+            Debug.LogError($"{nameof(JobManager)}.{nameof(OfferTurnIn)}: job is required.", this);
             return;
         }
 
         pendingClient = client;
+        pendingOfferJob = job;
         pendingSpeechAction = JobSpeechAction.TurnInJob;
-        ShowJobDialogues(client.Job.Presentation.outroDialogues, OnSpeechAccepted);
+        ShowJobDialogues(job.Presentation.outroDialogues, OnSpeechAccepted);
+    }
+
+    public void OfferJob(JobClient client)
+    {
+        OfferJob(client, client.Job);
+    }
+
+    public void OfferTurnIn(JobClient client)
+    {
+        OfferTurnIn(client, GetTurnInJob(client));
     }
 
     public void StartJob(JobClient client)
@@ -210,8 +357,10 @@ public class JobManager : MonoBehaviour
         }
 
         pendingClient = client;
+        pendingOfferJob = client.Job;
         AcceptNewJob();
         pendingClient = null;
+        pendingOfferJob = null;
     }
 
     public void StartGuidanceJob(Job job)
@@ -228,9 +377,59 @@ public class JobManager : MonoBehaviour
         BeginTracking(new TrackedJob { Job = job, Client = null });
     }
 
+    public void DebugStartAtJob(Job job, Job previousJob = null)
+    {
+        if (job == null)
+        {
+            Debug.LogError($"{nameof(JobManager)}.{nameof(DebugStartAtJob)}: job is required.", this);
+            return;
+        }
+
+        if (IsTrackingJob(job))
+            return;
+
+        ClearPendingChainTalkClient();
+
+        JobClient client = job.Speaker;
+        if (client == null)
+            client = job.GetComponentInParent<JobClient>();
+
+        if (client == null)
+        {
+            StartGuidanceJob(job);
+            return;
+        }
+
+        chainActive = true;
+        chainFirstJob = job;
+        currentChainJob = job;
+        waitingForChainOutro = false;
+
+        OpenClientForJob(client);
+
+        if (ShouldGuideToJobClient(job, previousJob))
+            pendingChainTalkClient = client;
+
+        OpenSpokenConditionClient(job);
+
+        RefreshWaypoint();
+    }
+
+    static bool ShouldGuideToJobClient(Job job, Job previousJob)
+    {
+        if (job.Speaker == null && job.GetComponentInParent<JobClient>() == null)
+            return false;
+
+        if (previousJob != null && previousJob.FollowUpJob == job)
+            return previousJob.GuideToFollowUpClient;
+
+        return true;
+    }
+
     public void ClearPendingOffer()
     {
         pendingClient = null;
+        pendingOfferJob = null;
         pendingSpeechAction = JobSpeechAction.None;
     }
 
@@ -247,6 +446,7 @@ public class JobManager : MonoBehaviour
         }
 
         pendingClient = null;
+        pendingOfferJob = null;
         pendingSpeechAction = JobSpeechAction.None;
     }
 
@@ -309,6 +509,7 @@ public class JobManager : MonoBehaviour
             Managers.Speech.SuppressDialogueFacingRestore();
 
         presentation.onJobStarted?.Invoke();
+        ClearPendingChainTalkClient();
         StartChainJobTracking(currentChainJob, currentChainJob.Speaker);
     }
 
@@ -336,6 +537,7 @@ public class JobManager : MonoBehaviour
                 if (targetHighlighter != null)
                     targetHighlighter.HighlightActiveJobTargets();
 
+                OpenSpokenConditionClient(job);
                 RefreshWaypoint();
                 return;
             }
@@ -350,6 +552,8 @@ public class JobManager : MonoBehaviour
             Client = client,
             IsChainJob = true
         });
+
+        OpenSpokenConditionClient(job);
 
         if (targetHighlighter != null)
             targetHighlighter.HighlightActiveJobTargets();
@@ -383,6 +587,10 @@ public class JobManager : MonoBehaviour
         try
         {
             waitingForChainOutro = false;
+
+            if (currentChainJob.RequiresTurnIn)
+                currentChainJob.OnTurnedIn();
+
             JobPresentation presentation = currentChainJob.Presentation;
             await NpcMoveRunner.RunAsync(presentation.movesAfterOutro);
 
@@ -391,9 +599,12 @@ public class JobManager : MonoBehaviour
             if (presentation.payRewardOnComplete && currentChainJob.Speaker != null)
                 currentChainJob.Speaker.PayReward();
 
-            Job nextJob = currentChainJob.FollowUpJob;
+            Job completedJob = currentChainJob;
+            Job nextJob = completedJob.FollowUpJob;
             if (nextJob == null)
             {
+                ClearPendingChainTalkClient();
+
                 if (currentChainJob.Speaker != null)
                     currentChainJob.Speaker.SetState(JobClientState.TurnedIn);
 
@@ -406,19 +617,24 @@ public class JobManager : MonoBehaviour
                 else if (triggerTutorialOnComplete)
                     Managers.Tutorial.NotifyJobChainCompleted();
 
+                RefreshWaypoint();
                 return;
             }
 
             currentChainJob = nextJob;
             if (currentChainJob.Speaker != null)
-                currentChainJob.Speaker.SetState(JobClientState.Available);
+                OpenClientForJob(currentChainJob.Speaker);
+
+            OpenSpokenConditionClient(currentChainJob);
 
             if (!startFollowUpIntro || presentation.movesAfterOutro is { Length: > 0 })
             {
+                UpdatePendingChainTalkClient(completedJob, currentChainJob);
                 RefreshWaypoint();
                 return;
             }
 
+            ClearPendingChainTalkClient();
             await BeginCurrentChainJobAsync(cancellationToken);
         }
         catch (OperationCanceledException)
@@ -428,20 +644,14 @@ public class JobManager : MonoBehaviour
 
     void AcceptNewJob()
     {
-        if (pendingClient == null)
+        if (pendingClient == null || pendingOfferJob == null)
             return;
 
-        if (pendingClient.Job == null)
-        {
-            Debug.LogError($"{nameof(JobManager)}.{nameof(AcceptNewJob)}: {nameof(JobClient.Job)} is not assigned on {pendingClient.name}.", pendingClient);
-            return;
-        }
-
-        if (IsTrackingJob(pendingClient.Job))
+        if (IsTrackingJob(pendingOfferJob))
             return;
 
         pendingClient.SetState(JobClientState.Active);
-        BeginTracking(new TrackedJob { Job = pendingClient.Job, Client = pendingClient });
+        BeginTracking(new TrackedJob { Job = pendingOfferJob, Client = pendingClient });
 
         if (targetHighlighter != null)
             targetHighlighter.HighlightActiveJobTargets();
@@ -452,18 +662,25 @@ public class JobManager : MonoBehaviour
         if (pendingClient == null)
             return;
 
-        CompleteClientTurnIn(pendingClient);
+        CompleteClientTurnIn(pendingClient, pendingOfferJob);
         RefreshWaypoint();
     }
 
     public void RefreshWaypoint()
     {
         RefreshReturnMessages();
+        RefreshTalkMessages();
 
         JobClient turnInClient = FindTurnInClient();
         if (turnInClient != null)
         {
             Managers.UI.SetWaypointTurnInTarget(turnInClient.WaypointTransform);
+            return;
+        }
+
+        if (pendingChainTalkClient != null)
+        {
+            Managers.UI.SetWaypointTurnInTarget(pendingChainTalkClient.WaypointTransform);
             return;
         }
 
@@ -484,6 +701,28 @@ public class JobManager : MonoBehaviour
     void RefreshReturnMessages()
     {
         Managers.UI.RefreshReturnMessages();
+    }
+
+    void RefreshTalkMessages()
+    {
+        Managers.UI.RefreshTalkMessages(pendingChainTalkClient);
+    }
+
+    void UpdatePendingChainTalkClient(Job completedJob, Job nextJob)
+    {
+        if (completedJob.GuideToFollowUpClient && nextJob.Speaker != null && !IsTrackingJob(nextJob))
+        {
+            pendingChainTalkClient = nextJob.Speaker;
+            OpenClientForJob(pendingChainTalkClient);
+        }
+        else
+            ClearPendingChainTalkClient();
+    }
+
+    void ClearPendingChainTalkClient()
+    {
+        pendingChainTalkClient = null;
+        RefreshTalkMessages();
     }
 
     void BeginTracking(TrackedJob tracked)
@@ -514,6 +753,7 @@ public class JobManager : MonoBehaviour
         StopTracking(tracked);
         tracked.Job.CompleteRemaining();
         tracked.Job.MarkCompleted();
+        tracked.Job.RenameAsDone();
         ShowJobCompletedPopup(tracked.Job, "Job Completed");
         OnChainJobObjectivesCompleted();
         ClearTargetHighlightsIfNeeded();
@@ -525,19 +765,27 @@ public class JobManager : MonoBehaviour
         StopTracking(tracked);
         tracked.Job.CompleteRemaining();
         tracked.Job.MarkCompleted();
+        tracked.Job.RenameAsDone();
         ShowJobCompletedPopup(tracked.Job, "Job Completed");
 
         if (tracked.Job.RequiresTurnIn)
+        {
+            turnInJobs[tracked.Client] = tracked.Job;
             tracked.Client.SetState(JobClientState.CompletedPendingTurnIn);
+        }
         else
-            CompleteClientTurnIn(tracked.Client);
+            CompleteClientTurnIn(tracked.Client, tracked.Job);
 
         ClearTargetHighlightsIfNeeded();
         RefreshWaypoint();
     }
 
-    void CompleteClientTurnIn(JobClient client)
+    void CompleteClientTurnIn(JobClient client, Job job)
     {
+        if (job != null)
+            job.OnTurnedIn();
+
+        turnInJobs.Remove(client);
         client.PayReward();
         client.SetState(JobClientState.TurnedIn);
     }
@@ -547,6 +795,7 @@ public class JobManager : MonoBehaviour
         StopTracking(tracked);
         tracked.Job.CompleteRemaining();
         tracked.Job.MarkCompleted();
+        tracked.Job.RenameAsDone();
         ShowJobCompletedPopup(tracked.Job, "Task Completed");
         RefreshWaypoint();
     }
