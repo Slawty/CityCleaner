@@ -251,8 +251,8 @@ MonoBehaviour:
     y: 0
     width: 465
     height: 634
-  m_MinSize: {x: 201, y: 226}
-  m_MaxSize: {x: 4001, y: 4026}
+  m_MinSize: {x: 202, y: 226}
+  m_MaxSize: {x: 4002, y: 4026}
   m_ActualView: {fileID: 24}
   m_Panes:
   - {fileID: 24}
@@ -387,7 +387,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 43
+    y: 0
     width: 2560
     height: 36
   m_SerializedDataModeController:
@@ -653,7 +653,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 79
+    y: 24
     width: 1576
     height: 587
   m_SerializedDataModeController:
@@ -4684,7 +4684,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 692
+    y: 637
     width: 1576
     height: 654
   m_SerializedDataModeController:
@@ -5405,11 +5405,11 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: -0.061189868, y: -0.88239616, z: 0.12705736, w: -0.4510503}
     speed: 2
-    m_Value: {x: -0.06180383, y: -0.88134235, z: 0.12825643, w: -0.45051765}
+    m_Value: {x: 0.06118987, y: 0.8823962, z: -0.12705736, w: 0.4510503}
   m_Size:
     m_Target: 3.9120848
     speed: 2
-    m_Value: 3.9120862
+    m_Value: 3.9120848
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -12096,8 +12096,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Hierarchy\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1577
-    y: 79
+    x: 1
+    y: 24
     width: 463
     height: 608
   m_SerializedDataModeController:
@@ -12283,8 +12283,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Project\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1577
-    y: 713
+    x: 1
+    y: 658
     width: 463
     height: 633
   m_SerializedDataModeController:
@@ -12336,56 +12336,54 @@ MonoBehaviour:
     m_ExpandedIDs:
     - m_Data: 0
     - m_Data: 51952
-    - m_Data: 94254
-    - m_Data: 94256
-    - m_Data: 94258
-    - m_Data: 94260
-    - m_Data: 94262
-    - m_Data: 94264
-    - m_Data: 94266
-    - m_Data: 94268
-    - m_Data: 94270
-    - m_Data: 94272
-    - m_Data: 94274
-    - m_Data: 94276
-    - m_Data: 94278
-    - m_Data: 94280
-    - m_Data: 94282
-    - m_Data: 94284
-    - m_Data: 94286
-    - m_Data: 94288
-    - m_Data: 94290
-    - m_Data: 94292
-    - m_Data: 94294
-    - m_Data: 94296
-    - m_Data: 94298
-    - m_Data: 94300
-    - m_Data: 94302
-    - m_Data: 94304
-    - m_Data: 94306
-    - m_Data: 94308
-    - m_Data: 94310
-    - m_Data: 94312
-    - m_Data: 94314
-    - m_Data: 94316
-    - m_Data: 94318
-    - m_Data: 94320
-    - m_Data: 94322
-    - m_Data: 94324
-    - m_Data: 94326
-    - m_Data: 94328
-    - m_Data: 94330
-    - m_Data: 94332
-    - m_Data: 94334
-    - m_Data: 94336
-    - m_Data: 94338
-    - m_Data: 94340
-    - m_Data: 94344
-    - m_Data: 94346
-    - m_Data: 94690
-    - m_Data: 795366
-    - m_Data: 1000000000
-    - m_Data: 2147483647
+    - m_Data: 99310
+    - m_Data: 99312
+    - m_Data: 99314
+    - m_Data: 99316
+    - m_Data: 99318
+    - m_Data: 99320
+    - m_Data: 99322
+    - m_Data: 99324
+    - m_Data: 99326
+    - m_Data: 99328
+    - m_Data: 99330
+    - m_Data: 99332
+    - m_Data: 99334
+    - m_Data: 99336
+    - m_Data: 99338
+    - m_Data: 99340
+    - m_Data: 99342
+    - m_Data: 99344
+    - m_Data: 99346
+    - m_Data: 99348
+    - m_Data: 99350
+    - m_Data: 99352
+    - m_Data: 99354
+    - m_Data: 99356
+    - m_Data: 99358
+    - m_Data: 99360
+    - m_Data: 99362
+    - m_Data: 99364
+    - m_Data: 99366
+    - m_Data: 99368
+    - m_Data: 99370
+    - m_Data: 99372
+    - m_Data: 99374
+    - m_Data: 99376
+    - m_Data: 99378
+    - m_Data: 99380
+    - m_Data: 99382
+    - m_Data: 99384
+    - m_Data: 99386
+    - m_Data: 99388
+    - m_Data: 99390
+    - m_Data: 99392
+    - m_Data: 99394
+    - m_Data: 99396
+    - m_Data: 99398
+    - m_Data: 99400
+    - m_Data: 99402
+    - m_Data: 99404
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -12419,56 +12417,54 @@ MonoBehaviour:
     m_ExpandedIDs:
     - m_Data: 0
     - m_Data: 51952
-    - m_Data: 94254
-    - m_Data: 94256
-    - m_Data: 94258
-    - m_Data: 94260
-    - m_Data: 94262
-    - m_Data: 94264
-    - m_Data: 94266
-    - m_Data: 94268
-    - m_Data: 94270
-    - m_Data: 94272
-    - m_Data: 94274
-    - m_Data: 94276
-    - m_Data: 94278
-    - m_Data: 94280
-    - m_Data: 94282
-    - m_Data: 94284
-    - m_Data: 94286
-    - m_Data: 94288
-    - m_Data: 94290
-    - m_Data: 94292
-    - m_Data: 94294
-    - m_Data: 94296
-    - m_Data: 94298
-    - m_Data: 94300
-    - m_Data: 94302
-    - m_Data: 94304
-    - m_Data: 94306
-    - m_Data: 94308
-    - m_Data: 94310
-    - m_Data: 94312
-    - m_Data: 94314
-    - m_Data: 94316
-    - m_Data: 94318
-    - m_Data: 94320
-    - m_Data: 94322
-    - m_Data: 94324
-    - m_Data: 94326
-    - m_Data: 94328
-    - m_Data: 94330
-    - m_Data: 94332
-    - m_Data: 94334
-    - m_Data: 94336
-    - m_Data: 94338
-    - m_Data: 94340
-    - m_Data: 94344
-    - m_Data: 94346
-    - m_Data: 94690
-    - m_Data: 795366
-    - m_Data: 1000000000
-    - m_Data: 2147483647
+    - m_Data: 99310
+    - m_Data: 99312
+    - m_Data: 99314
+    - m_Data: 99316
+    - m_Data: 99318
+    - m_Data: 99320
+    - m_Data: 99322
+    - m_Data: 99324
+    - m_Data: 99326
+    - m_Data: 99328
+    - m_Data: 99330
+    - m_Data: 99332
+    - m_Data: 99334
+    - m_Data: 99336
+    - m_Data: 99338
+    - m_Data: 99340
+    - m_Data: 99342
+    - m_Data: 99344
+    - m_Data: 99346
+    - m_Data: 99348
+    - m_Data: 99350
+    - m_Data: 99352
+    - m_Data: 99354
+    - m_Data: 99356
+    - m_Data: 99358
+    - m_Data: 99360
+    - m_Data: 99362
+    - m_Data: 99364
+    - m_Data: 99366
+    - m_Data: 99368
+    - m_Data: 99370
+    - m_Data: 99372
+    - m_Data: 99374
+    - m_Data: 99376
+    - m_Data: 99378
+    - m_Data: 99380
+    - m_Data: 99382
+    - m_Data: 99384
+    - m_Data: 99386
+    - m_Data: 99388
+    - m_Data: 99390
+    - m_Data: 99392
+    - m_Data: 99394
+    - m_Data: 99396
+    - m_Data: 99398
+    - m_Data: 99400
+    - m_Data: 99402
+    - m_Data: 99404
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -13123,8 +13119,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 2042
-    y: 79
+    x: 1
+    y: 24
     width: 517
     height: 936
   m_SerializedDataModeController:
@@ -13213,8 +13209,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Console\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 2042
-    y: 1041
+    x: 1
+    y: 986
     width: 517
     height: 305
   m_SerializedDataModeController:
