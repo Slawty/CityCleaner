@@ -14,7 +14,7 @@ public enum JobClientState
 
 public class JobClient : MonoBehaviour, IInteractable
 {
-    const string ActiveJobDialogue = "Keep cleaning — you're not done yet!";
+    const string ActiveJobDialogue = "Not done yet, Boss!";
 
     [SerializeField] Job job;
     [Header("Symbols")]

@@ -112,4 +112,15 @@ public class CleanTargetsJob : Job
                 results.Add(target);
         }
     }
+
+    public override bool HasIncompleteHighlightableTargets()
+    {
+        foreach (GPUPaintableObject target in targets)
+        {
+            if (target != null && !target.isClean)
+                return true;
+        }
+
+        return false;
+    }
 }

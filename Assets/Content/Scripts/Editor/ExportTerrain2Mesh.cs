@@ -7,6 +7,7 @@ using System.Text;
 
 enum SaveFormat { Triangles, Quads }
 enum SaveResolution { Full = 0, Half, Quarter, Eighth, Sixteenth }
+enum ExportPivot { TerrainCorner, TerrainCenter, World }
 
 namespace MeshUtilities
 {
@@ -14,6 +15,7 @@ namespace MeshUtilities
     {
         SaveFormat saveFormat = SaveFormat.Triangles;
         SaveResolution saveResolution = SaveResolution.Half;
+        ExportPivot exportPivot = ExportPivot.TerrainCorner;
 
         static TerrainData terrain;
         static Vector3 terrainPos;
@@ -56,6 +58,13 @@ namespace MeshUtilities
 
             saveResolution = (SaveResolution)EditorGUILayout.EnumPopup("Resolution", saveResolution);
 
+            exportPivot = (ExportPivot)EditorGUILayout.EnumPopup("Pivot", exportPivot);
+            EditorGUILayout.HelpBox(
+                "Terrain Corner: same pivot as the terrain object (bottom-left corner). Place the imported mesh at the terrain position.\n" +
+                "Terrain Center: pivot at the center of the terrain footprint on the ground.\n" +
+                "World: bake the terrain world position into vertex coordinates (legacy export).",
+                MessageType.Info);
+
             if (GUILayout.Button("Export"))
             {
                 Export();
@@ -65,6 +74,9 @@ namespace MeshUtilities
         void Export()
         {
             string fileName = EditorUtility.SaveFilePanel("Export .obj file", "", "Terrain", "obj");
+            if (string.IsNullOrEmpty(fileName))
+                return;
+
             int w = terrain.heightmapResolution;
             int h = terrain.heightmapResolution;
             Vector3 meshScale = terrain.size;
@@ -94,10 +106,12 @@ namespace MeshUtilities
             {
                 for (int x = 0; x < w; x++)
                 {
-                    tVertices[y * w + x] = Vector3.Scale(meshScale, new Vector3(-y, tData[x * tRes, y * tRes], x)) + terrainPos;
+                    tVertices[y * w + x] = Vector3.Scale(meshScale, new Vector3(-y, tData[x * tRes, y * tRes], x));
                     tUV[y * w + x] = Vector2.Scale(new Vector2(x * tRes, y * tRes), uvScale);
                 }
             }
+
+            ApplyExportPivot(tVertices);
 
             int index = 0;
             if (saveFormat == SaveFormat.Triangles)
@@ -140,6 +154,7 @@ namespace MeshUtilities
             {
 
                 sw.WriteLine("# Unity terrain OBJ File");
+                sw.WriteLine("# Pivot: " + exportPivot);
 
                 // Write vertices
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -203,6 +218,34 @@ namespace MeshUtilities
             EditorUtility.DisplayProgressBar("Saving file to disc.", "This might take a while...", 1f);
             EditorWindow.GetWindow<ExportTerrain2Mesh>().Close();
             EditorUtility.ClearProgressBar();
+        }
+
+        void ApplyExportPivot(Vector3[] vertices)
+        {
+            switch (exportPivot)
+            {
+                case ExportPivot.TerrainCorner:
+                    return;
+
+                case ExportPivot.TerrainCenter:
+                    Vector3 min = vertices[0];
+                    Vector3 max = vertices[0];
+                    for (int i = 1; i < vertices.Length; i++)
+                    {
+                        min = Vector3.Min(min, vertices[i]);
+                        max = Vector3.Max(max, vertices[i]);
+                    }
+
+                    Vector3 footprintCenter = new Vector3((min.x + max.x) * 0.5f, min.y, (min.z + max.z) * 0.5f);
+                    for (int i = 0; i < vertices.Length; i++)
+                        vertices[i] -= footprintCenter;
+                    return;
+
+                case ExportPivot.World:
+                    for (int i = 0; i < vertices.Length; i++)
+                        vertices[i] += terrainPos;
+                    return;
+            }
         }
 
         void UpdateProgress()

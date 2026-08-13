@@ -57,6 +57,11 @@ public class DirtAreaJob : Job
         targetArea?.CollectIncompletePaintables(results);
     }
 
+    public override bool HasIncompleteHighlightableTargets()
+    {
+        return targetArea != null && targetArea.HasIncompletePaintables();
+    }
+
     protected override Transform GetWaypointTargetTransform()
     {
         if (waypointTarget != null)

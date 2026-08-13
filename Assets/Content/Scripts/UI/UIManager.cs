@@ -20,6 +20,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text poopValueText;
     [SerializeField] GameObject gameplayHudRoot;
     [SerializeField] ScreenWaypointMarker waypointMarker;
+    [SerializeField] ScreenFadeOverlay screenFadeOverlay;
+
+    public ScreenFadeOverlay ScreenFade => screenFadeOverlay;
 
     void Start()
     {

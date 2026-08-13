@@ -106,4 +106,15 @@ public class GrowTargetsJob : Job
 
         return target.GrowthProgress01;
     }
+
+    public override bool HasIncompleteHighlightableTargets()
+    {
+        foreach (GooHitGrowable target in targets)
+        {
+            if (target != null && !target.IsFullyGrown)
+                return true;
+        }
+
+        return false;
+    }
 }

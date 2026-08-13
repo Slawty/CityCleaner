@@ -130,4 +130,12 @@ public class SimplePlayerMovement : MonoBehaviour
 
         currentLadder = null;
     }
+
+    public void ResetMovementState()
+    {
+        velocity = Vector3.zero;
+        jumpRequested = false;
+        currentLadder = null;
+        wasGrounded = controller.isGrounded;
+    }
 }

@@ -1,5 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using FMODUnity;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,6 +8,7 @@ using UnityEngine.InputSystem;
 public class JobTargetHighlighter : MonoBehaviour
 {
     [SerializeField] InputActionReference highlightAction;
+    [SerializeField] JobHighlightButtonPanel highlightButtonPanel;
     [SerializeField] float highlightDuration = 4f;
     [SerializeField] float fadeInDuration = 0.35f;
     [SerializeField] float fadeOutDuration = 0.65f;
@@ -14,7 +16,7 @@ public class JobTargetHighlighter : MonoBehaviour
 
     readonly List<GPUPaintableObject> highlightedTargets = new();
     readonly List<GPUPaintableObject> scratchTargets = new();
-    Coroutine highlightRoutine;
+    CancellationTokenSource highlightCts;
 
     void OnEnable()
     {
@@ -40,20 +42,20 @@ public class JobTargetHighlighter : MonoBehaviour
         if (Managers.Input.InteractionBlocked())
             return;
 
-        if (!Managers.Jobs.HasActiveJob)
+        if (!Managers.Jobs.HasHighlightableTargets())
             return;
 
         StartHighlight();
     }
 
+    public void RefreshButtonAvailability(bool available)
+    {
+        highlightButtonPanel?.SetAvailable(available);
+    }
+
     public void StopHighlight()
     {
-        if (highlightRoutine != null)
-        {
-            StopCoroutine(highlightRoutine);
-            highlightRoutine = null;
-        }
-
+        CancelHighlightRoutine();
         ClearHighlightedTargets();
     }
 
@@ -85,10 +87,10 @@ public class JobTargetHighlighter : MonoBehaviour
         if (highlightedTargets.Count == 0)
             return;
 
+        Managers.Tutorial.NotifyHighlightPressed();
         PlayHighlightSound();
-        float holdDuration = Mathf.Max(highlightDuration - fadeInDuration - fadeOutDuration, 0f);
-        ApplyStrengthToAll(EvaluateHighlightStrength(Time.deltaTime, holdDuration));
-        highlightRoutine = StartCoroutine(HighlightRoutine());
+        highlightCts = new CancellationTokenSource();
+        HighlightRoutineAsync(highlightCts.Token).Forget();
     }
 
     void PlayHighlightSound()
@@ -99,21 +101,39 @@ public class JobTargetHighlighter : MonoBehaviour
         RuntimeManager.PlayOneShotAttached(highlightSoundEvent, gameObject);
     }
 
-    IEnumerator HighlightRoutine()
+    async UniTaskVoid HighlightRoutineAsync(CancellationToken cancellationToken)
     {
         float holdDuration = Mathf.Max(highlightDuration - fadeInDuration - fadeOutDuration, 0f);
         float elapsed = 0f;
         float totalDuration = fadeInDuration + holdDuration + fadeOutDuration;
 
-        while (elapsed < totalDuration && highlightedTargets.Count > 0)
+        try
         {
-            elapsed += Time.deltaTime;
-            float strength = EvaluateHighlightStrength(elapsed, holdDuration);
-            ApplyStrengthToAll(strength);
-            yield return null;
+            while (elapsed < totalDuration && highlightedTargets.Count > 0)
+            {
+                elapsed += Time.deltaTime;
+                float strength = EvaluateHighlightStrength(elapsed, holdDuration);
+                ApplyStrengthToAll(strength);
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+        }
+        catch (System.OperationCanceledException)
+        {
+            return;
         }
 
-        StopHighlight();
+        CancelHighlightRoutine();
+        ClearHighlightedTargets();
+    }
+
+    void CancelHighlightRoutine()
+    {
+        if (highlightCts == null)
+            return;
+
+        highlightCts.Cancel();
+        highlightCts.Dispose();
+        highlightCts = null;
     }
 
     float EvaluateHighlightStrength(float elapsed, float holdDuration)

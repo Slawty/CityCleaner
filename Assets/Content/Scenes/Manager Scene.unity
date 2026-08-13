@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000002, guid: 740346660aafaea40bdc27e356e02dab, type: 2}
+  m_LightingDataAsset: {fileID: 112000002, guid: 28121eab22c7c654683ec3133fe7c9b6, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 5482702ed11dfe349bc16acf514d93a6, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -5910,6 +5910,7 @@ RectTransform:
   - {fileID: 900200002}
   - {fileID: 1384580553}
   - {fileID: 1716178818}
+  - {fileID: 1169219361}
   m_Father: {fileID: 1886075399}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -11287,7 +11288,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 1e611a1c3bb19e0459ea6b0c0a30a3fa, type: 2}
   - {fileID: 2100000, guid: f7e03f44fdc74284c8718d858bd52359, type: 2}
   - {fileID: 2100000, guid: 7e1c8870707066b4a9bdc138bb73f8fd, type: 2}
-  previewDirty: 0
+  previewDirty: 1
 --- !u!1 &335207498
 GameObject:
   m_ObjectHideFlags: 0
@@ -41827,6 +41828,69 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1168011925}
   m_CullTransparentMesh: 1
+--- !u!1 &1169219360
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1169219361}
+  - component: {fileID: 1169219362}
+  - component: {fileID: 1169219363}
+  m_Layer: 5
+  m_Name: ScreenFadeOverlay
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1169219361
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1169219360}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 1714866349}
+  m_Father: {fileID: 121026623}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &1169219362
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1169219360}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
+--- !u!114 &1169219363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1169219360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3d6e0a14f5b6782d1e2f3a4b5c6d7e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScreenFadeOverlay
+  canvasGroup: {fileID: 1169219362}
 --- !u!1001 &1171152369
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -58627,6 +58691,7 @@ GameObject:
   - component: {fileID: 1518474219}
   - component: {fileID: 1518474218}
   - component: {fileID: 1518474224}
+  - component: {fileID: 1518474225}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -58808,6 +58873,42 @@ MonoBehaviour:
   strideDistance: 1.6
   minMoveSpeed: 0.1
   minLandSpeed: -3.5
+--- !u!114 &1518474225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1518474217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1c4e8f92b3d5470e9f1a2b3c4d5e6f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerFallRecovery
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 1
+  sampleIntervalSeconds: 0.5
+  minSampleDistance: 1
+  fallYThreshold: -4
+  recoveryCooldownSeconds: 1.5
+  fadeOutDuration: 0.2
+  fadeInDuration: 0.3
+  groundRaycastStartOffset: 0.5
+  groundRaycastDownDistance: 12
+  groundRaycastStepUp: 5
+  groundRaycastUpSteps: 3
+  landingHeightOffset: 1
+  minGroundNormalY: 0.7
+  maxSafePointCount: 10
+  useFallYThreshold: 1
+  splashSoundEvent:
+    Guid:
+      Data1: 1406007527
+      Data2: 1233046613
+      Data3: 1079263674
+      Data4: -877829595
+    Path: event:/Player/WaterSplash
 --- !u!1 &1546378063
 GameObject:
   m_ObjectHideFlags: 0
@@ -59041,6 +59142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::JobTargetHighlighter
   highlightAction: {fileID: -2839183555325076454, guid: 14d982206ce2c274d9be45a1071dde9c, type: 3}
+  highlightButtonPanel: {fileID: 2119630040}
   highlightDuration: 1
   fadeInDuration: 0.35
   fadeOutDuration: 0.35
@@ -60135,6 +60237,81 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1712818726}
+  m_CullTransparentMesh: 1
+--- !u!1 &1714866348
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1714866349}
+  - component: {fileID: 1714866351}
+  - component: {fileID: 1714866350}
+  m_Layer: 5
+  m_Name: FadeImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1714866349
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714866348}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 1169219361}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1714866350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714866348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1714866351
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714866348}
   m_CullTransparentMesh: 1
 --- !u!1001 &1716178817
 PrefabInstance:
@@ -80903,6 +81080,7 @@ MonoBehaviour:
   poopValueText: {fileID: 1163560607}
   gameplayHudRoot: {fileID: 900200001}
   waypointMarker: {fileID: 900100003}
+  screenFadeOverlay: {fileID: 1169219363}
 --- !u!4 &1886075399
 Transform:
   m_ObjectHideFlags: 0
@@ -102395,6 +102573,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2119630038}
+  - component: {fileID: 2119630039}
+  - component: {fileID: 2119630040}
   m_Layer: 5
   m_Name: Dirt Highlight Button Panel
   m_TagString: Untagged
@@ -102423,6 +102603,31 @@ RectTransform:
   m_AnchoredPosition: {x: -80, y: 63.6}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 1, y: 0}
+--- !u!225 &2119630039
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2119630037}
+  m_Enabled: 1
+  m_Alpha: 0.2
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
+--- !u!114 &2119630040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2119630037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8e4f2a91c3d5470e9f1a2b3c4d5e6f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JobHighlightButtonPanel
+  canvasGroup: {fileID: 2119630039}
 --- !u!1001 &764352165076055011
 PrefabInstance:
   m_ObjectHideFlags: 0

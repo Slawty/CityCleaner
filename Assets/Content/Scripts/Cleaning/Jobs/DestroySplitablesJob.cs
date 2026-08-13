@@ -143,4 +143,17 @@ public class DestroySplitablesJob : Job
 
         return null;
     }
+
+    public override bool HasIncompleteHighlightableTargets()
+    {
+        BuildTargetList();
+
+        foreach (SplitableObject target in resolvedTargets)
+        {
+            if (target != null && !target.IsDestroyed)
+                return true;
+        }
+
+        return false;
+    }
 }

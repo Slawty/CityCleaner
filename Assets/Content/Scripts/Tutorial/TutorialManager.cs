@@ -7,11 +7,16 @@ public class TutorialManager : MonoBehaviour
 
     const string VacuumCoinInfo = "Use RMB to activate the Vacuum";
 
+    const string HighlightTargetsInfo = "Press Q to highlight objects to clean.";
+
     bool waterRefillTutorialShown;
     bool waitingForWaterRefill;
 
     bool vacuumCoinTutorialShown;
     bool waitingForFirstCoinCollection;
+
+    bool highlightTutorialShown;
+    bool waitingForHighlightPress;
 
     void Start()
     {
@@ -37,6 +42,25 @@ public class TutorialManager : MonoBehaviour
 
     public void NotifyJobChainCompleted()
     {
+    }
+
+    public void NotifyPowerWasherUnlocked()
+    {
+        if (highlightTutorialShown)
+            return;
+
+        highlightTutorialShown = true;
+        waitingForHighlightPress = true;
+        Managers.UI.ShowTutorialInfoText(HighlightTargetsInfo, 0f);
+    }
+
+    public void NotifyHighlightPressed()
+    {
+        if (!waitingForHighlightPress)
+            return;
+
+        waitingForHighlightPress = false;
+        Managers.UI.HideTutorialInfoText();
     }
 
     void HandleCoinSpawned()

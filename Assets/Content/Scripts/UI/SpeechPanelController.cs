@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 public class SpeechPanelController : MonoBehaviour
 {
-    const string DefaultDialogue = "Please, can you help me?";
+    const string DefaultDialogue = "Got a minute, Boss?";
 
     [SerializeField] GameObject panelRoot;
     [SerializeField] TMP_Text dialogueText;

@@ -189,6 +189,9 @@ public class ToolsController : MonoBehaviour
         toolUnlocked[type] = true;
         RefreshToolSlotUnlockStates();
         EquipTool(type);
+
+        if (type == PlayerToolType.PowerWasher)
+            Managers.Tutorial.NotifyPowerWasherUnlocked();
     }
 
     void OnNextTool(InputAction.CallbackContext ctx) => SelectNextTool();

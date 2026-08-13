@@ -65,7 +65,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 2800000, guid: cb07de49363281a4d806d82d9c14a732, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -126,7 +126,7 @@ Material:
     - _DebugView: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DirtAmount: 0
+    - _DirtAmount: 1
     - _DirtMetallicStrength: 0.418
     - _DirtSmoothStrength: 0.266
     - _DstBlend: 0

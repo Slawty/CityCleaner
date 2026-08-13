@@ -187,7 +187,7 @@ Material:
     - _Surface: 1
     - _UVSec: 0
     - _UseVoronoiNoiseForCaustics: 0
-    - _Very_Deep_Height: 29.49
+    - _Very_Deep_Height: 19.5
     - _Water_Depth: 0.697
     - _Water_Near_Far_Balance: 0
     - _Water_Noise_Tiling: 0.19

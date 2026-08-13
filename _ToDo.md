@@ -1,0 +1,70 @@
+\- rework all Job Client dialogues
+
+\- tutorial message for using Q
+
+\- windows (transparents) have no clean-shine-animation
+
+\- reset when falling into water
+
+\- rework recharge-fountain
+
+~~- Island Environment and Preview City~~
+
+\- Refill: some animation/sound. Should not be one E button press
+
+\- Tool Models for GooGun and Vacuum
+
+\- Retexture /UV tool models
+
+\- Shop Roof: Add sidewalls
+
+\- Change Shop Statue Colors
+
+\- Job Completed sound
+
+\- Waypoint: better icon
+
+\- Job Clients: animation: face expression (especially first guy)
+
+\- Shop Exterior: Add shop signs
+
+\- Shop Interior: more branded corporate textures, inventory, furniture
+
+\- Job Clients: add individual assets like Gardener hat
+
+\- Job Clients: Should wonder around instead of standing still
+
+\- Improve upgrade menu design
+
+\- music
+
+\- esc settings menu should work also in intro
+
+\- vacuum-symbol should not be visible at start
+
+\- q show cleanables should only be visible in a mission / when it make sense
+
+\- UI: better tool images
+
+\- JobClients: make ?, !-Icons face player view
+
+\- title start screen
+
+\- Shop: Front doors need to be transparent
+
+\- sound for retracting ladder at 2nd job
+
+\- adjust dirt chunk effects
+
+\- better dirt chunk models
+
+\- Connect the pier walls with the pillars: Don't let pillars be single clean targets.
+
+\- Laser: explain recharge
+
+\- different coin pick up sound
+
+\- barrier explosion / remove effect
+
+\- find fitting end for the demo
+

@@ -304,6 +304,17 @@ public class DirtArea : MonoBehaviour
         }
     }
 
+    public bool HasIncompletePaintables()
+    {
+        foreach (GPUPaintableObject paintable in paintables)
+        {
+            if (paintable != null && !paintable.isClean)
+                return true;
+        }
+
+        return false;
+    }
+
     public void CompleteAllRemainingTargets()
     {
         foreach (GPUPaintableObject paintableObject in paintables)

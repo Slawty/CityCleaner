@@ -1,3 +1,4 @@
+TODO
 - rework all Job Client dialogues
 - tutorial message for using Q
 - windows (transparents) have no clean-shine-animation
@@ -33,3 +34,5 @@
 - different coin pick up sound
 - barrier explosion / remove effect
 - find fitting end for the demo
+
+DONE

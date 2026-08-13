@@ -160,6 +160,7 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
+    - _CleanFlash: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -167,7 +168,7 @@ Material:
     - _DebugView: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DirtAmount: 0
+    - _DirtAmount: 1
     - _DirtMetallic: 0
     - _DirtMetallicStrength: 0
     - _DirtNoiseOffset: 1.995
@@ -186,6 +187,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _JobHighlight: 0
     - _MaskScale: 1
     - _Metallic: 0
     - _NormalStrength: 0.08

@@ -116,6 +116,11 @@ public abstract class Job : MonoBehaviour
     {
     }
 
+    public virtual bool HasIncompleteHighlightableTargets()
+    {
+        return false;
+    }
+
     public virtual Transform GetWaypointTarget()
     {
         if (!useWaypoint || waypointDismissed)

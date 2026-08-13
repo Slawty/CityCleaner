@@ -126,7 +126,7 @@ Material:
     - _DebugView: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DirtAmount: 0
+    - _DirtAmount: 1
     - _DirtMetallicStrength: 0.418
     - _DirtSmoothStrength: 0.266
     - _DstBlend: 0

@@ -60,6 +60,17 @@ public class JobManager : MonoBehaviour
     public bool HasActiveJob => activeJobs.Count > 0;
     public bool IsChainActive => chainActive;
 
+    public bool HasHighlightableTargets()
+    {
+        foreach (TrackedJob tracked in activeJobs)
+        {
+            if (tracked.Job.HasIncompleteHighlightableTargets())
+                return true;
+        }
+
+        return false;
+    }
+
     void Update()
     {
         foreach (TrackedJob tracked in activeJobs)
@@ -733,10 +744,13 @@ public class JobManager : MonoBehaviour
         tracked.Job.StartTracking();
         activeJobs.Add(tracked);
         RefreshWaypoint();
+        RefreshHighlightButtonAvailability();
     }
 
     void OnJobProgressChanged(TrackedJob tracked, float progress)
     {
+        RefreshHighlightButtonAvailability();
+
         if (progress < tracked.Job.CompletionFraction)
             return;
 
@@ -811,6 +825,7 @@ public class JobManager : MonoBehaviour
         tracked.Job.OnProgressChanged -= tracked.ProgressHandler;
         tracked.Job.StopTracking();
         activeJobs.Remove(tracked);
+        RefreshHighlightButtonAvailability();
     }
 
     JobClient FindTurnInClient()
@@ -851,6 +866,13 @@ public class JobManager : MonoBehaviour
 
         if (activeJobs.Count == 0)
             targetHighlighter.StopHighlight();
+
+        RefreshHighlightButtonAvailability();
+    }
+
+    void RefreshHighlightButtonAvailability()
+    {
+        targetHighlighter?.RefreshButtonAvailability(HasHighlightableTargets());
     }
 
     static bool HasDialogues(string[] dialogues)
