@@ -1,14 +1,21 @@
 using System.Collections.Generic;
+using FMOD.Studio;
+using FMODUnity;
 using UnityEngine;
 
-public class WaterRefill : MonoBehaviour, IInteractable
+public class WaterRefill : MonoBehaviour, IVacuumable
 {
     [SerializeField] float refillDuration = 3f;
     [SerializeField] List<ParticleSystem> refillEffects;
 
-    bool isRefilling;
+    [Header("Audio")]
+    [SerializeField] EventReference refillLoopEvent;
 
-    public string Prompt => "Refill Water";
+    bool isRefilling;
+    EventInstance refillLoopInstance;
+
+    public bool CanVacuum => Managers.Tools.WaterSprayer.NormalizedAmmo < 1f;
+    public string VacuumPrompt => "Vacuum";
 
     void Update()
     {
@@ -23,18 +30,17 @@ public class WaterRefill : MonoBehaviour, IInteractable
             StopRefill();
     }
 
-    public void Interact(GameObject interactor)
+    public void VacuumStart()
     {
-        WaterSprayTool waterSprayer = Managers.Tools.WaterSprayer;
-        if (waterSprayer.NormalizedAmmo >= 1f)
+        if (!CanVacuum || isRefilling)
             return;
 
         isRefilling = true;
-        Managers.Input.BlockInteraction(this);
         PlayRefillEffects();
+        StartRefillLoop();
     }
 
-    public void InteractReleased(GameObject interactor)
+    public void VacuumEnd()
     {
         StopRefill();
     }
@@ -50,8 +56,8 @@ public class WaterRefill : MonoBehaviour, IInteractable
             return;
 
         isRefilling = false;
-        Managers.Input.UnblockInteraction(this);
         StopRefillEffects();
+        StopRefillLoop();
     }
 
     void PlayRefillEffects()
@@ -76,5 +82,27 @@ public class WaterRefill : MonoBehaviour, IInteractable
             if (effect != null)
                 effect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         }
+    }
+
+    void StartRefillLoop()
+    {
+        if (refillLoopEvent.IsNull)
+            throw new System.InvalidOperationException("Water refill loop FMOD event is not assigned on WaterRefill.");
+
+        StopRefillLoop();
+
+        refillLoopInstance = RuntimeManager.CreateInstance(refillLoopEvent);
+        RuntimeManager.AttachInstanceToGameObject(refillLoopInstance, gameObject);
+        refillLoopInstance.start();
+    }
+
+    void StopRefillLoop()
+    {
+        if (!refillLoopInstance.isValid())
+            return;
+
+        refillLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        refillLoopInstance.release();
+        refillLoopInstance.clearHandle();
     }
 }

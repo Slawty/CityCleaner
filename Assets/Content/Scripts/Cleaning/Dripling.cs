@@ -71,6 +71,7 @@ public class Dripling : MonoBehaviour, IVacuumable
     }
 
     public bool CanVacuum => true;
+    public string VacuumPrompt => string.IsNullOrEmpty(prompt) ? "Vacuum" : prompt;
 
     public void VacuumStart()
     {

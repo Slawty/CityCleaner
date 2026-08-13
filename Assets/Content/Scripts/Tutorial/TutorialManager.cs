@@ -3,7 +3,7 @@ using UnityEngine;
 public class TutorialManager : MonoBehaviour
 {
     const string WaterRefillInfo =
-        "You have run out of water! Find a Cleanling and activate the Vacuum to refill.";
+        "You have run out of water! Hold RMB with the Vacuum on a fountain or Cleanling to refill.";
 
     const string VacuumCoinInfo = "Use RMB to activate the Vacuum";
 

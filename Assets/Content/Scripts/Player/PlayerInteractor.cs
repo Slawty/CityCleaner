@@ -6,7 +6,8 @@ public class PlayerInteractor : MonoBehaviour
     [Header("Interaction Settings")]
     public float interactDistance = 3f;
     public InputActionReference interactAction;
-    private IInteractable currentInteractable;
+    IInteractable currentInteractable;
+    IVacuumable currentVacuumPrompt;
 
     Camera cam;
 
@@ -38,14 +39,12 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (Managers.Input.InteractionBlocked())
         {
-            if (currentInteractable != null)
-            {
-                currentInteractable = null;
-                Managers.UI.HideInteractText();
-            }
-
+            ClearPrompts();
             return;
         }
+
+        if (Managers.Tools.IsInVacuumMode)
+            return;
 
         bool hitSomething = Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, interactDistance, ~0, QueryTriggerInteraction.Ignore);
 
@@ -57,25 +56,39 @@ public class PlayerInteractor : MonoBehaviour
             {
                 if (interactable != currentInteractable)
                 {
+                    currentVacuumPrompt = null;
                     currentInteractable = interactable;
-                    Debug.Log($"Found interactable: {hit.collider.name}");
+                    Managers.UI.ShowInteractText(interactable.Prompt);
+                }
 
-                    if (string.IsNullOrEmpty(interactable.Prompt))
-                        Managers.UI.HideInteractText();
-                    else
-                        Managers.UI.ShowInteractText(interactable.Prompt);
+                return;
+            }
+
+            IVacuumable vacuumable = hit.collider.GetComponentInParent<IVacuumable>();
+            if (vacuumable != null && vacuumable.CanVacuum)
+            {
+                if (vacuumable != currentVacuumPrompt)
+                {
+                    currentInteractable = null;
+                    currentVacuumPrompt = vacuumable;
+                    Managers.UI.ShowVacuumPrompt(vacuumable.VacuumPrompt);
                 }
 
                 return;
             }
         }
 
-        // caching when we actually lost an interactable
-        if (currentInteractable != null && !Managers.Input.InteractionBlocked())
-        {
-            currentInteractable = null;
-            Managers.UI.HideInteractText();
-        }
+        ClearPrompts();
+    }
+
+    void ClearPrompts()
+    {
+        if (currentInteractable == null && currentVacuumPrompt == null)
+            return;
+
+        currentInteractable = null;
+        currentVacuumPrompt = null;
+        Managers.UI.HideInteractText();
     }
 
     void InteractButtonPressed(InputAction.CallbackContext ctx)
@@ -83,7 +96,6 @@ public class PlayerInteractor : MonoBehaviour
         if (Managers.Input.InteractionBlocked())
             return;
 
-        Debug.Log($"Interact button pressed. Has inetractable: {currentInteractable != null}");
         if (currentInteractable == null)
             return;
 
@@ -95,11 +107,9 @@ public class PlayerInteractor : MonoBehaviour
         if (Managers.Input.InteractionBlocked())
             return;
 
-        Debug.Log($"Interact button released. Has inetractable: {currentInteractable != null}");
         if (currentInteractable == null)
             return;
 
         currentInteractable.InteractReleased(transform.parent.gameObject);
     }
-
 }

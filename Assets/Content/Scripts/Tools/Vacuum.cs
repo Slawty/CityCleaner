@@ -14,10 +14,15 @@ public class Vacuum : MonoBehaviour
     [Header("Audio")]
     [SerializeField] EventReference vacuumLoopEvent;
 
+    [Header("Effects")]
+    [SerializeField] ParticleSystem waterRefillEffect;
+
     IVacuumable currentVacuumable;
+    IVacuumable promptVacuumable;
     Camera cam;
     bool suctionActive;
     bool carryMode;
+    bool waterRefillEffectPlaying;
     EventInstance vacuumLoopInstance;
 
     public bool HasCarryTarget =>
@@ -31,14 +36,17 @@ public class Vacuum : MonoBehaviour
     void OnDisable()
     {
         StopVacuumLoop();
+        StopWaterRefillEffect();
+        ClearVacuumPrompt();
     }
 
     void Update()
     {
-        if (!suctionActive || carryMode)
+        if (carryMode)
             return;
 
-        CheckForVacuumable();
+        if (suctionActive)
+            CheckForVacuumable();
     }
 
     public void Begin()
@@ -58,14 +66,15 @@ public class Vacuum : MonoBehaviour
         carryMode = true;
         suctionActive = false;
         particleTriggerCollider.enabled = false;
+        ClearVacuumPrompt();
     }
 
     public void ReleaseCarried()
     {
         if (currentVacuumable is IVacuumCarryable carryable && carryable.IsAttached)
             carryable.ReleaseFromVacuum();
-        else if (currentVacuumable != null)
-            currentVacuumable.VacuumEnd();
+        else
+            StopVacuumingTarget();
 
         ClearTarget();
     }
@@ -80,22 +89,19 @@ public class Vacuum : MonoBehaviour
             return;
         }
 
-        if (currentVacuumable != null)
-            currentVacuumable.VacuumEnd();
+        StopVacuumingTarget();
         ClearTarget();
     }
 
     public void End()
     {
-        if (currentVacuumable != null)
-            currentVacuumable.VacuumEnd();
-
-        currentVacuumable = null;
+        StopVacuumingTarget();
         suctionActive = false;
         carryMode = false;
         particleTriggerCollider.enabled = false;
         Managers.Input.UnblockInteraction(this);
         StopVacuumLoop();
+        ClearVacuumPrompt();
     }
 
     void StartVacuumLoop()
@@ -122,9 +128,11 @@ public class Vacuum : MonoBehaviour
 
     void ClearTarget()
     {
+        StopWaterRefillEffect();
         currentVacuumable = null;
         suctionActive = false;
         carryMode = false;
+        ClearVacuumPrompt();
     }
 
     void CheckForVacuumable()
@@ -138,27 +146,101 @@ public class Vacuum : MonoBehaviour
         {
             IVacuumable vacuumable = hit.collider.GetComponentInParent<IVacuumable>();
 
-            if (vacuumable != null && vacuumable.CanVacuum)
+            if (vacuumable != null)
             {
-                if (vacuumable is DirtlingVacuumCapture capture && dirtlingAttachPoint != null)
-                    capture.BindVacuumAttachPoint(dirtlingAttachPoint);
-
-                if (vacuumable != currentVacuumable)
+                if (vacuumable.CanVacuum)
                 {
-                    if (currentVacuumable != null)
-                        currentVacuumable.VacuumEnd();
-                    currentVacuumable = vacuumable;
-                    currentVacuumable.VacuumStart();
+                    if (vacuumable is DirtlingVacuumCapture capture && dirtlingAttachPoint != null)
+                        capture.BindVacuumAttachPoint(dirtlingAttachPoint);
+
+                    ShowVacuumPrompt(vacuumable);
+
+                    if (vacuumable != currentVacuumable)
+                    {
+                        StartVacuumingTarget(vacuumable);
+                    }
+
+                    return;
                 }
 
+                if (vacuumable == currentVacuumable)
+                    StopVacuumingTarget();
+
+                ClearVacuumPrompt();
                 return;
             }
         }
 
         if (currentVacuumable != null && !HasCarryTarget)
-        {
-            currentVacuumable.VacuumEnd();
-            currentVacuumable = null;
-        }
+            StopVacuumingTarget();
+
+        ClearVacuumPrompt();
+    }
+
+    void StartVacuumingTarget(IVacuumable vacuumable)
+    {
+        StopVacuumingTarget();
+
+        currentVacuumable = vacuumable;
+        currentVacuumable.VacuumStart();
+
+        if (IsWaterRefillSource(vacuumable))
+            StartWaterRefillEffect();
+    }
+
+    void StopVacuumingTarget()
+    {
+        if (currentVacuumable == null)
+            return;
+
+        if (IsWaterRefillSource(currentVacuumable))
+            StopWaterRefillEffect();
+
+        currentVacuumable.VacuumEnd();
+        currentVacuumable = null;
+    }
+
+    static bool IsWaterRefillSource(IVacuumable vacuumable)
+    {
+        if (vacuumable is WaterRefill)
+            return true;
+
+        return vacuumable is Dripling dripling && dripling.Type == Dripling.ConsumableType.Water;
+    }
+
+    void StartWaterRefillEffect()
+    {
+        if (waterRefillEffect == null || waterRefillEffectPlaying)
+            return;
+
+        waterRefillEffectPlaying = true;
+        waterRefillEffect.Play();
+    }
+
+    void StopWaterRefillEffect()
+    {
+        if (waterRefillEffect == null || !waterRefillEffectPlaying)
+            return;
+
+        waterRefillEffectPlaying = false;
+        waterRefillEffect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+    }
+
+    void ShowVacuumPrompt(IVacuumable vacuumable)
+    {
+        if (vacuumable == promptVacuumable)
+            return;
+
+        promptVacuumable = vacuumable;
+        Managers.UI.ShowVacuumPrompt(vacuumable.VacuumPrompt);
+    }
+
+    void ClearVacuumPrompt()
+    {
+        if (promptVacuumable == null)
+            return;
+
+        promptVacuumable = null;
+        Managers.UI.HideInteractText();
     }
 }

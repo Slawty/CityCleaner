@@ -16,6 +16,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject interactPromptPanel;
     [FormerlySerializedAs("interactText")]
     [SerializeField] TMP_Text interactPromptText;
+    [SerializeField] TMP_Text interactButtonText;
     [SerializeField] private TMP_Text coinValueText;
     [SerializeField] private TMP_Text poopValueText;
     [SerializeField] GameObject gameplayHudRoot;
@@ -50,10 +51,22 @@ public class UIManager : MonoBehaviour
         SetWaypointTarget(target, WaypointTurnInHideDistance);
     }
 
+    public void ShowInteractPrompt(string actionText, string buttonText)
+    {
+        interactPromptText.text = actionText;
+        if (interactButtonText != null)
+            interactButtonText.text = buttonText;
+        interactPromptPanel.SetActive(true);
+    }
+
     public void ShowInteractText(string text)
     {
-        interactPromptText.text = text;
-        interactPromptPanel.SetActive(true);
+        ShowInteractPrompt(text, "E");
+    }
+
+    public void ShowVacuumPrompt(string text)
+    {
+        ShowInteractPrompt(text, "RB");
     }
 
     public void ShowInfoText(string text, float durationSeconds)

@@ -21,6 +21,7 @@ public class DirtlingVacuumCapture : MonoBehaviour, IVacuumCarryable
     public bool CanVacuum => stateController.IsDizzy
         && stateController.CurrentState != DirtlingState.Vacuumed
         && stateController.CurrentState != DirtlingState.Processed;
+    public string VacuumPrompt => "Vacuum";
 
     void Awake()
     {
