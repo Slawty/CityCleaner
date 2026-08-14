@@ -46,7 +46,7 @@ public class ZoneDirtMap : MonoBehaviour
     [Tooltip("Collect renderers inside the zone bounds collider that use a zone dirt surface shader.")]
     [SerializeField] bool autoCollectTargetRenderers = true;
     [Tooltip("Materials using these shaders receive zone dirt masks. Leave empty to resolve SG_ObjectDirtSimpleWorld shaders by name.")]
-    [SerializeField] Shader zoneDirtSurfaceShader;
+    [SerializeField] List<Shader> zoneDirtSurfaceShaders = new();
     [SerializeField] List<Renderer> targetRenderers = new();
 
     readonly List<Shader> resolvedZoneDirtSurfaceShaders = new();
@@ -180,7 +180,7 @@ public class ZoneDirtMap : MonoBehaviour
         if (resolvedZoneDirtSurfaceShaders.Count == 0)
         {
             Debug.LogWarning(
-                $"ZoneDirtMap on {name}: no zone dirt surface shaders found. Assign Zone Dirt Surface Shader on this component.",
+                $"ZoneDirtMap on {name}: no zone dirt surface shaders found. Assign Zone Dirt Surface Shaders on this component.",
                 this);
             return;
         }
@@ -204,11 +204,19 @@ public class ZoneDirtMap : MonoBehaviour
     {
         resolvedZoneDirtSurfaceShaders.Clear();
 
-        if (zoneDirtSurfaceShader != null)
+        if (zoneDirtSurfaceShaders != null)
         {
-            resolvedZoneDirtSurfaceShaders.Add(zoneDirtSurfaceShader);
-            return;
+            foreach (Shader shader in zoneDirtSurfaceShaders)
+            {
+                if (shader == null || resolvedZoneDirtSurfaceShaders.Contains(shader))
+                    continue;
+
+                resolvedZoneDirtSurfaceShaders.Add(shader);
+            }
         }
+
+        if (resolvedZoneDirtSurfaceShaders.Count > 0)
+            return;
 
         foreach (string shaderName in DefaultZoneDirtSurfaceShaderNames)
         {

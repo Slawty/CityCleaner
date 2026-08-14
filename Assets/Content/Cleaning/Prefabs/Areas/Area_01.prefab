@@ -947,7 +947,9 @@ MonoBehaviour:
   initialZoneDirtTextureXY: {fileID: 2800000, guid: 30763da6623a8c444916e4e9c64b5086, type: 3}
   initialZoneDirtTextureYZ: {fileID: 2800000, guid: 30763da6623a8c444916e4e9c64b5086, type: 3}
   autoCollectTargetRenderers: 1
-  zoneDirtSurfaceShader: {fileID: -6465566751694194690, guid: fc004f396df8a0742a1bbb4035cc6773, type: 3}
+  zoneDirtSurfaceShaders:
+  - {fileID: 4800000, guid: fc004f396df8a0742a1bbb4035cc6773, type: 3}
+  - {fileID: 4800000, guid: 7f8b3da69a301d543b8572221b08b878, type: 3}
   targetRenderers:
   - {fileID: 951676751472412788}
   - {fileID: 995293082983299273}

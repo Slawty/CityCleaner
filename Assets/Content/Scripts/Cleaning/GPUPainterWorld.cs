@@ -13,6 +13,7 @@ public class GPUPainterWorld : MonoBehaviour
     [SerializeField] int textureResolution = 1024;
 
     [Header("Brush")]
+    [SerializeField] Shader paintBrushShader;
     [SerializeField] Texture2D brushTexture;
     [SerializeField] float brushWorldSize = 0.5f;
     [SerializeField] float cleanSpeed = 4f;
@@ -46,7 +47,10 @@ public class GPUPainterWorld : MonoBehaviour
 
     void Awake()
     {
-        localPaintMaterial = new Material(Shader.Find("Hidden/GPUPaintBrush"));
+        if (paintBrushShader == null)
+            throw new System.InvalidOperationException($"{nameof(GPUPainterWorld)} on {name}: {nameof(paintBrushShader)} is not assigned.");
+
+        localPaintMaterial = new Material(paintBrushShader);
     }
 
     void Update()

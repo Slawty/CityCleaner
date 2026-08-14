@@ -18,23 +18,34 @@ public class TutorialManager : MonoBehaviour
     bool highlightTutorialShown;
     bool waitingForHighlightPress;
 
-    void Start()
+    WaterSprayTool waterSprayer;
+    bool subscriptionsActive;
+
+    public void StartGameplay()
     {
-        Managers.Tools.WaterSprayer.OnAmmoDepleted += HandleWaterDepleted;
-        Managers.Tools.WaterSprayer.OnAmmoRestored += HandleWaterRestored;
+        if (subscriptionsActive)
+            return;
+
+        subscriptionsActive = true;
+        waterSprayer = Managers.Tools.WaterSprayer;
+        waterSprayer.OnAmmoDepleted += HandleWaterDepleted;
+        waterSprayer.OnAmmoRestored += HandleWaterRestored;
         Managers.Spawning.OnCoinSpawned += HandleCoinSpawned;
         CoinParticleMover.OnCoinCollected += HandleCoinCollected;
     }
 
     void OnDestroy()
     {
-        if (Managers.Tools?.WaterSprayer != null)
+        if (waterSprayer != null)
         {
-            Managers.Tools.WaterSprayer.OnAmmoDepleted -= HandleWaterDepleted;
-            Managers.Tools.WaterSprayer.OnAmmoRestored -= HandleWaterRestored;
+            waterSprayer.OnAmmoDepleted -= HandleWaterDepleted;
+            waterSprayer.OnAmmoRestored -= HandleWaterRestored;
         }
 
-        if (Managers.Spawning != null)
+        if (!subscriptionsActive)
+            return;
+
+        if (Managers.IsInitialized)
             Managers.Spawning.OnCoinSpawned -= HandleCoinSpawned;
 
         CoinParticleMover.OnCoinCollected -= HandleCoinCollected;

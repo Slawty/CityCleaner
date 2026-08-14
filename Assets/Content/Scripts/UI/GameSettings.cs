@@ -49,9 +49,13 @@ public static class GameSettings
 
     static void ApplyMouseSensitivity()
     {
-        if (Managers.Player == null || Managers.Player.mouseLook == null)
+        if (!Managers.IsInitialized)
             return;
 
-        Managers.Player.mouseLook.sensitivity = MouseSensitivity;
+        Player player = Managers.Player;
+        if (player == null || player.mouseLook == null)
+            return;
+
+        player.mouseLook.sensitivity = MouseSensitivity;
     }
 }

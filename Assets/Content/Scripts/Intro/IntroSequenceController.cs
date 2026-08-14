@@ -1,12 +1,16 @@
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [DefaultExecutionOrder(-50)]
 public class IntroSequenceController : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] bool useIntro = true;
+    [SerializeField] string startSceneName = "Start Scene";
 
     [Header("Camera")]
     [SerializeField] CinemachineCamera introCamera;
@@ -23,7 +27,7 @@ public class IntroSequenceController : MonoBehaviour
 
     Sequence activeSequence;
     bool introFinished;
-    bool playerDeactivatedForIntro;
+    bool introStarted;
 
     public static IntroSequenceController Instance { get; private set; }
     public bool UseIntro => useIntro;
@@ -45,8 +49,7 @@ public class IntroSequenceController : MonoBehaviour
         if (!useIntro)
             return;
 
-        LockGameplayForIntro();
-        PlayIntro();
+        BeginIntroWhenReadyAsync(destroyCancellationToken).Forget();
     }
 
     void OnDestroy()
@@ -56,8 +59,40 @@ public class IntroSequenceController : MonoBehaviour
         if (Instance == this)
             Instance = null;
 
-        if (!introFinished)
+        if (!introFinished && Managers.IsInitialized)
             ReleaseGameplay();
+    }
+
+    async UniTaskVoid BeginIntroWhenReadyAsync(CancellationToken cancellationToken)
+    {
+        await WaitForStartSceneToUnloadAsync(cancellationToken);
+        BeginIntro();
+    }
+
+    async UniTask WaitForStartSceneToUnloadAsync(CancellationToken cancellationToken)
+    {
+        Scene startScene = SceneManager.GetSceneByName(startSceneName);
+        if (!startScene.IsValid() || !startScene.isLoaded)
+            return;
+
+        while (startScene.isLoaded)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            startScene = SceneManager.GetSceneByName(startSceneName);
+            if (!startScene.IsValid())
+                return;
+        }
+    }
+
+    void BeginIntro()
+    {
+        if (!useIntro || introStarted || introFinished)
+            return;
+
+        introStarted = true;
+        LockGameplayForIntro();
+        PlayIntro();
     }
 
     void DisableIntroCamera()
@@ -73,10 +108,7 @@ public class IntroSequenceController : MonoBehaviour
 
         GameObject playerObject = Managers.Player.gameObject;
         if (playerObject.activeSelf)
-        {
             playerObject.SetActive(false);
-            playerDeactivatedForIntro = true;
-        }
 
         if (introCamera != null)
             introCamera.Priority = introCameraPriority;
@@ -109,10 +141,9 @@ public class IntroSequenceController : MonoBehaviour
         introFinished = true;
         DisableIntroCamera();
 
-        if (playerDeactivatedForIntro)
-            Managers.Player.gameObject.SetActive(true);
-        else
-            Managers.Player.SetPlayerActive(true);
+        Managers.Player.gameObject.SetActive(true);
+        Managers.Player.SetPlayerActive(true);
+        Managers.Tutorial.StartGameplay();
 
         Managers.UI.SetHudVisible(true);
         Managers.Input.UnblockInteraction(this);

@@ -25,6 +25,8 @@ public class Managers : MonoBehaviour
         Instance = this;
     }
 
+    public static bool IsInitialized => Instance != null;
+
     public static Camera MainCam => Instance.mainCam;
     public static UIManager UI => Instance.uIManager;
     public static SpawnManager Spawning => Instance.spawnManager;

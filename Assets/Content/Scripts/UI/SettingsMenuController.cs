@@ -8,6 +8,8 @@ public class SettingsMenuController : MonoBehaviour
     [SerializeField] SettingsSliderRow masterVolumeRow;
     [SerializeField] SettingsSliderRow mouseSensitivityRow;
     [SerializeField] SettingsMenuButton resumeButton;
+    [SerializeField] SettingsMenuButton exitButton;
+    [SerializeField] string startSceneName = "Start Scene";
 
     bool isOpen;
     float previousTimeScale = 1f;
@@ -34,6 +36,12 @@ public class SettingsMenuController : MonoBehaviour
 
         resumeButton.SetLabel("Resume");
         resumeButton.SetClickHandler(Close);
+
+        if (exitButton == null)
+            throw new System.InvalidOperationException($"{nameof(SettingsMenuController)} on {name}: {nameof(exitButton)} is not assigned.");
+
+        exitButton.SetLabel("Exit");
+        exitButton.SetClickHandler(ExitToStartScene);
     }
 
     void Start()
@@ -83,6 +91,13 @@ public class SettingsMenuController : MonoBehaviour
         Managers.Player.SetMovementEnabled(false);
         Managers.Player.mouseLook.SetPointerMode(true);
         Managers.Tools.StopActiveShooting();
+    }
+
+    void ExitToStartScene()
+    {
+        StopEnableGameplayInputRoutine();
+        isOpen = false;
+        GameRestart.LoadStartScene(startSceneName);
     }
 
     public void Close()
