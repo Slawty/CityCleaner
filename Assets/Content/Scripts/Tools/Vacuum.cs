@@ -15,6 +15,7 @@ public class Vacuum : MonoBehaviour
     [SerializeField] EventReference vacuumLoopEvent;
 
     [Header("Effects")]
+    [SerializeField] ParticleSystem[] vacuumEffects;
     [SerializeField] ParticleSystem waterRefillEffect;
 
     IVacuumable currentVacuumable;
@@ -36,6 +37,7 @@ public class Vacuum : MonoBehaviour
     void OnDisable()
     {
         StopVacuumLoop();
+        StopVacuumEffects();
         StopWaterRefillEffect();
         ClearVacuumPrompt();
     }
@@ -56,6 +58,7 @@ public class Vacuum : MonoBehaviour
         particleTriggerCollider.enabled = true;
         Managers.Input.BlockInteraction(this);
         StartVacuumLoop();
+        StartVacuumEffects();
     }
 
     public void EnterCarryMode()
@@ -101,6 +104,7 @@ public class Vacuum : MonoBehaviour
         particleTriggerCollider.enabled = false;
         Managers.Input.UnblockInteraction(this);
         StopVacuumLoop();
+        StopVacuumEffects();
         ClearVacuumPrompt();
     }
 
@@ -124,6 +128,30 @@ public class Vacuum : MonoBehaviour
         vacuumLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         vacuumLoopInstance.release();
         vacuumLoopInstance.clearHandle();
+    }
+
+    void StartVacuumEffects()
+    {
+        if (vacuumEffects == null)
+            return;
+
+        foreach (ParticleSystem effect in vacuumEffects)
+        {
+            if (effect != null)
+                effect.Play();
+        }
+    }
+
+    void StopVacuumEffects()
+    {
+        if (vacuumEffects == null)
+            return;
+
+        foreach (ParticleSystem effect in vacuumEffects)
+        {
+            if (effect != null)
+                effect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
     }
 
     void ClearTarget()

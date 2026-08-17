@@ -5,6 +5,7 @@ using UnityEngine.Events;
 public class JobPresentation
 {
     [TextArea(2, 6)] public string[] introDialogues;
+    [TextArea(2, 6)] public string[] inProgressDialogues;
     [TextArea(2, 6)] public string[] outroDialogues;
     public NpcMoveInstruction[] movesBeforeIntro;
     public NpcMoveInstruction[] movesAfterOutro;

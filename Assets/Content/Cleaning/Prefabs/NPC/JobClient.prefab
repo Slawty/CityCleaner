@@ -72,6 +72,7 @@ GameObject:
   m_Component:
   - component: {fileID: 618334033904508694}
   - component: {fileID: 6389937430097353917}
+  - component: {fileID: 6009459950772351541}
   - component: {fileID: 8055453177405506620}
   - component: {fileID: 928904253216001386}
   - component: {fileID: 1226433375803334992}
@@ -125,6 +126,23 @@ MonoBehaviour:
   returnDestinationName: 
   waypointTarget: {fileID: 9025912406636663398}
   animationSounds: {fileID: 0}
+--- !u!114 &6009459950772351541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3147195090969340309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4d9f2a53c6e7f8091a2b3c4d5e6f708, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcExpressionController
+  atlas: {fileID: 11400000, guid: c5e0a3b14d6f7e8091a2b3c4d5e6f809, type: 2}
+  faceRenderer: {fileID: 9007655579152578263}
+  materialIndex: 0
+  texturePropertyName: _BaseMap
+  effects: []
 --- !u!136 &8055453177405506620
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1016,5 +1034,10 @@ Transform:
 --- !u!4 &8843694600266706524 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
+  m_PrefabInstance: {fileID: 9021171983535212983}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &9007655579152578263 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 13575778485075808, guid: f8d7c365db0ca944780907e491e1429b, type: 3}
   m_PrefabInstance: {fileID: 9021171983535212983}
   m_PrefabAsset: {fileID: 0}

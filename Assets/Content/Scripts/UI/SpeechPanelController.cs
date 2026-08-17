@@ -47,7 +47,16 @@ public class SpeechPanelController : MonoBehaviour
 
     public void SetDialogueClient(JobClient client)
     {
+        if (dialogueClient == client)
+            return;
+
+        if (dialogueClient != null)
+            dialogueClient.SetSymbolsVisible(true);
+
         dialogueClient = client;
+
+        if (dialogueClient != null)
+            dialogueClient.SetSymbolsVisible(false);
     }
 
     public void SuppressDialogueFacingRestore()
@@ -205,6 +214,7 @@ public class SpeechPanelController : MonoBehaviour
 
         if (dialogueClient != null)
         {
+            dialogueClient.SetSymbolsVisible(true);
             dialogueClient.EndDialogueFacing(restoreRotation: !suppressDialogueFacingRestore);
             dialogueClient = null;
         }
@@ -219,7 +229,8 @@ public class SpeechPanelController : MonoBehaviour
         ResetAcceptButtonState();
         panelRoot.SetActive(false);
 
-        Managers.UI.SetHudVisible(true);
+        if (ShouldRestoreHud())
+            Managers.UI.SetHudVisible(true);
         Managers.Player.SetMovementEnabled(true);
         Managers.Player.mouseLook.SetPointerMode(false);
         enableGameplayInputCts = new CancellationTokenSource();
@@ -286,6 +297,12 @@ public class SpeechPanelController : MonoBehaviour
         enableGameplayInputCts.Cancel();
         enableGameplayInputCts.Dispose();
         enableGameplayInputCts = null;
+    }
+
+    static bool ShouldRestoreHud()
+    {
+        IntroSequenceController intro = IntroSequenceController.Instance;
+        return intro == null || intro.IsGameplayReleased;
     }
 
     void ResetAcceptButtonState()

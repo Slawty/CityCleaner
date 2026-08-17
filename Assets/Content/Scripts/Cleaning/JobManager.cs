@@ -245,15 +245,15 @@ public class JobManager : MonoBehaviour
             return false;
         }
 
-        if (chainActive)
-            return false;
-
         Job job = client.Job;
         if (job == null)
         {
             Debug.LogError($"{nameof(JobManager)}.{nameof(TryOfferStandaloneJob)}: {nameof(JobClient.Job)} is not assigned on {client.name}.", client);
             return false;
         }
+
+        if (chainActive && !job.OfferDuringActiveChain)
+            return false;
 
         if (job.FollowUpJob != null)
             StartJobChain(job);
@@ -873,6 +873,35 @@ public class JobManager : MonoBehaviour
     void RefreshHighlightButtonAvailability()
     {
         targetHighlighter?.RefreshButtonAvailability(HasHighlightableTargets());
+    }
+
+    public void ShowInProgressDialogue(JobClient client)
+    {
+        ShowJobDialogues(GetInProgressDialogues(client), null);
+    }
+
+    public Job GetActiveJobForClient(JobClient client)
+    {
+        if (client == null)
+            return null;
+
+        for (int index = activeJobs.Count - 1; index >= 0; index--)
+        {
+            TrackedJob tracked = activeJobs[index];
+            if (tracked.Client == client && tracked.Job != null)
+                return tracked.Job;
+        }
+
+        return client.Job;
+    }
+
+    string[] GetInProgressDialogues(JobClient client)
+    {
+        Job job = GetActiveJobForClient(client);
+        if (job != null && HasDialogues(job.Presentation.inProgressDialogues))
+            return job.Presentation.inProgressDialogues;
+
+        return new[] { JobClient.DefaultInProgressDialogue };
     }
 
     static bool HasDialogues(string[] dialogues)

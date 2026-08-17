@@ -15,7 +15,7 @@ public class WaterRefill : MonoBehaviour, IVacuumable
     EventInstance refillLoopInstance;
 
     public bool CanVacuum => Managers.Tools.WaterSprayer.NormalizedAmmo < 1f;
-    public string VacuumPrompt => "Vacuum";
+    public string VacuumPrompt => "Refill Water";
 
     void Update()
     {

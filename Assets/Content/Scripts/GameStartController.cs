@@ -13,6 +13,7 @@ public class GameStartController : MonoBehaviour
     [SerializeField] SettingsMenuButton exitButton;
     [SerializeField] CanvasGroup backgroundGroup;
     [SerializeField] TMP_Text loadingText;
+    [SerializeField] float levelLoadDelaySeconds = 0.25f;
     [SerializeField] float backgroundFadeOutDuration = 0.6f;
 
     bool managerSceneReady;
@@ -79,21 +80,38 @@ public class GameStartController : MonoBehaviour
             return;
 
         isLoadingLevel = true;
+        ShowLoadingState();
+
+        loadCts = new CancellationTokenSource();
+        StartLevelAsync(loadCts.Token).Forget();
+    }
+
+    void ShowLoadingState()
+    {
+        startButton.Button.interactable = false;
+        exitButton.Button.interactable = false;
         startButton.gameObject.SetActive(false);
+        exitButton.gameObject.SetActive(false);
 
         if (loadingText != null)
             loadingText.gameObject.SetActive(true);
 
-        Canvas.ForceUpdateCanvases();
+        if (backgroundGroup != null)
+        {
+            backgroundGroup.interactable = false;
+            backgroundGroup.blocksRaycasts = false;
+        }
 
-        loadCts = new CancellationTokenSource();
-        StartLevelAsync(loadCts.Token).Forget();
+        Canvas.ForceUpdateCanvases();
     }
 
     async UniTaskVoid StartLevelAsync(CancellationToken cancellationToken)
     {
         try
         {
+            if (levelLoadDelaySeconds > 0f)
+                await UniTask.Delay(TimeSpan.FromSeconds(levelLoadDelaySeconds), ignoreTimeScale: true, cancellationToken: cancellationToken);
+
             await LoadSceneAdditiveAsync(levelSceneName, cancellationToken);
 
             Scene levelScene = SceneManager.GetSceneByName(levelSceneName);
@@ -101,7 +119,6 @@ public class GameStartController : MonoBehaviour
                 throw new InvalidOperationException($"{nameof(GameStartController)} on {name}: loaded scene '{levelSceneName}' is not valid.");
 
             SceneManager.SetActiveScene(levelScene);
-            RefreshZoneDirtMaps();
 
             await FadeCanvasGroupAsync(backgroundGroup, 0f, backgroundFadeOutDuration, cancellationToken);
 
@@ -158,19 +175,5 @@ public class GameStartController : MonoBehaviour
         bool visible = alpha > 0.01f;
         canvasGroup.blocksRaycasts = visible;
         canvasGroup.interactable = visible;
-    }
-
-    static void RefreshZoneDirtMaps()
-    {
-        ZoneDirtMap[] zoneDirtMaps = UnityEngine.Object.FindObjectsByType<ZoneDirtMap>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (ZoneDirtMap zoneDirtMap in zoneDirtMaps)
-        {
-            if (zoneDirtMap == null)
-                continue;
-
-            zoneDirtMap.UpdateZoneBounds();
-            zoneDirtMap.RebuildZoneTexture();
-            zoneDirtMap.ApplyToTargetRenderers();
-        }
     }
 }

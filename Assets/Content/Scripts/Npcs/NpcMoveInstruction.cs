@@ -8,4 +8,10 @@ public class NpcMoveInstruction
     public Transform destination;
     public bool stopWandering = true;
     public JobClientState returnState = JobClientState.Available;
+
+    [Header("Presentation")]
+    public string expressionOnStart;
+    public string expressionOnArrive;
+    public string[] enableEffectsOnStart = Array.Empty<string>();
+    public string[] disableEffectsOnArrive = Array.Empty<string>();
 }

@@ -12,6 +12,7 @@ public class ToolsController : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] ToolSlot[] toolSlots;
+    [SerializeField] ToolSlot vacuumToolSlot;
 
     [Header("Audio")]
     [SerializeField] EventReference toolSwitchEvent;
@@ -323,6 +324,7 @@ public class ToolsController : MonoBehaviour
         CurrentTool = null;
         currentToolType = null;
         RefreshToolSlotVisuals();
+        vacuumToolSlot?.SetSelected(true);
     }
 
     public void EndVacuumMode()
@@ -334,6 +336,7 @@ public class ToolsController : MonoBehaviour
         vacuum.End();
         vacuum.gameObject.SetActive(false);
         vacuumMode = false;
+        vacuumToolSlot?.SetSelected(false);
 
         PlayerToolType? restoreType = savedToolType;
         savedToolType = null;
@@ -385,6 +388,9 @@ public class ToolsController : MonoBehaviour
 
         foreach (ToolSlot slot in toolSlots)
         {
+            if (slot == vacuumToolSlot)
+                continue;
+
             if (!IsToolUnlocked(slot.ToolType))
                 continue;
 
@@ -398,7 +404,15 @@ public class ToolsController : MonoBehaviour
             return;
 
         foreach (ToolSlot slot in toolSlots)
+        {
+            if (slot == vacuumToolSlot)
+                continue;
+
             slot.SetUnlocked(IsToolUnlocked(slot.ToolType));
+        }
+
+        if (vacuumToolSlot != null)
+            vacuumToolSlot.gameObject.SetActive(true);
     }
 
     public Tool GetCurrentTool()

@@ -4,6 +4,8 @@ using UnityEngine;
 public class CleanTargetsJob : Job
 {
     [SerializeField] List<GPUPaintableObject> targets = new();
+    [Header("Completion")]
+    [SerializeField] List<GPUPaintableObject> additionalCleanOnComplete = new();
 
     bool tracking;
 
@@ -56,15 +58,21 @@ public class CleanTargetsJob : Job
     public override void CompleteRemaining()
     {
         foreach (GPUPaintableObject target in targets)
-        {
-            if (target == null || target.isClean)
-                continue;
+            CleanPaintableIfDirty(target, playSuccessSound: true);
 
-            if (!target.IsInitialized)
-                target.Initialize(128);
+        foreach (GPUPaintableObject paintable in additionalCleanOnComplete)
+            CleanPaintableIfDirty(paintable, playSuccessSound: false);
+    }
 
-            target.SetClean();
-        }
+    static void CleanPaintableIfDirty(GPUPaintableObject paintable, bool playSuccessSound)
+    {
+        if (paintable == null || paintable.isClean)
+            return;
+
+        if (!paintable.IsInitialized)
+            paintable.Initialize(128);
+
+        paintable.SetClean(playSuccessSound);
     }
 
     public override void MarkCompleted()

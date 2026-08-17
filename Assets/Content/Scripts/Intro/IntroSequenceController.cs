@@ -21,6 +21,7 @@ public class IntroSequenceController : MonoBehaviour
     [SerializeField] float holdDuration = 1.5f;
     [SerializeField] float moveDuration = 4f;
     [SerializeField] int introCameraPriority = 26;
+    [SerializeField] float gameplayReleaseDelay = 1f;
 
     [Header("Tween")]
     [SerializeField] Ease moveEase = Ease.InOutSine;
@@ -31,6 +32,16 @@ public class IntroSequenceController : MonoBehaviour
 
     public static IntroSequenceController Instance { get; private set; }
     public bool UseIntro => useIntro;
+    public bool IsIntroReadyToSync => !useIntro || introStarted;
+    public bool IsGameplayReleased => introFinished;
+
+    public async UniTask WaitUntilIntroReadyAsync(CancellationToken cancellationToken)
+    {
+        if (IsIntroReadyToSync)
+            return;
+
+        await UniTask.WaitUntil(() => IsIntroReadyToSync, cancellationToken: cancellationToken);
+    }
 
     void Awake()
     {
@@ -118,7 +129,7 @@ public class IntroSequenceController : MonoBehaviour
     {
         IntroCameraRigMover mover = new IntroCameraRigMover(cameraRig, endPosition, holdDuration, moveDuration, moveEase);
         activeSequence = mover.Play(SyncPlayerToEndOrientation);
-        activeSequence.OnComplete(ReleaseGameplay);
+        // activeSequence.OnComplete(ReleaseGameplay);
     }
 
     void SyncPlayerToEndOrientation()
@@ -147,5 +158,16 @@ public class IntroSequenceController : MonoBehaviour
 
         Managers.UI.SetHudVisible(true);
         Managers.Input.UnblockInteraction(this);
+    }
+
+    public void ReleaseGameplayAsyncCall()
+    {
+        ReleaseGameplayAsync().Forget();
+    }
+
+    public async UniTaskVoid ReleaseGameplayAsync()
+    {
+        await UniTask.Delay(System.TimeSpan.FromSeconds(gameplayReleaseDelay), cancellationToken: destroyCancellationToken);
+        ReleaseGameplay();
     }
 }

@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 [CanEditMultipleObjects]
@@ -48,12 +49,23 @@ public class ZoneDirtMapEditor : Editor
 }
 
 [InitializeOnLoad]
-static class ZoneDirtMapPlayModeRefresh
+static class ZoneDirtMapEditorRefresh
 {
-    static ZoneDirtMapPlayModeRefresh()
+    static ZoneDirtMapEditorRefresh()
     {
         EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
         EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        EditorSceneManager.sceneOpened -= OnSceneOpened;
+        EditorSceneManager.sceneOpened += OnSceneOpened;
+    }
+
+    static void OnSceneOpened(UnityEngine.SceneManagement.Scene scene, OpenSceneMode mode)
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+            return;
+
+        EditorApplication.delayCall -= RefreshAllZoneDirtInOpenScenes;
+        EditorApplication.delayCall += RefreshAllZoneDirtInOpenScenes;
     }
 
     static void OnPlayModeStateChanged(PlayModeStateChange playModeState)
@@ -61,13 +73,15 @@ static class ZoneDirtMapPlayModeRefresh
         if (playModeState != PlayModeStateChange.EnteredEditMode)
             return;
 
-        ZoneDirtMap[] zoneDirtMaps = Object.FindObjectsByType<ZoneDirtMap>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (ZoneDirtMap zoneDirtMap in zoneDirtMaps)
-        {
-            if (zoneDirtMap == null)
-                continue;
+        RefreshAllZoneDirtInOpenScenes();
+    }
 
-            ZoneDirtMapEditor.RefreshZoneDirt(zoneDirtMap, rebuildTextures: true);
-        }
+    static void RefreshAllZoneDirtInOpenScenes()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+            return;
+
+        VisualDirtController.RefreshAll(rebuildTextures: true);
+        SceneView.RepaintAll();
     }
 }

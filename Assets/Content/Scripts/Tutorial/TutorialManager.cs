@@ -3,11 +3,13 @@ using UnityEngine;
 public class TutorialManager : MonoBehaviour
 {
     const string WaterRefillInfo =
-        "You have run out of water! Hold RMB with the Vacuum on a fountain or Cleanling to refill.";
+        "You have run out of water! Find a fountain to refill.";
 
     const string VacuumCoinInfo = "Use RMB to activate the Vacuum";
 
     const string HighlightTargetsInfo = "Press Q to highlight objects to clean.";
+    [SerializeField] Transform waterRefillWaypointTarget;
+    [SerializeField] float waterRefillWaypointHideDistance = 4f;
 
     bool waterRefillTutorialShown;
     bool waitingForWaterRefill;
@@ -101,6 +103,9 @@ public class TutorialManager : MonoBehaviour
         waterRefillTutorialShown = true;
         waitingForWaterRefill = true;
         Managers.UI.ShowTutorialInfoText(WaterRefillInfo, 0f);
+
+        if (waterRefillWaypointTarget != null)
+            Managers.UI.SetWaypointTarget(waterRefillWaypointTarget, waterRefillWaypointHideDistance);
     }
 
     void HandleWaterRestored()
@@ -110,5 +115,7 @@ public class TutorialManager : MonoBehaviour
 
         waitingForWaterRefill = false;
         Managers.UI.HideTutorialInfoText();
+        Managers.UI.ClearWaypointTarget();
+        Managers.Jobs?.RefreshWaypoint();
     }
 }

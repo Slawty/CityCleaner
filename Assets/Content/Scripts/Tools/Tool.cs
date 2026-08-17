@@ -10,6 +10,9 @@ public abstract class Tool : MonoBehaviour
     {
         shootAction.action.performed += HandleShootDown;
         shootAction.action.canceled += HandleShootUp;
+
+        if (!Managers.Input.InteractionBlocked() && shootAction.action.IsPressed())
+            OnShootStart();
     }
 
     protected virtual void OnDisable()

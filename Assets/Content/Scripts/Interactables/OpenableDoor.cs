@@ -1,5 +1,6 @@
 using System;
 using DG.Tweening;
+using FMODUnity;
 using UnityEngine;
 
 public class OpenableDoor : MonoBehaviour
@@ -15,6 +16,7 @@ public class OpenableDoor : MonoBehaviour
     [SerializeField] DoorPanel primaryDoor = new();
     [SerializeField] DoorPanel secondaryDoor = new();
     [SerializeField] float openDuration = 0.5f;
+    [SerializeField] EventReference openSoundEvent;
 
     Quaternion primaryClosedRotation;
     Quaternion primaryOpenRotation;
@@ -34,6 +36,7 @@ public class OpenableDoor : MonoBehaviour
             return;
 
         isOpen = true;
+        PlayOpenSound();
         AnimateDoor(primaryDoor.door, primaryOpenRotation);
         AnimateDoor(secondaryDoor.door, secondaryOpenRotation);
     }
@@ -63,5 +66,14 @@ public class OpenableDoor : MonoBehaviour
             return;
 
         door.DOLocalRotateQuaternion(targetRotation, openDuration);
+    }
+
+    void PlayOpenSound()
+    {
+        if (openSoundEvent.IsNull)
+            return;
+
+        GameObject attachTarget = primaryDoor.door != null ? primaryDoor.door.gameObject : gameObject;
+        RuntimeManager.PlayOneShotAttached(openSoundEvent, attachTarget);
     }
 }

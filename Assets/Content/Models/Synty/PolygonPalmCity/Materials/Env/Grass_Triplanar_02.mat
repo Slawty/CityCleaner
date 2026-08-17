@@ -221,7 +221,7 @@ Material:
     - _ReceiveShadows: 1
     - _Side_Metallic: 0
     - _Side_Smoothness: 0
-    - _Smoothness: 0.5
+    - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _Snow_Level: 0
     - _Snow_Metallic: 0.1

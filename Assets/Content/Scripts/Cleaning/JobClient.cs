@@ -14,7 +14,7 @@ public enum JobClientState
 
 public class JobClient : MonoBehaviour, IInteractable
 {
-    const string ActiveJobDialogue = "Not done yet, Boss!";
+    public const string DefaultInProgressDialogue = "Not done yet, Boss!";
 
     [SerializeField] Job job;
     [Header("Symbols")]
@@ -39,6 +39,7 @@ public class JobClient : MonoBehaviour, IInteractable
     bool isInDialogueFacing;
     bool hasPendingReturnRotation;
     bool hasSavedDialogueReturnRotation;
+    bool symbolsHiddenByDialogue;
     CancellationTokenSource dialogueFacingCts;
 
     public JobClientState State => state;
@@ -104,7 +105,7 @@ public class JobClient : MonoBehaviour, IInteractable
                 Managers.Jobs.OfferStandaloneTurnIn(this);
                 break;
             case JobClientState.Active:
-                Managers.Speech.Show(ActiveJobDialogue);
+                Managers.Jobs.ShowInProgressDialogue(this);
                 NotifySpokenTo();
                 break;
             default:
@@ -291,8 +292,22 @@ public class JobClient : MonoBehaviour, IInteractable
         Managers.Speech.SetDialogueClient(null);
     }
 
+    public void SetSymbolsVisible(bool visible)
+    {
+        symbolsHiddenByDialogue = !visible;
+        RefreshSymbols();
+    }
+
     void RefreshSymbols()
     {
+        if (symbolsHiddenByDialogue)
+        {
+            SetSymbolActive(jobAvailableSymbol, false);
+            SetSymbolActive(jobPendingSymbol, false);
+            SetSymbolActive(jobCompletedSymbol, false);
+            return;
+        }
+
         bool showAvailable = state == JobClientState.Available;
         bool showPending = state == JobClientState.Active;
         bool showCompleted = state == JobClientState.CompletedPendingTurnIn;

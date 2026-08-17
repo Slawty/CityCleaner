@@ -123,10 +123,6 @@ public class ZoneDirtMap : MonoBehaviour
         }
 
         brushMaterial = new Material(zoneBrushShader);
-
-        RebuildZoneTexture();
-        UpdateZoneBounds();
-        ApplyToTargetRenderers();
     }
 
     void OnDestroy()
@@ -166,7 +162,7 @@ public class ZoneDirtMap : MonoBehaviour
         zoneMaxYZ = new Vector2(bounds.max.y, bounds.max.z);
     }
 
-    public void CollectTargetRenderers()
+    public void CollectTargetRenderers(HashSet<Renderer> ownedRenderers = null)
     {
         targetRenderers.Clear();
 
@@ -190,6 +186,9 @@ public class ZoneDirtMap : MonoBehaviour
         foreach (Renderer renderer in renderers)
         {
             if (renderer == null || !renderer.bounds.Intersects(zoneBounds))
+                continue;
+
+            if (ownedRenderers != null && ownedRenderers.Contains(renderer))
                 continue;
 
             if (!RendererUsesAnyShader(renderer, resolvedZoneDirtSurfaceShaders))
@@ -246,13 +245,13 @@ public class ZoneDirtMap : MonoBehaviour
 
     public bool ContainsWorldPoint(Vector3 worldPoint) => zoneBoundsCollider.bounds.Contains(worldPoint);
 
-    public void ApplyToTargetRenderers()
+    public void ApplyToTargetRenderers(HashSet<Renderer> ownedRenderers = null)
     {
         if (propertyBlock == null)
             propertyBlock = new MaterialPropertyBlock();
 
         if (autoCollectTargetRenderers)
-            CollectTargetRenderers();
+            CollectTargetRenderers(ownedRenderers);
 
         foreach (Renderer targetRenderer in targetRenderers)
         {
@@ -271,6 +270,7 @@ public class ZoneDirtMap : MonoBehaviour
             propertyBlock.SetVector(ZoneMinYZId, zoneMinYZ);
             propertyBlock.SetVector(ZoneMaxYZId, zoneMaxYZ);
             targetRenderer.SetPropertyBlock(propertyBlock);
+            ownedRenderers?.Add(targetRenderer);
         }
     }
 

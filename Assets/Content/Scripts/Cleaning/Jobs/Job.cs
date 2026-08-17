@@ -10,6 +10,7 @@ public abstract class Job : MonoBehaviour
     [SerializeField] Job followUpJob;
     [SerializeField] bool guideToFollowUpClient = true;
     [SerializeField] bool runPreIntroMovesOnLoad;
+    [SerializeField] bool offerDuringActiveChain;
     [Header("Completion")]
     [SerializeField] bool requiresTurnIn = true;
     [SerializeField] bool showCompletionPopup = true;
@@ -32,6 +33,7 @@ public abstract class Job : MonoBehaviour
     public JobClient Speaker => speaker;
     public Job FollowUpJob => followUpJob;
     public bool GuideToFollowUpClient => guideToFollowUpClient;
+    public bool OfferDuringActiveChain => offerDuringActiveChain;
     public string ProgressDescription => progressDescription;
     public abstract float NormalizedProgress { get; }
 
