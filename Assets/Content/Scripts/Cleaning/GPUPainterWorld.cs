@@ -56,14 +56,29 @@ public class GPUPainterWorld : MonoBehaviour
     void Update()
     {
         if (!isPainting)
+        {
+            CleaningDebugStats.ClearStroke();
             return;
+        }
+
+        CleaningDebugStats.IsPainting = true;
+        CleaningDebugStats.CleanSpeed = cleanSpeed;
 
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
         if (!Physics.Raycast(ray, out RaycastHit hit, 10f, paintMask, QueryTriggerInteraction.Ignore))
+        {
+            CleaningDebugStats.RayHit = false;
             return;
+        }
+
+        CleaningDebugStats.RayHit = true;
 
         GPUPaintableObject paintable = hit.collider.GetComponentInParent<GPUPaintableObject>();
-        PaintBrushAt(hit.point, hit.normal, cleanSpeed * Time.deltaTime, paintZoneDirt: paintable == null);
+        CleaningDebugStats.HitPaintableName = paintable != null ? paintable.name : "none";
+
+        float cleanStrength = cleanSpeed * Time.deltaTime;
+        CleaningDebugStats.LastCleanStrength = cleanStrength;
+        PaintBrushAt(hit.point, hit.normal, cleanStrength, paintZoneDirt: paintable == null);
 
         if (paintable != null)
             return;
@@ -75,8 +90,9 @@ public class GPUPainterWorld : MonoBehaviour
 
     void PaintBrushAt(Vector3 brushCenter, Vector3 hitNormal, float cleanStrength, bool paintZoneDirt)
     {
-        if (paintZoneDirt)
-            PaintZoneDirtMaps(brushCenter, hitNormal, cleanStrength);
+        int zoneMapsPainted = paintZoneDirt ? PaintZoneDirtMaps(brushCenter, hitNormal, cleanStrength) : 0;
+        CleaningDebugStats.ZoneDirtPainted = zoneMapsPainted > 0;
+        CleaningDebugStats.ZoneMapsPainted = zoneMapsPainted;
 
         int hitCount = Physics.OverlapSphereNonAlloc(
             brushCenter,
@@ -108,6 +124,9 @@ public class GPUPainterWorld : MonoBehaviour
         if (dirtyPaintableCount > 0)
             SpawnCleaningDirt(brushCenter, dirtMultiplierSum / dirtyPaintableCount);
 
+        CleaningDebugStats.PaintablesInBrush = paintablesInBrush.Count;
+        UpdatePrimaryPaintableDebugStats();
+
         if (paintablesInBrush.Count == 0 || Time.time <= nextUpdateTime)
             return;
 
@@ -115,17 +134,41 @@ public class GPUPainterWorld : MonoBehaviour
 
         foreach (GPUPaintableObject paintable in paintablesInBrush)
             UpdatePaintableTracking(paintable, brushCenter);
+
+        UpdatePrimaryPaintableDebugStats();
     }
 
-    void PaintZoneDirtMaps(Vector3 brushCenter, Vector3 hitNormal, float cleanStrength)
+    void UpdatePrimaryPaintableDebugStats()
     {
+        foreach (GPUPaintableObject paintable in paintablesInBrush)
+        {
+            CleaningDebugStats.PrimaryPaintableName = paintable.name;
+            CleaningDebugStats.PrimaryCleanPercent = paintable.GetCleanPercent();
+            CleaningDebugStats.PrimaryHasMaskOnRenderer = paintable.RendererHasMaskBound();
+            CleaningDebugStats.PrimaryHasZoneOnRenderer = paintable.RendererHasZoneDirtBound();
+            return;
+        }
+
+        CleaningDebugStats.PrimaryPaintableName = "none";
+        CleaningDebugStats.PrimaryCleanPercent = 0f;
+        CleaningDebugStats.PrimaryHasMaskOnRenderer = false;
+        CleaningDebugStats.PrimaryHasZoneOnRenderer = false;
+    }
+
+    int PaintZoneDirtMaps(Vector3 brushCenter, Vector3 hitNormal, float cleanStrength)
+    {
+        int zoneMapsPainted = 0;
+
         foreach (ZoneDirtMap zoneDirtMap in ZoneDirtMap.ActiveMaps)
         {
             if (zoneDirtMap == null || !zoneDirtMap.ContainsWorldPoint(brushCenter))
                 continue;
 
             zoneDirtMap.PaintAtWorldPos(brushCenter, hitNormal, brushWorldSize, cleanStrength, brushTexture);
+            zoneMapsPainted++;
         }
+
+        return zoneMapsPainted;
     }
 
     public void Bind(WaterSprayTool tool)

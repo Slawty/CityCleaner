@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[DefaultExecutionOrder(-100)]
 [DisallowMultipleComponent]
 public class VisualDirtController : MonoBehaviour
 {
@@ -49,6 +50,7 @@ public class VisualDirtController : MonoBehaviour
         }
 
         RefreshUnlistedZoneDirtMaps(ownedRenderers, processedMaps, rebuildTextures);
+        GPUPaintableObject.RebindAllInitializedMasks();
     }
 
     public void Refresh(bool rebuildTextures = true)

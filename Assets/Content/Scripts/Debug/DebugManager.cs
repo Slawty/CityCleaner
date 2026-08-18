@@ -9,6 +9,15 @@ public class DebugManager : MonoBehaviour
     public bool InstantCleaning;
     [SerializeField] InputActionReference pauseAction;
 
+    CleaningDebugOverlay cleaningDebugOverlay;
+
+    void Awake()
+    {
+        cleaningDebugOverlay = GetComponent<CleaningDebugOverlay>();
+        if (cleaningDebugOverlay == null)
+            cleaningDebugOverlay = gameObject.AddComponent<CleaningDebugOverlay>();
+    }
+
     void OnEnable()
     {
         if (pauseAction == null)
@@ -34,6 +43,9 @@ public class DebugManager : MonoBehaviour
 
         if (Keyboard.current != null && Keyboard.current.f11Key.wasPressedThisFrame && Managers.UpgradeMenu != null)
             Managers.UpgradeMenu.Open();
+
+        if (Keyboard.current != null && Keyboard.current.f9Key.wasPressedThisFrame && cleaningDebugOverlay != null)
+            cleaningDebugOverlay.Visible = !cleaningDebugOverlay.Visible;
     }
 
     void OnPausePressed(InputAction.CallbackContext context)

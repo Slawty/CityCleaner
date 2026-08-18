@@ -11,6 +11,7 @@ public class GPUPaintableObject : MonoBehaviour
 {
     static readonly int DirtMaskShaderId = Shader.PropertyToID("_DirtMask");
     static readonly int LocalCleanMaskShaderId = Shader.PropertyToID("_LocalCleanMask");
+    static readonly int ZoneDirtTexXZId = Shader.PropertyToID("_ZoneDirtTexXZ");
     static readonly int JobHighlightShaderId = Shader.PropertyToID("_JobHighlight");
     static readonly int CleanFlashShaderId = Shader.PropertyToID("_CleanFlash");
     static readonly int GooReadyGlowShaderId = Shader.PropertyToID("_GooReadyGlow");
@@ -152,6 +153,39 @@ public class GPUPaintableObject : MonoBehaviour
         PropertyBlock.SetTexture(DirtMaskShaderId, runtimeMask);
         PropertyBlock.SetTexture(LocalCleanMaskShaderId, runtimeMask);
         cachedRenderer.SetPropertyBlock(PropertyBlock);
+    }
+
+    public void RebindMaskToRenderer()
+    {
+        if (!IsInitialized || maskTexture == null || usesCleanMaterial)
+            return;
+
+        BindMaskToRenderer(maskTexture);
+    }
+
+    public bool RendererHasMaskBound()
+    {
+        if (!IsInitialized || cachedRenderer == null)
+            return false;
+
+        cachedRenderer.GetPropertyBlock(PropertyBlock);
+        return PropertyBlock.GetTexture(LocalCleanMaskShaderId) != null;
+    }
+
+    public bool RendererHasZoneDirtBound()
+    {
+        EnsureRenderer();
+        cachedRenderer.GetPropertyBlock(PropertyBlock);
+        return PropertyBlock.GetTexture(ZoneDirtTexXZId) != null;
+    }
+
+    public static void RebindAllInitializedMasks()
+    {
+        GPUPaintableObject[] paintables = Object.FindObjectsByType<GPUPaintableObject>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        foreach (GPUPaintableObject paintable in paintables)
+            paintable.RebindMaskToRenderer();
     }
 
     public void SetJobHighlight(float amount)

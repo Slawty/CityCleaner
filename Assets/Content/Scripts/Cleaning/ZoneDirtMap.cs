@@ -271,6 +271,10 @@ public class ZoneDirtMap : MonoBehaviour
             propertyBlock.SetVector(ZoneMaxYZId, zoneMaxYZ);
             targetRenderer.SetPropertyBlock(propertyBlock);
             ownedRenderers?.Add(targetRenderer);
+
+            GPUPaintableObject paintable = targetRenderer.GetComponent<GPUPaintableObject>();
+            if (paintable != null)
+                paintable.RebindMaskToRenderer();
         }
     }
 
