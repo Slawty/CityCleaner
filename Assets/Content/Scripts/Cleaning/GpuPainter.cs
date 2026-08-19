@@ -69,12 +69,7 @@ public class GPUPainter : MonoBehaviour
         if (paintZoneDirt)
             PaintZoneDirtMaps(brushCenter, hitNormal, cleanStrength);
 
-        int hitCount = Physics.OverlapSphereNonAlloc(
-            brushCenter,
-            brushWorldSize,
-            overlapColliders,
-            paintMask,
-            QueryTriggerInteraction.Ignore);
+        int hitCount = Physics.OverlapSphereNonAlloc(brushCenter, brushWorldSize, overlapColliders, paintMask, QueryTriggerInteraction.Ignore);
 
         paintablesInBrush.Clear();
 

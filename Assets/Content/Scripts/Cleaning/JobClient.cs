@@ -21,6 +21,7 @@ public class JobClient : MonoBehaviour, IInteractable
     [SerializeField] GameObject jobAvailableSymbol;
     [SerializeField] GameObject jobPendingSymbol;
     [SerializeField] GameObject jobCompletedSymbol;
+    [SerializeField] CameraBillboard symbolBillboard;
     [Header("Reward")]
     [SerializeField] Transform coinSpawnPoint;
     [SerializeField] int rewardCoinCount = 20;
@@ -71,6 +72,7 @@ public class JobClient : MonoBehaviour, IInteractable
         ResolveJobReference();
         ResolveAnimationSounds();
         ResolveNavMovement();
+        ResolveSymbolBillboard();
     }
 
     void Start()
@@ -305,6 +307,7 @@ public class JobClient : MonoBehaviour, IInteractable
             SetSymbolActive(jobAvailableSymbol, false);
             SetSymbolActive(jobPendingSymbol, false);
             SetSymbolActive(jobCompletedSymbol, false);
+            SetSymbolBillboardActive(false);
             return;
         }
 
@@ -317,11 +320,42 @@ public class JobClient : MonoBehaviour, IInteractable
         if (jobPendingSymbol != null && jobCompletedSymbol != null && jobPendingSymbol == jobCompletedSymbol)
         {
             SetSymbolActive(jobPendingSymbol, showPending || showCompleted);
+            SetSymbolBillboardActive(showAvailable || showPending || showCompleted);
             return;
         }
 
         SetSymbolActive(jobPendingSymbol, showPending);
         SetSymbolActive(jobCompletedSymbol, showCompleted);
+        SetSymbolBillboardActive(showAvailable || showPending || showCompleted);
+    }
+
+    void ResolveSymbolBillboard()
+    {
+        if (symbolBillboard != null)
+            return;
+
+        GameObject symbol = jobAvailableSymbol != null ? jobAvailableSymbol
+            : jobPendingSymbol != null ? jobPendingSymbol
+            : jobCompletedSymbol;
+
+        if (symbol == null)
+            return;
+
+        Transform symbolCanvas = symbol.transform.parent;
+        if (symbolCanvas == null)
+            return;
+
+        symbolBillboard = symbolCanvas.GetComponent<CameraBillboard>();
+        if (symbolBillboard == null)
+            symbolBillboard = symbolCanvas.gameObject.AddComponent<CameraBillboard>();
+
+        symbolBillboard.enabled = false;
+    }
+
+    void SetSymbolBillboardActive(bool active)
+    {
+        if (symbolBillboard != null)
+            symbolBillboard.enabled = active;
     }
 
     static void SetSymbolActive(GameObject symbol, bool active)

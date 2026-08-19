@@ -55,7 +55,6 @@ public class GPUPaintableObject : MonoBehaviour
     int pixelsToCleanCount;
     int cleanedPixelCount;
     uint defaultRenderingLayerMask;
-    Mesh mesh;
     Renderer cachedRenderer;
     MaterialPropertyBlock propertyBlock;
     public bool IsInitialized { get; private set; }
@@ -88,7 +87,6 @@ public class GPUPaintableObject : MonoBehaviour
 
     void Awake()
     {
-        mesh = GetComponent<MeshFilter>().sharedMesh;
         EnsureRenderer();
         _ = PropertyBlock;
     }
@@ -273,7 +271,9 @@ public class GPUPaintableObject : MonoBehaviour
         CommandBuffer cmd = new CommandBuffer();
         cmd.SetRenderTarget(coverageTexture);
         cmd.ClearRenderTarget(false, true, Color.black);
-        cmd.DrawMesh(mesh, transform.localToWorldMatrix, bakeMaterial);
+        // DrawRenderer instead of DrawMesh: static batching replaces the MeshFilter mesh with a combined
+        // mesh in builds, so only the renderer knows the submesh range that belongs to this object.
+        cmd.DrawRenderer(cachedRenderer, bakeMaterial);
         Graphics.ExecuteCommandBuffer(cmd);
         cmd.Release();
         Destroy(bakeMaterial);
@@ -335,7 +335,7 @@ public class GPUPaintableObject : MonoBehaviour
                 cleanedPixels[pixelIndex] = true;
         }
 
-        Debug.Log($"{name} dirty pixels: {pixelsToCleanCount}");
+        Debug.Log($"{name} dirty pixels: {pixelsToCleanCount}. Size: {size}. raw: {rawPixels.Length}");
 
         if (pixelsToCleanCount == 0)
         {
@@ -515,6 +515,9 @@ public class GPUPaintableObject : MonoBehaviour
     // ----------------------------------------------------
     // GET PERCENT
     // ----------------------------------------------------
+
+    public int CleanedPixelCount => cleanedPixelCount;
+    public int PixelsToCleanCount => pixelsToCleanCount;
 
     public float GetCleanPercent()
     {

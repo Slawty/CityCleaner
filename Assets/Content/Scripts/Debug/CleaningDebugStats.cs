@@ -1,4 +1,37 @@
+using System.Collections.Generic;
 using UnityEngine;
+
+public struct PaintableDebugEntry
+{
+    public string Name;
+    public int CleanedPixels;
+    public int PixelsToClean;
+    public float CleanPercent;
+    public bool HasMaskOnRenderer;
+    public bool HasZoneOnRenderer;
+
+    public static PaintableDebugEntry From(GPUPaintableObject paintable)
+    {
+        return new PaintableDebugEntry
+        {
+            Name = paintable.name,
+            CleanedPixels = paintable.CleanedPixelCount,
+            PixelsToClean = paintable.PixelsToCleanCount,
+            CleanPercent = paintable.GetCleanPercent(),
+            HasMaskOnRenderer = paintable.RendererHasMaskBound(),
+            HasZoneOnRenderer = paintable.RendererHasZoneDirtBound(),
+        };
+    }
+
+    public string FormatProgress()
+    {
+        if (PixelsToClean <= 0)
+            return $"{Name}: —/— (—)";
+
+        int percent = Mathf.RoundToInt(CleanPercent * 100f);
+        return $"{Name}: {CleanedPixels}/{PixelsToClean} ({percent}%)";
+    }
+}
 
 public static class CleaningDebugStats
 {
@@ -10,10 +43,9 @@ public static class CleaningDebugStats
     public static float LastCleanStrength;
     public static float CleanSpeed;
     public static string HitPaintableName = "none";
-    public static string PrimaryPaintableName = "none";
-    public static float PrimaryCleanPercent;
-    public static bool PrimaryHasMaskOnRenderer;
-    public static bool PrimaryHasZoneOnRenderer;
+    public static bool HasRayTargetPaintable;
+    public static PaintableDebugEntry RayTargetPaintable;
+    public static readonly List<PaintableDebugEntry> OverlapPaintables = new();
 
     public static void ClearStroke()
     {
@@ -24,9 +56,7 @@ public static class CleaningDebugStats
         PaintablesInBrush = 0;
         LastCleanStrength = 0f;
         HitPaintableName = "none";
-        PrimaryPaintableName = "none";
-        PrimaryCleanPercent = 0f;
-        PrimaryHasMaskOnRenderer = false;
-        PrimaryHasZoneOnRenderer = false;
+        HasRayTargetPaintable = false;
+        OverlapPaintables.Clear();
     }
 }

@@ -78,7 +78,7 @@ public class GPUPainterWorld : MonoBehaviour
 
         float cleanStrength = cleanSpeed * Time.deltaTime;
         CleaningDebugStats.LastCleanStrength = cleanStrength;
-        PaintBrushAt(hit.point, hit.normal, cleanStrength, paintZoneDirt: paintable == null);
+        PaintBrushAt(hit.point, hit.normal, cleanStrength, paintZoneDirt: paintable == null, rayTargetPaintable: paintable);
 
         if (paintable != null)
             return;
@@ -88,7 +88,7 @@ public class GPUPainterWorld : MonoBehaviour
             dirtNest.ApplyDamageOverTime(waterTool.DamagePerSecond);
     }
 
-    void PaintBrushAt(Vector3 brushCenter, Vector3 hitNormal, float cleanStrength, bool paintZoneDirt)
+    void PaintBrushAt(Vector3 brushCenter, Vector3 hitNormal, float cleanStrength, bool paintZoneDirt, GPUPaintableObject rayTargetPaintable)
     {
         int zoneMapsPainted = paintZoneDirt ? PaintZoneDirtMaps(brushCenter, hitNormal, cleanStrength) : 0;
         CleaningDebugStats.ZoneDirtPainted = zoneMapsPainted > 0;
@@ -125,7 +125,7 @@ public class GPUPainterWorld : MonoBehaviour
             SpawnCleaningDirt(brushCenter, dirtMultiplierSum / dirtyPaintableCount);
 
         CleaningDebugStats.PaintablesInBrush = paintablesInBrush.Count;
-        UpdatePrimaryPaintableDebugStats();
+        UpdatePaintableDebugStats(rayTargetPaintable);
 
         if (paintablesInBrush.Count == 0 || Time.time <= nextUpdateTime)
             return;
@@ -135,24 +135,24 @@ public class GPUPainterWorld : MonoBehaviour
         foreach (GPUPaintableObject paintable in paintablesInBrush)
             UpdatePaintableTracking(paintable, brushCenter);
 
-        UpdatePrimaryPaintableDebugStats();
+        UpdatePaintableDebugStats(rayTargetPaintable);
     }
 
-    void UpdatePrimaryPaintableDebugStats()
+    void UpdatePaintableDebugStats(GPUPaintableObject rayTargetPaintable)
     {
+        CleaningDebugStats.OverlapPaintables.Clear();
+        CleaningDebugStats.HasRayTargetPaintable = rayTargetPaintable != null;
+
+        if (rayTargetPaintable != null)
+            CleaningDebugStats.RayTargetPaintable = PaintableDebugEntry.From(rayTargetPaintable);
+
         foreach (GPUPaintableObject paintable in paintablesInBrush)
         {
-            CleaningDebugStats.PrimaryPaintableName = paintable.name;
-            CleaningDebugStats.PrimaryCleanPercent = paintable.GetCleanPercent();
-            CleaningDebugStats.PrimaryHasMaskOnRenderer = paintable.RendererHasMaskBound();
-            CleaningDebugStats.PrimaryHasZoneOnRenderer = paintable.RendererHasZoneDirtBound();
-            return;
-        }
+            if (paintable == rayTargetPaintable)
+                continue;
 
-        CleaningDebugStats.PrimaryPaintableName = "none";
-        CleaningDebugStats.PrimaryCleanPercent = 0f;
-        CleaningDebugStats.PrimaryHasMaskOnRenderer = false;
-        CleaningDebugStats.PrimaryHasZoneOnRenderer = false;
+            CleaningDebugStats.OverlapPaintables.Add(PaintableDebugEntry.From(paintable));
+        }
     }
 
     int PaintZoneDirtMaps(Vector3 brushCenter, Vector3 hitNormal, float cleanStrength)
