@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Events;
@@ -24,6 +25,10 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
 
     [Header("Linked Growables")]
     [SerializeField] List<GooHitGrowable> linkedGrowables = new();
+
+    [Header("Reward")]
+    [SerializeField] int winCoins = 1;
+    [SerializeField] Transform coinSpawnPos;
 
     int gooHitCount;
     bool fullyGrown;
@@ -157,6 +162,7 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
         {
             fullyGrown = true;
             OnFullyGrown();
+            SpawnWinCoins();
             OnFullyGrownCompleted?.Invoke();
         }
     }
@@ -362,6 +368,15 @@ public abstract class GooHitGrowable : MonoBehaviour, IGooHitReceiver
     protected void DisablePrerequisiteGlow()
     {
         DisableGooReadyGlow();
+    }
+
+    void SpawnWinCoins()
+    {
+        if (winCoins <= 0)
+            return;
+
+        Vector3 spawnPos = coinSpawnPos != null ? coinSpawnPos.position : transform.position;
+        Managers.Spawning.SpawnCoins(winCoins, spawnPos).Forget();
     }
 
     protected virtual void OnFullyGrown()

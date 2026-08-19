@@ -6,8 +6,6 @@ using UnityEngine;
 [CustomEditor(typeof(DirtMaterialPreview))]
 public class DirtMaterialPreviewEditor : Editor
 {
-    const string DirtAmountProperty = "_DirtAmount";
-
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
@@ -22,69 +20,44 @@ public class DirtMaterialPreviewEditor : Editor
 
             string buttonLabel = preview.PreviewDirty ? "Set Clean (0)" : "Set Dirty (1)";
             if (GUILayout.Button($"{buttonLabel}  (U)"))
-                TogglePreview(preview, applyGrowables: true);
+                ToggleWithUndo(preview, applyGrowables: true);
         }
     }
 
     [Shortcut("City Cleaner/Toggle Dirt Material Preview", KeyCode.U)]
     static void ToggleShortcut()
     {
+        if (Application.isPlaying)
+            return;
+
         DirtMaterialPreview[] previews = Object.FindObjectsByType<DirtMaterialPreview>(
             FindObjectsInactive.Include,
             FindObjectsSortMode.None);
 
         foreach (DirtMaterialPreview preview in previews)
-            TogglePreview(preview, applyGrowables: false);
+            ToggleWithUndo(preview, applyGrowables: false);
 
         if (previews.Length > 0)
-            ApplyGrowablePreview(previews[0].PreviewDirty);
-    }
-
-    static void TogglePreview(DirtMaterialPreview preview, bool applyGrowables)
-    {
-        Undo.RecordObject(preview, "Toggle Dirt Material Preview");
-        preview.PreviewDirty = !preview.PreviewDirty;
-        ApplyPreview(preview);
-        EditorUtility.SetDirty(preview);
-
-        if (applyGrowables)
-            ApplyGrowablePreview(preview.PreviewDirty);
-    }
-
-    static void ApplyPreview(DirtMaterialPreview preview)
-    {
-        float dirtAmount = preview.PreviewDirty ? 1f : 0f;
-
-        foreach (Material material in preview.Materials)
-        {
-            if (material == null || !material.HasProperty(DirtAmountProperty))
-                continue;
-
-            Undo.RecordObject(material, "Toggle Dirt Material Preview");
-            material.SetFloat(DirtAmountProperty, dirtAmount);
-            EditorUtility.SetDirty(material);
-        }
+            DirtMaterialPreview.ApplyGrowablePreview(previews[0].PreviewDirty);
 
         SceneView.RepaintAll();
     }
 
-    static void ApplyGrowablePreview(bool previewDirty)
+    static void ToggleWithUndo(DirtMaterialPreview preview, bool applyGrowables)
     {
-        GooHitGrowable[] growables = Object.FindObjectsByType<GooHitGrowable>(
-            FindObjectsInactive.Include,
-            FindObjectsSortMode.None);
+        Undo.RecordObject(preview, "Toggle Dirt Material Preview");
+        preview.Toggle(applyGrowables);
 
-        foreach (GooHitGrowable growable in growables)
+        foreach (Material material in preview.Materials)
         {
-            if (growable == null)
+            if (material == null)
                 continue;
 
-            if (previewDirty)
-                growable.DebugResetGrowth();
-            else
-                growable.DebugSetFullyGrown();
+            Undo.RecordObject(material, "Toggle Dirt Material Preview");
+            EditorUtility.SetDirty(material);
         }
 
+        EditorUtility.SetDirty(preview);
         SceneView.RepaintAll();
     }
 }

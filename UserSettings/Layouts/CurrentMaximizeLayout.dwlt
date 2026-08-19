@@ -7411,9 +7411,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 67.281, y: 3.3173048, z: 232.55807}
+    m_Target: {x: 102.34188, y: 2.4752393, z: 238.26974}
     speed: 2
-    m_Value: {x: 67.281, y: 3.3173048, z: 232.55807}
+    m_Value: {x: 102.34188, y: 2.4752393, z: 238.26974}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -7459,13 +7459,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0
   m_Rotation:
-    m_Target: {x: 0.2744205, y: 0.44280007, z: -0.14443804, w: 0.8412853}
+    m_Target: {x: -0.16611597, y: -0.8279628, z: 0.32047847, w: -0.42916226}
     speed: 2
-    m_Value: {x: 0.27442026, y: 0.44279972, z: -0.14443792, w: 0.8412846}
+    m_Value: {x: -0.16611567, y: -0.8279613, z: 0.3204779, w: -0.4291615}
   m_Size:
-    m_Target: 1.6421365
+    m_Target: 2.9340892
     speed: 2
-    m_Value: 1.6421365
+    m_Value: 2.9340892
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -14155,7 +14155,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 112}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 7805
+  controlID: 27012
   draggingID: 0
 --- !u!114 &14
 MonoBehaviour:
@@ -14224,12 +14224,19 @@ MonoBehaviour:
     m_DynamicPanelBehavior: 0
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 54}
-      m_SelectedIDs:
-      - m_Data: 3196310
+      scrollPos: {x: 0, y: 1450}
+      m_SelectedIDs: []
       m_LastClickedID:
-        m_Data: 3196310
+        m_Data: 0
       m_ExpandedIDs:
+      - m_Data: -1654488
+      - m_Data: -1630820
+      - m_Data: -1522930
+      - m_Data: -1085260
+      - m_Data: -1084930
+      - m_Data: -1017232
+      - m_Data: -1015728
+      - m_Data: -1015702
       - m_Data: -856090
       - m_Data: -855760
       - m_Data: -788134
@@ -14308,10 +14315,36 @@ MonoBehaviour:
       - m_Data: 3179362
       - m_Data: 3189328
       - m_Data: 3200182
+      - m_Data: 3710588
+      - m_Data: 3719364
+      - m_Data: 3963992
+      - m_Data: 3990644
+      - m_Data: 3995810
+      - m_Data: 3996444
+      - m_Data: 4006756
+      - m_Data: 4048480
+      - m_Data: 4048618
+      - m_Data: 4051208
+      - m_Data: 4345698
+      - m_Data: 4345746
+      - m_Data: 4550498
+      - m_Data: 4550546
+      - m_Data: 4550596
+      - m_Data: 4624974
+      - m_Data: 4633750
+      - m_Data: 4692458
+      - m_Data: 4695370
+      - m_Data: 4718842
+      - m_Data: 4721446
+      - m_Data: 4721858
+      - m_Data: 4727090
+      - m_Data: 4728708
+      - m_Data: 4730042
+      - m_Data: 4732668
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
+        m_Name: GrassPlateau_Straight_1 (1)
+        m_OriginalName: GrassPlateau_Straight_1 (1)
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
@@ -14319,10 +14352,10 @@ MonoBehaviour:
           width: 0
           height: 0
         m_UserData:
-          m_Data: 0
+          m_Data: -1654488
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 11
+        m_OriginalEventType: 0
         m_IsRenamingFilename: 0
         m_TrimLeadingAndTrailingWhitespace: 0
         m_ClientGUIView: {fileID: 14}
@@ -14447,7 +14480,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Content/Cleaning/Models/Shop
+    - Assets/Content/Models/BlenderImports/Blue Diamond Sweeper_20260813_231443
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -14457,18 +14490,18 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Content/Cleaning/Models/Shop
+  - Assets/Content/Models/BlenderImports/Blue Diamond Sweeper_20260813_231443
   m_LastFoldersGridSize: 16
   m_LastProjectPath: E:\Unity Projects\GIT\City Cleaner
   m_LockTracker:
     m_IsLocked: 0
   m_LastLocalAssetsSearchArea: 1
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 303}
+    scrollPos: {x: 0, y: 298}
     m_SelectedIDs:
-    - m_Data: 1654272
+    - m_Data: 98446
     m_LastClickedID:
-      m_Data: 1654272
+      m_Data: 98446
     m_ExpandedIDs:
     - m_Data: 0
     - m_Data: 52062
@@ -14508,14 +14541,12 @@ MonoBehaviour:
     - m_Data: 98040
     - m_Data: 98042
     - m_Data: 98044
-    - m_Data: 98046
     - m_Data: 98048
     - m_Data: 98050
     - m_Data: 98052
     - m_Data: 98054
     - m_Data: 98056
     - m_Data: 98058
-    - m_Data: 98060
     - m_Data: 98062
     - m_Data: 98064
     - m_Data: 98066
@@ -14527,6 +14558,7 @@ MonoBehaviour:
     - m_Data: 98078
     - m_Data: 98338
     - m_Data: 98344
+    - m_Data: 98374
     - m_Data: 98448
     - m_Data: 1000000000
     - m_Data: 2147483647
@@ -14599,15 +14631,12 @@ MonoBehaviour:
     - m_Data: 98040
     - m_Data: 98042
     - m_Data: 98044
-    - m_Data: 98046
     - m_Data: 98048
     - m_Data: 98050
     - m_Data: 98052
     - m_Data: 98054
     - m_Data: 98056
     - m_Data: 98058
-    - m_Data: 98060
-    - m_Data: 98062
     - m_Data: 98064
     - m_Data: 98066
     - m_Data: 98068
@@ -14616,6 +14645,8 @@ MonoBehaviour:
     - m_Data: 98074
     - m_Data: 98076
     - m_Data: 98078
+    - m_Data: 98338
+    - m_Data: 98374
     - m_Data: 1000000000
     - m_Data: 2147483647
     m_RenameOverlay:
@@ -14644,10 +14675,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs:
-    - m_Data: 3196310
-    m_LastClickedInstanceID: 3196310
-    m_HadKeyboardFocusLastEvent: 1
+    m_SelectedInstanceIDs: []
+    m_LastClickedInstanceID: 0
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs:
     - m_Data: 83296
     - m_Data: 94598
@@ -15173,9 +15203,11 @@ MonoBehaviour:
     - m_Data: 83932
     - m_Data: 87710
     - m_Data: 85404
-    - m_Data: 85414
     - m_Data: 94734
     - m_Data: 789748
+    - m_Data: 122748
+    - m_Data: 87470
+    - m_Data: 85414
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -15204,7 +15236,7 @@ MonoBehaviour:
     m_ScrollPosition: {x: 0, y: 0}
     m_GridSize: 16
   m_SkipHiddenPackages: 0
-  m_DirectoriesAreaWidth: 119
+  m_DirectoriesAreaWidth: 280
 --- !u!114 &19
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -15250,6 +15282,11 @@ MonoBehaviour:
       m_LastClickedID:
         m_Data: 0
       m_ExpandedIDs:
+      - m_Data: -1085260
+      - m_Data: -1084930
+      - m_Data: -1017232
+      - m_Data: -1015728
+      - m_Data: -1015702
       - m_Data: -856090
       - m_Data: -855760
       - m_Data: -788134
@@ -15342,7 +15379,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 112}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 7902
+  controlID: 26975
   draggingID: 0
 --- !u!114 &21
 MonoBehaviour:

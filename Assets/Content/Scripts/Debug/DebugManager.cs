@@ -46,6 +46,11 @@ public class DebugManager : MonoBehaviour
 
         if (Keyboard.current != null && Keyboard.current.f9Key.wasPressedThisFrame && cleaningDebugOverlay != null)
             cleaningDebugOverlay.Visible = !cleaningDebugOverlay.Visible;
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (Keyboard.current != null && Keyboard.current.uKey.wasPressedThisFrame && Application.isPlaying)
+            DirtMaterialPreview.ToggleAll();
+#endif
     }
 
     void OnPausePressed(InputAction.CallbackContext context)

@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3224747353779322131
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3211825751001643574}
+  m_Layer: 0
+  m_Name: CoinSpawnPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3211825751001643574
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3224747353779322131}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.2499995, y: 0.24999991, z: 1.2500005}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 8402115690323531808}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8291398258308497355
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -78,6 +109,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 73751b5f4d5f770428e076e65732aab1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8280205113985222068}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 73751b5f4d5f770428e076e65732aab1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3211825751001643574}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73751b5f4d5f770428e076e65732aab1, type: 3}
       insertIndex: 1
@@ -121,6 +155,8 @@ MonoBehaviour:
   prerequisiteCleanables:
   - {fileID: -3282914307557084573}
   linkedGrowables: []
+  winCoins: 1
+  coinSpawnPos: {fileID: 3211825751001643574}
   growableRenderers:
   - {fileID: 7107276640851967707}
   growableDirtRenderers:
@@ -141,13 +177,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GPUPaintableObject
   winCoins: 1
   AdditionalObjectsToClean: []
-  CoinSpawnPos: {fileID: 0}
+  CoinSpawnPos: {fileID: 3211825751001643574}
   trackingResolution: 128
   cleanThreshold: 200
   cleanPercentage: 0.85
   countsTowardAreaProgress: 1
+  useContinuousProgress: 0
   allowGooCleaning: 0
   deferCleanMaterialSwapUntilGrowComplete: 0
+  onCleaned:
+    m_PersistentCalls:
+      m_Calls: []
+  dirtChunkMultiplier: 1
   maskTexture: {fileID: 0}
   coverageTexture: {fileID: 0}
   coverageReadable: {fileID: 0}
